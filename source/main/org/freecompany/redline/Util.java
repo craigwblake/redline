@@ -11,11 +11,17 @@ class Util {
 
 	static ByteBuffer fill( ReadableByteChannel in, int size) throws IOException {
 		ByteBuffer buffer = ByteBuffer.allocate( size);
-		while ( buffer.hasRemaining()) {
-			in.read( buffer);
-		}
+		while ( buffer.hasRemaining()) in.read( buffer);
 		buffer.flip();
 		return buffer;
+	}
+
+	static void empty( WritableByteChannel out, ByteBuffer buffer) throws IOException {
+		while ( buffer.hasRemaining()) out.write( buffer);
+	}
+
+	static void check( int expected, int actual) throws IOException {
+		if ( expected != actual) System.err.println( "check expected " + Integer.toHexString( expected) + ", found " + Integer.toHexString( actual));
 	}
 
 	static void check( byte expected, byte actual) throws IOException {

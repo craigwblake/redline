@@ -10,8 +10,6 @@ public class Header extends AbstractHeader {
 
 	static { for ( HeaderTag tag : HeaderTag.values()) TAGS.put( tag.getCode(), tag); }
 
-	public Header( final ReadableByteChannel in) throws IOException { super( in); }
-	
 	public enum HeaderTag implements Tag {
 		NAME( 1000, "name"),
 		VERSION( 1001, "version"),

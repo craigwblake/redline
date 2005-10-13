@@ -10,8 +10,6 @@ public class Signature extends AbstractHeader {
 
 	static { for ( SignatureTag tag : SignatureTag.values()) TAGS.put( tag.getCode(), tag); }
 
-	public Signature( final ReadableByteChannel in) throws IOException { super( in); }
-	
 	public enum SignatureTag implements Tag {
 		SIGSIZE( 1000, "sigsize"),
 		PGP( 1002, "pgp"),

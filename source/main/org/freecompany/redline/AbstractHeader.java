@@ -16,19 +16,38 @@ public abstract class AbstractHeader {
 	private static final int HEADER_HEADER_SIZE = 16;
 	private static final int ENTRY_SIZE = 16;
 
-	protected static final Map< Integer, Tag> TAGS = new HashMap< Integer, Tag>();
-	
-	private final ByteBuffer index;
-	private final ByteBuffer data;
+	private static final int MAGIC_WORD = 0x8EADE801;
 
-	public AbstractHeader( ReadableByteChannel in) throws IOException {
+	protected static final Map< Integer, Tag> TAGS = new HashMap< Integer, Tag>();
+
+	private final List< Entry> entries = new ArrayList< Entry>();
+	private ByteBuffer index;
+	private ByteBuffer data;
+
+	public void read( ReadableByteChannel in) throws IOException {
 		ByteBuffer header = Util.fill( in, HEADER_HEADER_SIZE);
-		checkHeader( header);
+		Util.check( header.getInt(), MAGIC_WORD);
+		header.getInt();
 		index = Util.fill( in, header.getInt() * ENTRY_SIZE);
 		data = Util.fill( in, header.getInt());
+
+		Entry entry;
+		while (( entry = nextEntry()) != null) entries.add( entry);
 	}
 
-	public Entry nextEntry() throws IOException {
+	public void write( WritableByteChannel out) throws IOException {
+		ByteBuffer buffer = ByteBuffer.allocate( HEADER_HEADER_SIZE);
+		buffer.putInt( MAGIC_WORD);
+		buffer.putInt( 0);
+		//for ( Entry entry : entries) entry.writeIndex( out);
+		//for ( Entry entry : entries) entry.writeData( out);
+	}
+
+	public Iterable< Entry> entries() {
+		return entries;
+	}
+
+	protected Entry nextEntry() throws IOException {
 		if ( index.remaining() < 16) return null;
 
 		int tag = index.getInt();
@@ -60,15 +79,7 @@ public abstract class AbstractHeader {
 		throw new IOException( "unknown entry type");
 	}
 
-	private void checkHeader( ByteBuffer header) throws IOException {
-		Util.check(( byte) 0x8e, header.get());
-		Util.check(( byte) 0xad, header.get());
-		Util.check(( byte) 0xe8, header.get());
-		Util.check(( byte) 0x01, header.get());
-		header.getInt();
-	}
-
-	abstract class Entry {
+	public abstract class Entry {
 		private transient Tag tag;
 		protected int code;
 		protected int offset;
@@ -101,8 +112,7 @@ public abstract class AbstractHeader {
 		public String toString() {
 			StringBuilder b = new StringBuilder( super.toString());
 			b.append( "\n\t");
-			ByteBuffer buf = data.duplicate();
-			buf.position( offset);
+			ByteBuffer buf = data();
 			for ( int i = 0; i < count; i++) {
 				b.append(( char) buf.get());
 			}

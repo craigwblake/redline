@@ -27,21 +27,14 @@ public class Scanner {
 		System.out.println( "Sig type: " + lead.getShort());
 		if ( lead.remaining() != 16) System.err.println( "expected 16 remaining, found " + lead.remaining());
 
-		AbstractHeader signature = new Signature( in);
-		AbstractHeader header = new Header( in);
-
 		System.out.println( "Signature header:");
-		while ( true) {
-			Header.Entry entry = signature.nextEntry();
-			if ( entry == null) break;
-			System.out.println( entry);
-		}
+		AbstractHeader signature = new Signature();
+	   	signature.read( in);
+		for ( AbstractHeader.Entry entry : signature.entries()) System.out.println( entry);
 
 		System.out.println( "RPM header:");
-		while ( true) {
-			Header.Entry entry = header.nextEntry();
-			if ( entry == null) break;
-			System.out.println( entry);
-		}
+		AbstractHeader header = new Header();
+	   	header.read( in);
+		for ( AbstractHeader.Entry entry : header.entries()) System.out.println( entry);
 	}
 }
