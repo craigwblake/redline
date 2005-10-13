@@ -208,7 +208,7 @@ public abstract class AbstractHeader {
 			StringBuilder b = new StringBuilder( super.toString());
 			b.append( "\n");
 			ByteBuffer buf = data();
-			buf.limit( count);
+			buf.limit( offset + count);
 			Util.dump( buf, b);
 			return b.toString();
 		}
