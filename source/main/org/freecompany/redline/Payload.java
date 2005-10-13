@@ -1,17 +1,19 @@
 package org.freecompany.redline;
 
-import java.io.*;
+import java.nio.channels.*;
 import java.util.*;
 
 public class Payload {
 
-	protected List< File> files = new LinkedList< File>();
+	/*
+	protected List< Cpio, ByteChannel> channels = new LinkedHashMap< Cpio, Byte>();
 
-	public void add( File file) {
-		files.add( file);
+	public void put( Cpio cpio, ByteChannel channel) {
+		channels.put( cpio, channel);
 	}
 
-	public List< File> getFiles() {
-		return files;
+	public Map< Cpio, ByteChannel> getFiles() {
+		return channels;
 	}
+	*/
 }

@@ -6,47 +6,31 @@ import java.util.*;
 public class Rpm {
 
 	protected Lead lead = new Lead();
-	protected Header signature = new Header();
+	protected Signature signature = new Signature();
 	protected Header header = new Header();
 	protected Payload payload = new Payload();
 
-	public void setMajor( int major) {
-		lead.setMajor( major);
+	public Lead getLead() {
+		return lead;
 	}
 
-	public int getMajor() {
-		return lead.getMajor();
+	public Signature getSignature() {
+		return signature;
 	}
 
-	public void setMinor( int minor) {
-		lead.setMinor( minor);
+	public Header getHeader() {
+		return header;
 	}
 
-	public int getminor() {
-		return lead.getMinor();
+	public Payload getPayload() {
+		return payload;
 	}
 
-	public void addSignature( Tag tag, Object object) {
-		signature.put( tag, object);
-	}
-
-	public Map< Tag, Object> getSignatures() {
-		return signature.getEntries();
-	}
-
-	public void addHeader( Tag tag, Object object) {
-		header.put( tag, object);
-	}
-
-	public Map< Tag, Object> getHeaders() {
-		return header.getEntries();
-	}
-
-	public void addPayload( File file) {
-		payload.add( file);
-	}
-	
-	public List< File> getPayloads() {
-		return payload.getFiles();
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append( lead);
+		builder.append( signature);
+		builder.append( header);
+		return builder.toString();
 	}
 }
