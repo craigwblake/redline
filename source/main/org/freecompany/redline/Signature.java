@@ -1,49 +1,36 @@
 package org.freecompany.redline;
 
 import java.io.*;
+import java.net.*;
+import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
-import java.util.concurrent.*;
 
-import static org.freecompany.redline.Type.*;
+public class Signature extends AbstractHeader {
 
-public class Signature extends AbstractHeader< Signature.Tag> {
+	static { for ( SignatureTag tag : SignatureTag.values()) TAGS.put( tag.getCode(), tag); }
 
-	public enum Tag {
+	public Signature( final ReadableByteChannel in) throws IOException { super( in); }
+	
+	public enum SignatureTag implements Tag {
+		SIGSIZE( 1000, "sigsize"),
+		PGP( 1002, "pgp"),
+		MD5( 1004, "md5"),
+		GPG( 1005, "gpg"),
+		PAYLOADSIZE( 1007, "payloadsize"),
+		SHA1HEADER( 1010, "sha1header"),
+		DSAHEADER( 1011, "dsaheader"),
+		RSAHEADER( 1012, "rsaheader");
 
-		SIG_SIZE( 1000, INT32, "Signature Size"),
-		SIG_MD5( 1001, BINARY, "Signature MD5 Sum"),
-		SIG_PGP( 1002, BINARY, "Signature PGP");
-
-		private static Map< Integer, Tag> tags = new ConcurrentHashMap< Integer, Tag>();
 		private int code;
-		private Type type;
 		private String name;
 
-		private Tag( int code, Type type, String name) {
+		private SignatureTag( final int code, final String name) {
 			this.code = code;
-			this.type = type;
 			this.name = name;
 		}
 
-		public int getCode() {
-			return code;
-		}
-
-		public Type getType() {
-			return type;
-		}
-
-		public String toString() {
-			return name;
-		}
-
-		public static Tag getTag( int code) {
-			return tags.get( code);
-		}
-	}
-
-	protected Tag getTag( int code) {
-		return Tag.getTag( code);
+		public int getCode() { return code; }
+		public String getName() { return name; }
 	}
 }
