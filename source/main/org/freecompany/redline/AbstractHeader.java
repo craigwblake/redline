@@ -26,7 +26,16 @@ public abstract class AbstractHeader {
 
 	public void read( ReadableByteChannel in) throws IOException {
 		ByteBuffer header = Util.fill( in, HEADER_HEADER_SIZE);
-		Util.check( header.getInt(), MAGIC_WORD);
+
+		int magic = header.getInt();
+
+		// TODO: Determine if this hack to fix mangled headers for some RPMs is really needed.
+		if ( magic == 0) {
+			header.compact();
+			Util.fill( in, header);
+			magic = header.getInt();
+		}
+		Util.check( MAGIC_WORD, magic);
 		header.getInt();
 		index = Util.fill( in, header.getInt() * ENTRY_SIZE);
 		data = Util.fill( in, header.getInt());

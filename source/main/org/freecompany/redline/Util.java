@@ -10,7 +10,10 @@ class Util {
 	private Util() {}
 
 	static ByteBuffer fill( ReadableByteChannel in, int size) throws IOException {
-		ByteBuffer buffer = ByteBuffer.allocate( size);
+		return fill( in, ByteBuffer.allocate( size));
+	}
+
+	static ByteBuffer fill( ReadableByteChannel in, ByteBuffer buffer) throws IOException {
 		while ( buffer.hasRemaining()) in.read( buffer);
 		buffer.flip();
 		return buffer;
