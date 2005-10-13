@@ -31,11 +31,12 @@ class Util {
 		if ( expected != actual) System.err.println( "check expected " + Integer.toHexString( 0xff & expected) + ", found " + Integer.toHexString( 0xff & actual));
 	}
 
-	static void dump( ByteBuffer buf) {
-		dump( buf, System.out);
+	static void dump( byte[] data) {
+		dump( data, System.out);
 	}
 
-	static void dump( ByteBuffer buf, Appendable out) {
+	static void dump( byte[] data, Appendable out) {
+		ByteBuffer buf = ByteBuffer.wrap( data);
 		Formatter fmt = new Formatter( out);
 
 		int pos = buf.position();

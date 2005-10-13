@@ -40,211 +40,237 @@ public abstract class AbstractHeader {
 		index = Util.fill( in, header.getInt() * ENTRY_SIZE);
 		data = Util.fill( in, header.getInt());
 
-		Entry entry;
-		while (( entry = nextEntry()) != null) entries.add( entry);
+		while ( index.remaining() >= 16) createEntry( index.getInt(), index.getInt(), index.getInt(), index.getInt());
 	}
 
 	public void write( WritableByteChannel out) throws IOException {
 		ByteBuffer buffer = ByteBuffer.allocate( HEADER_HEADER_SIZE);
 		buffer.putInt( MAGIC_WORD);
 		buffer.putInt( 0);
-		//for ( Entry entry : entries) entry.writeIndex( out);
-		//for ( Entry entry : entries) entry.writeData( out);
+		int size = entries.size() * ENTRY_SIZE;
+		buffer.putInt( size);
+		buffer.putInt( offset);
+
+		index = ByteBuffer.allocate( size);
+		data = ByteBuffer.allocate( 10000);
+		for ( Entry entry : entries) entry.write( out);
 	}
 
 	public Iterable< Entry> entries() {
 		return entries;
 	}
 
-	protected Entry nextEntry() throws IOException {
-		if ( index.remaining() < 16) return null;
-
-		int tag = index.getInt();
-		int type = index.getInt();
-		int offset = index.getInt();
-		int count = index.getInt();
-		switch ( type) {
-			case 0:
-				return new NullEntry( tag, offset, count);
-			case 1:
-				return new CharEntry( tag, offset, count);
-			case 2:
-				return new Int8Entry( tag, offset, count);
-			case 3:
-				return new Int8Entry( tag, offset, count);
-			case 4:
-				return new Int8Entry( tag, offset, count);
-			case 5:
-				return new Int8Entry( tag, offset, count);
-			case 6:
-				return new StringEntry( tag, offset, count);
-			case 7:
-				return new BinEntry( tag, offset, count);
-			case 8:
-				return new StringArrayEntry( tag, offset, count);
-			case 9:
-				return new I18NStringEntry( tag, offset, count);
-		}
-		throw new IOException( "unknown entry type");
+	public void createEntry( int tag, int type, int offset, int count) {
+		ByteBuffer buffer = data.duplicate();
+		buffer.position( offset);
+		
+		Entry entry = createEntry( type);
+		entry.setTag( tag);
+		entry.setCount( count);
+		entry.read( buffer);
+		entries.add( entry);
 	}
 
-	public abstract class Entry {
-		private transient Tag tag;
-		protected int code;
-		protected int offset;
-		protected int count;
-
-		Entry( int code, int offset, int count) {
-			this.code = code;
-			tag = TAGS.get( code);
-			this.offset = offset;
-			this.count = count;
+	protected Entry createEntry( int type) {
+		switch ( type) {
+			case 0:
+				return new NullEntry();
+			case 1:
+				return new CharEntry();
+			case 2:
+				return new Int8Entry();
+			case 3:
+				return new Int8Entry();
+			case 4:
+				return new Int8Entry();
+			case 5:
+				return new Int8Entry();
+			case 6:
+				return new StringEntry();
+			case 7:
+				return new BinEntry();
+			case 8:
+				return new StringArrayEntry();
+			case 9:
+				return new I18NStringEntry();
 		}
+		throw new IllegalStateException( "Unknown entry type '" + type + "'.");
+	}
+	
+	public abstract class Entry< T> {
+		protected int tag;
+		protected int count;
+		protected T data;
+
+		public void setTag( Tag tag) { this.tag = tag.getCode(); }
+		public void setTag( int tag) { this.tag = tag; }
+		public void setCount( int count) { this.count = count; }
+		public void setData( T data) { this.data = data; }
+
+		public abstract void read( final ByteBuffer buffer);
+		public abstract void write( final ByteBuffer buffer);
 
 		public String toString() {
-			return ( tag != null ? tag.getName() : super.toString()) + "[tag=" + code + ",offset=" + offset + ",count=" + count + "]";
-		}
-
-		protected ByteBuffer data() {
-			ByteBuffer buf = data.duplicate();
-			buf.position( offset);
-			return buf;
+			return ( TAGS.containsKey( tag) ? TAGS.get( tag).getName() : super.toString()) + "[tag=" + tag + ",offset=" + offset + ",count=" + count + "]";
 		}
 	}
 
 	class NullEntry extends Entry {
-		public NullEntry( int code, int offset, int count) { super( code, offset, count); }
-	}
-
-	class CharEntry extends Entry {
-		public CharEntry( int code, int offset, int count) { super( code, offset, count); }
-		public String toString() {
-			StringBuilder b = new StringBuilder( super.toString());
-			b.append( "\n\t");
-			ByteBuffer buf = data();
-			for ( int i = 0; i < count; i++) {
-				b.append(( char) buf.get());
-			}
-			return b.toString();
+		public void read( final ByteBuffer buffer) {}
+		public void write( final WritableByteChannel channel) {
+			index.put( tag, 0, data.position(), 0);
 		}
 	}
 
-	class Int8Entry extends Entry {
-		public Int8Entry( int code, int offset, int count) { super( code, offset, count); }
+	class CharEntry extends Entry< char[]> {
+		public void read( final ByteBuffer buffer) {
+			char[] data = new char[ count];
+			for ( int x = 0; x < count; x++) data[ x] = ( char) buffer.get();
+			setData( data);
+		}
 		public String toString() {
-			StringBuilder b = new StringBuilder( super.toString());
-			b.append( "\n\t");
-			ByteBuffer buf = data();
-			for ( int i = 0; i < count; i++) {
-				b.append( buf.get());
-				b.append( ", ");
-			}
-			return b.toString();
+			StringBuilder builder = new StringBuilder( super.toString());
+			for ( char c : data) builder.append( c);
+			builder.append( "\n\t");
+			return builder.toString();
 		}
 	}
 
-	class Int16Entry extends Entry {
-		public Int16Entry( int code, int offset, int count) { super( code, offset, count); }
+	class Int8Entry extends Entry< byte[]> {
+		public void read( final ByteBuffer buffer) {
+			byte[] data = new byte[ count];
+			for ( int x = 0; x < count; x++) data[ x] = buffer.get();
+			setData( data);
+		}
 		public String toString() {
-			StringBuilder b = new StringBuilder( super.toString());
-			b.append( "\n\t");
-			ByteBuffer buf = data();
-			for ( int i = 0; i < count; i++) {
-				b.append( buf.getShort());
-				b.append( ", ");
-			}
-			return b.toString();
+			StringBuilder builder = new StringBuilder( super.toString());
+			builder.append( "\n\t");
+			for ( byte b : data) builder.append( b).append( ", ");
+			return builder.toString();
 		}
 	}
 
-	class Int32Entry extends Entry {
-		public Int32Entry( int code, int offset, int count) { super( code, offset, count); }
+	class Int16Entry extends Entry< short[]> {
+		public void read( final ByteBuffer buffer) {
+			short[] data = new short[ count];
+			for ( int x = 0; x < count; x++) data[ x] = buffer.getShort();
+			setData( data);
+		}
 		public String toString() {
-			StringBuilder b = new StringBuilder( super.toString());
-			b.append( "\n\t");
-			ByteBuffer buf = data();
-			for ( int i = 0; i < count; i++) {
-				b.append( buf.getInt());
-				b.append( ", ");
-			}
-			return b.toString();
+			StringBuilder builder = new StringBuilder( super.toString());
+			builder.append( "\n\t");
+			for ( short s : data) builder.append( s).append( ", ");
+			return builder.toString();
 		}
 	}
 
-	class Int64Entry extends Entry {
-		public Int64Entry( int code, int offset, int count) { super( code, offset, count); }
+	class Int32Entry extends Entry< int[]> {
+		public void read( final ByteBuffer buffer) {
+			int[] data = new int[ count];
+			for ( int x = 0; x < count; x++) data[ x] = buffer.getInt();
+			setData( data);
+		}
 		public String toString() {
-			StringBuilder b = new StringBuilder( super.toString());
-			b.append( "\n\t");
-			ByteBuffer buf = data();
-			for ( int i = 0; i < count; i++) {
-				b.append( buf.getLong());
-				b.append( ", ");
-			}
-			return b.toString();
+			StringBuilder builder = new StringBuilder( super.toString());
+			builder.append( "\n\t");
+			for ( int i : data) builder.append( i).append( ", ");
+			return builder.toString();
 		}
 	}
 
-	class StringEntry extends Entry {
-		public StringEntry( int code, int offset, int count) { super( code, offset, count); }
+	class Int64Entry extends Entry< long[]> {
+		public void read( final ByteBuffer buffer) {
+			long[] data = new long[ count];
+			for ( int x = 0; x < count; x++) data[ x] = buffer.getLong();
+			setData( data);
+		}
 		public String toString() {
-			StringBuilder b = new StringBuilder( super.toString());
-			ByteBuffer buf = data();
-			for ( int i = 0; i < count; i++) {
-				b.append( "\n\t");
-				while ( true) {
-					byte bb = buf.get();
-					if ( bb == 0) break;
-					b.append(( char) bb);
-				}
-			}
-			return b.toString();
+			StringBuilder builder = new StringBuilder( super.toString());
+			builder.append( "\n\t");
+			for ( long l : data) builder.append( l).append( ", ");
+			return builder.toString();
 		}
 	}
 
-	class BinEntry extends Entry {
-		public BinEntry( int code, int offset, int count) { super( code, offset, count); }
+	/**
+	 * According to early documentation it should be illegal for this type of
+	 * entry to store more than one string value, but other recent documents
+	 * indicate that this may not longer be the case.
+	 */
+	class StringEntry extends Entry< String[]> {
+		public void read( final ByteBuffer buffer) {
+			String[] data = new String[ count];
+			for ( int x = 0; x < count; x++) {
+				StringBuilder string = new StringBuilder();
+				byte b;
+				while (( b = buffer.get()) != 0) string.append(( char) b);
+				data[ x] = string.toString();
+			}
+			setData( data);
+		}
 		public String toString() {
-			StringBuilder b = new StringBuilder( super.toString());
-			b.append( "\n");
-			ByteBuffer buf = data();
-			buf.limit( offset + count);
-			Util.dump( buf, b);
-			return b.toString();
+			StringBuilder builder = new StringBuilder( super.toString());
+			for ( String s : data) {
+				builder.append( "\n\t");
+				builder.append( s);
+			}
+			return builder.toString();
 		}
 	}
 
-	class StringArrayEntry extends Entry {
-		public StringArrayEntry( int code, int offset, int count) { super( code, offset, count); }
+	class BinEntry extends Entry< byte[]> {
+		public void read( final ByteBuffer buffer) {
+			byte[] data = new byte[ count];
+			buffer.get( data);
+			setData( data);
+		}
 		public String toString() {
-			StringBuilder b = new StringBuilder( super.toString());
-			ByteBuffer buf = data();
-			for ( int i = 0; i < count; i++) {
-				b.append( "\n\t");
-				while ( true) {
-					byte bb = buf.get();
-					if ( bb == 0) break;
-					b.append(( char) bb);
-				}
-			}
-			return b.toString();
+			StringBuilder builder = new StringBuilder( super.toString());
+			builder.append( "\n");
+			Util.dump( data, builder);
+			return builder.toString();
 		}
 	}
 
-	class I18NStringEntry extends Entry {
-		public I18NStringEntry( int code, int offset, int count) { super( code, offset, count); }
-		public String toString() {
-			StringBuilder b = new StringBuilder( super.toString());
-			ByteBuffer buf = data();
-			for ( int i = 0; i < count; i++) {
-				b.append( "\n\t");
-				while ( true) {
-					byte bb = buf.get();
-					if ( bb == 0) break;
-					b.append(( char) bb);
-				}
+	class StringArrayEntry extends Entry< String[]> {
+		public void read( final ByteBuffer buffer) {
+			String[] data = new String[ count];
+			for ( int x = 0; x < count; x++) {
+				StringBuilder string = new StringBuilder();
+				byte b;
+				while (( b = buffer.get()) != 0) string.append(( char) b);
+				data[ x] = string.toString();
 			}
-			return b.toString();
+			setData( data);
+		}
+		public String toString() {
+			StringBuilder builder = new StringBuilder( super.toString());
+			for ( String s : data) {
+				builder.append( "\n\t");
+				builder.append( s);
+			}
+			return builder.toString();
+		}
+	}
+
+	class I18NStringEntry extends Entry< String[]> {
+		public void read( final ByteBuffer buffer) {
+			String[] data = new String[ count];
+			for ( int x = 0; x < count; x++) {
+				StringBuilder string = new StringBuilder();
+				byte b;
+				while (( b = buffer.get()) != 0) string.append(( char) b);
+				data[ x] = string.toString();
+			}
+			setData( data);
+		}
+		public String toString() {
+			StringBuilder builder = new StringBuilder( super.toString());
+			for ( String s : data) {
+				builder.append( "\n\t");
+				builder.append( s);
+			}
+			return builder.toString();
 		}
 	}
 }
