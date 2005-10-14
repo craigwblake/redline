@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.nio.*;
 import java.nio.channels.*;
+import java.nio.charset.*;
 import java.util.*;
 
 public abstract class AbstractHeader {
@@ -49,11 +50,15 @@ public abstract class AbstractHeader {
 		buffer.putInt( 0);
 		int size = entries.size() * ENTRY_SIZE;
 		buffer.putInt( size);
-		buffer.putInt( offset);
 
 		index = ByteBuffer.allocate( size);
 		data = ByteBuffer.allocate( 10000);
-		for ( Entry entry : entries) entry.write( out);
+		for ( Entry entry : entries) entry.write();
+		buffer.putInt( data.position());
+		
+		Util.empty( out, buffer);
+		Util.empty( out, index);
+		Util.empty( out, data);
 	}
 
 	public Iterable< Entry> entries() {
@@ -100,37 +105,41 @@ public abstract class AbstractHeader {
 	public abstract class Entry< T> {
 		protected int tag;
 		protected int count;
-		protected T data;
+		protected T values;
 
 		public void setTag( Tag tag) { this.tag = tag.getCode(); }
 		public void setTag( int tag) { this.tag = tag; }
 		public void setCount( int count) { this.count = count; }
-		public void setData( T data) { this.data = data; }
+		public void setValues( T values) { this.values = values; }
 
 		public abstract void read( final ByteBuffer buffer);
-		public abstract void write( final ByteBuffer buffer);
+		public abstract void write();
 
 		public String toString() {
-			return ( TAGS.containsKey( tag) ? TAGS.get( tag).getName() : super.toString()) + "[tag=" + tag + ",offset=" + offset + ",count=" + count + "]";
+			return ( TAGS.containsKey( tag) ? TAGS.get( tag).getName() : super.toString()) + "[tag=" + tag + ",offset=" + data.position() + ",count=" + count + "]";
 		}
 	}
 
 	class NullEntry extends Entry {
 		public void read( final ByteBuffer buffer) {}
-		public void write( final WritableByteChannel channel) {
-			index.put( tag, 0, data.position(), 0);
+		public void write() {
+			index.putInt( tag).putInt( 0).putInt( data.position()).putInt( 0);
 		}
 	}
 
 	class CharEntry extends Entry< char[]> {
 		public void read( final ByteBuffer buffer) {
-			char[] data = new char[ count];
-			for ( int x = 0; x < count; x++) data[ x] = ( char) buffer.get();
-			setData( data);
+			char[] values = new char[ count];
+			for ( int x = 0; x < count; x++) values[ x] = ( char) buffer.get();
+			setValues( values);
+		}
+		public void write() {
+			index.putInt( tag).putInt( 1).putInt( data.position()).putInt( values.length);
+			for ( char c : values) data.put(( byte) c);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
-			for ( char c : data) builder.append( c);
+			for ( char c : values) builder.append( c);
 			builder.append( "\n\t");
 			return builder.toString();
 		}
@@ -138,56 +147,75 @@ public abstract class AbstractHeader {
 
 	class Int8Entry extends Entry< byte[]> {
 		public void read( final ByteBuffer buffer) {
-			byte[] data = new byte[ count];
-			for ( int x = 0; x < count; x++) data[ x] = buffer.get();
-			setData( data);
+			byte[] values = new byte[ count];
+			for ( int x = 0; x < count; x++) values[ x] = buffer.get();
+			setValues( values);
+		}
+		public void write() {
+			index.putInt( tag).putInt( 2).putInt( data.position()).putInt( values.length);
+			for ( byte b : values) data.put( b);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
 			builder.append( "\n\t");
-			for ( byte b : data) builder.append( b).append( ", ");
+			for ( byte b : values) builder.append( b).append( ", ");
 			return builder.toString();
 		}
 	}
 
 	class Int16Entry extends Entry< short[]> {
 		public void read( final ByteBuffer buffer) {
-			short[] data = new short[ count];
-			for ( int x = 0; x < count; x++) data[ x] = buffer.getShort();
-			setData( data);
+			short[] values = new short[ count];
+			for ( int x = 0; x < count; x++) values[ x] = buffer.getShort();
+			setValues( values);
+		}
+		public void write() {
+			Util.pad( data, 0x1);
+			index.putInt( tag).putInt( 3).putInt( data.position()).putInt( values.length);
+			for ( short s : values) data.putShort( s);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
 			builder.append( "\n\t");
-			for ( short s : data) builder.append( s).append( ", ");
+			for ( short s : values) builder.append( s).append( ", ");
 			return builder.toString();
 		}
 	}
 
 	class Int32Entry extends Entry< int[]> {
 		public void read( final ByteBuffer buffer) {
-			int[] data = new int[ count];
-			for ( int x = 0; x < count; x++) data[ x] = buffer.getInt();
-			setData( data);
+			int[] values = new int[ count];
+			for ( int x = 0; x < count; x++) values[ x] = buffer.getInt();
+			setValues( values);
+		}
+		public void write() {
+			Util.pad( data, 0x3);
+			index.putInt( tag).putInt( 4).putInt( data.position()).putInt( values.length);
+			for ( int i : values) data.putInt( i);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
 			builder.append( "\n\t");
-			for ( int i : data) builder.append( i).append( ", ");
+			for ( int i : values) builder.append( i).append( ", ");
 			return builder.toString();
 		}
 	}
 
 	class Int64Entry extends Entry< long[]> {
 		public void read( final ByteBuffer buffer) {
-			long[] data = new long[ count];
-			for ( int x = 0; x < count; x++) data[ x] = buffer.getLong();
-			setData( data);
+			long[] values = new long[ count];
+			for ( int x = 0; x < count; x++) values[ x] = buffer.getLong();
+			setValues( values);
+		}
+		public void write() {
+			Util.pad( data, 0x7);
+			index.putInt( tag).putInt( 5).putInt( data.position()).putInt( values.length);
+			for ( long l : values) data.putLong( l);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
 			builder.append( "\n\t");
-			for ( long l : data) builder.append( l).append( ", ");
+			for ( long l : values) builder.append( l).append( ", ");
 			return builder.toString();
 		}
 	}
@@ -199,18 +227,22 @@ public abstract class AbstractHeader {
 	 */
 	class StringEntry extends Entry< String[]> {
 		public void read( final ByteBuffer buffer) {
-			String[] data = new String[ count];
+			String[] values = new String[ count];
 			for ( int x = 0; x < count; x++) {
 				StringBuilder string = new StringBuilder();
 				byte b;
 				while (( b = buffer.get()) != 0) string.append(( char) b);
-				data[ x] = string.toString();
+				values[ x] = string.toString();
 			}
-			setData( data);
+			setValues( values);
+		}
+		public void write() {
+			index.putInt( tag).putInt( 6).putInt( data.position()).putInt( values.length);
+			for ( String s : values) data.put( Charset.forName( "US-ASCII").encode( s)).put(( byte) 0);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
-			for ( String s : data) {
+			for ( String s : values) {
 				builder.append( "\n\t");
 				builder.append( s);
 			}
@@ -220,32 +252,40 @@ public abstract class AbstractHeader {
 
 	class BinEntry extends Entry< byte[]> {
 		public void read( final ByteBuffer buffer) {
-			byte[] data = new byte[ count];
-			buffer.get( data);
-			setData( data);
+			byte[] values = new byte[ count];
+			buffer.get( values);
+			setValues( values);
+		}
+		public void write() {
+			index.putInt( tag).putInt( 6).putInt( data.position()).putInt( values.length);
+			data.put( values);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
 			builder.append( "\n");
-			Util.dump( data, builder);
+			Util.dump( values, builder);
 			return builder.toString();
 		}
 	}
 
 	class StringArrayEntry extends Entry< String[]> {
 		public void read( final ByteBuffer buffer) {
-			String[] data = new String[ count];
+			String[] values = new String[ count];
 			for ( int x = 0; x < count; x++) {
 				StringBuilder string = new StringBuilder();
 				byte b;
 				while (( b = buffer.get()) != 0) string.append(( char) b);
-				data[ x] = string.toString();
+				values[ x] = string.toString();
 			}
-			setData( data);
+			setValues( values);
+		}
+		public void write() {
+			index.putInt( tag).putInt( 6).putInt( data.position()).putInt( values.length);
+			for ( String s : values) data.put( Charset.forName( "US-ASCII").encode( s)).put(( byte) 0);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
-			for ( String s : data) {
+			for ( String s : values) {
 				builder.append( "\n\t");
 				builder.append( s);
 			}
@@ -255,22 +295,32 @@ public abstract class AbstractHeader {
 
 	class I18NStringEntry extends Entry< String[]> {
 		public void read( final ByteBuffer buffer) {
-			String[] data = new String[ count];
+			String[] values = new String[ count];
 			for ( int x = 0; x < count; x++) {
 				StringBuilder string = new StringBuilder();
 				byte b;
 				while (( b = buffer.get()) != 0) string.append(( char) b);
-				data[ x] = string.toString();
+				values[ x] = string.toString();
 			}
-			setData( data);
+			setValues( values);
+		}
+		public void write() {
+			index.putInt( tag).putInt( 6).putInt( data.position()).putInt( values.length);
+			for ( String s : values) data.put( Charset.forName( "US-ASCII").encode( s)).put(( byte) 0);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
-			for ( String s : data) {
+			for ( String s : values) {
 				builder.append( "\n\t");
 				builder.append( s);
 			}
 			return builder.toString();
 		}
+	}
+
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		for ( Entry entry : entries()) builder.append( entry).append( "\n");
+		return builder.toString();
 	}
 }

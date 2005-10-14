@@ -31,6 +31,10 @@ class Util {
 		if ( expected != actual) System.err.println( "check expected " + Integer.toHexString( 0xff & expected) + ", found " + Integer.toHexString( 0xff & actual));
 	}
 
+	static void pad( ByteBuffer buffer, int boundary) {
+		buffer.position(( buffer.position() + boundary) & ~boundary);
+	}
+
 	static void dump( byte[] data) {
 		dump( data, System.out);
 	}
