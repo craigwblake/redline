@@ -53,7 +53,9 @@ public class Lead {
 
 		buffer.putShort( os);
 		buffer.putShort( sigtype);
+		buffer.position( buffer.position() + 16);
 		buffer.flip();
+		if ( buffer.remaining() != LEAD_SIZE) throw new IllegalStateException( "Invalid lead size generated with '" + buffer.remaining() + "' bytes.");
 		Util.empty( channel, buffer);
 	}
 

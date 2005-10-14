@@ -8,7 +8,7 @@ import java.nio.channels.*;
 public class Copier {
 
 	public static void main( String[] args) throws Exception {
-		new Copier().run( Channels.newChannel( System.in), Channels.newChannel( System.out));
+		new Copier().run( Channels.newChannel( System.in), new FileOutputStream( args[ 0]).getChannel());
 	}
 
 	public void run( ReadableByteChannel in, WritableByteChannel out) throws Exception {

@@ -56,9 +56,9 @@ public abstract class AbstractHeader {
 		for ( Entry entry : entries) entry.write();
 		buffer.putInt( data.position());
 		
-		Util.empty( out, buffer);
-		Util.empty( out, index);
-		Util.empty( out, data);
+		Util.empty( out, ( ByteBuffer) buffer.flip());
+		Util.empty( out, ( ByteBuffer) index.flip());
+		Util.empty( out, ( ByteBuffer) data.flip());
 	}
 
 	public Iterable< Entry> entries() {
