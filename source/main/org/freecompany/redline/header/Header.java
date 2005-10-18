@@ -1,4 +1,4 @@
-package org.freecompany.redline;
+package org.freecompany.redline.header;
 
 import java.io.*;
 import java.net.*;

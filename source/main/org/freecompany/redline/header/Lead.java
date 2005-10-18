@@ -1,5 +1,6 @@
-package org.freecompany.redline;
+package org.freecompany.redline.header;
 
+import org.freecompany.redline.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
@@ -16,6 +17,34 @@ public class Lead {
 	protected String name;
 	protected short os;
 	protected short sigtype;
+
+	public void setMajor( int major) {
+		this.major = major;
+	}
+
+	public void setMinor( int minor) {
+		this.minor = minor;
+	}
+
+	public void setType( short type) {
+		this.type = type;
+	}
+
+	public void setArch( short arch) {
+		this.arch = arch;
+	}
+
+	public void setName( String name) {
+		this.name = name;
+	}
+
+	public void setOs( short os) {
+		this.os = os;
+	}
+
+	public void setSigtype( short sigtype) {
+		this.sigtype = sigtype;
+	}
 
 	public void read( ReadableByteChannel channel) throws IOException {
 		ByteBuffer lead = Util.fill( channel, LEAD_SIZE);

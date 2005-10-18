@@ -1,5 +1,6 @@
 package org.freecompany.redline;
 
+import org.freecompany.redline.header.*;
 import java.io.*;
 import java.net.*;
 import java.nio.*;
@@ -12,7 +13,7 @@ public class Copier {
 	}
 
 	public void run( ReadableByteChannel in, WritableByteChannel out) throws Exception {
-		Rpm rpm = new Scanner().run( in);
-		rpm.write( out);
+		Format format = new Scanner().run( in);
+		format.write( out);
 	}
 }

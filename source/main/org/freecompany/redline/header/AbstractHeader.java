@@ -1,5 +1,6 @@
-package org.freecompany.redline;
+package org.freecompany.redline.header;
 
+import org.freecompany.redline.*;
 import java.io.*;
 import java.net.*;
 import java.nio.*;
@@ -48,24 +49,75 @@ public abstract class AbstractHeader {
 		ByteBuffer buffer = ByteBuffer.allocate( HEADER_HEADER_SIZE);
 		buffer.putInt( MAGIC_WORD);
 		buffer.putInt( 0);
-		int size = entries.size() * ENTRY_SIZE;
-		buffer.putInt( size);
+		buffer.putInt( entries.size());
 
-		index = ByteBuffer.allocate( size);
+		index = ByteBuffer.allocate( entries.size() * ENTRY_SIZE);
 		data = ByteBuffer.allocate( 10000);
 		for ( Entry entry : entries) entry.write();
 		buffer.putInt( data.position());
 		
-		Util.empty( out, ( ByteBuffer) buffer.flip());
-		Util.empty( out, ( ByteBuffer) index.flip());
-		Util.empty( out, ( ByteBuffer) data.flip());
+		buffer.flip();
+		index.flip();
+		data.flip();
+		Util.empty( out, buffer);
+		Util.empty( out, index);
+		Util.empty( out, data);
 	}
 
 	public Iterable< Entry> entries() {
 		return entries;
 	}
 
-	public void createEntry( int tag, int type, int offset, int count) {
+	public void addEntry( Tag tag) {
+		Entry< Object> entry = createEntry( tag.getCode(), 0, 0, 0);
+	}
+
+	public void addEntry( Tag tag, char c) {
+		Entry<char[]> entry = createEntry( tag.getCode(), 1, 0, 1);
+		entry.setValues( new char[] { c});
+	}
+
+	public void addEntry( Tag tag, byte b) {
+		Entry<byte[]> entry = createEntry( tag.getCode(), 2, 0, 1);
+		entry.setValues( new byte[] { b});
+	}
+
+	public void addEntry( Tag tag, short s) {
+		Entry<short> entry = createEntry( tag.getCode(), 3, 0, 1);
+		entry.setValues( new short[] { s});
+	}
+
+	public void addEntry( Tag tag, int i) {
+		Entry< int[]> entry = createEntry( tag.getCode(), 4, 0, 1);
+		entry.setValues( new int[] { i});
+	}
+
+	public void addEntry( Tag tag, long l) {
+		Entry< long[]> entry = createEntry( tag.getCode(), 5, 0, 1);
+		entry.setValues( new long[] { l});
+	}
+
+	public void addEntry( Tag tag, String value) {
+		Entry< String[]> entry = createEntry( tag.getCode(), 6, 0, 1);
+		entry.setValues( new String[] { value});
+	}
+
+	public void addEntry( Tag tag, byte[] binary) {
+		Entry< byte[]>  entry= createEntry( tag.getCode(), 7, 0, 1);
+		entry.setValues( binary);
+	}
+
+	public void addEntry( Tag tag, String[] value) {
+		Entry< String[]> entry = createEntry( tag.getCode(), 8, 0, value.length);
+		entry.setValues( value);
+	}
+
+	public void addI18NEntry( Tag tag, String[] value) {
+		Entry< String[]> entry = createEntry( tag.getCode(), 8, 0, value.length);
+		entry.setValues( value);
+	}
+
+	public Entry createEntry( int tag, int type, int offset, int count) {
 		ByteBuffer buffer = data.duplicate();
 		buffer.position( offset);
 		
@@ -74,6 +126,7 @@ public abstract class AbstractHeader {
 		entry.setCount( count);
 		entry.read( buffer);
 		entries.add( entry);
+		return entry;
 	}
 
 	protected Entry createEntry( int type) {
@@ -85,11 +138,11 @@ public abstract class AbstractHeader {
 			case 2:
 				return new Int8Entry();
 			case 3:
-				return new Int8Entry();
+				return new Int16Entry();
 			case 4:
-				return new Int8Entry();
+				return new Int32Entry();
 			case 5:
-				return new Int8Entry();
+				return new Int64Entry();
 			case 6:
 				return new StringEntry();
 			case 7:
@@ -116,7 +169,7 @@ public abstract class AbstractHeader {
 		public abstract void write();
 
 		public String toString() {
-			return ( TAGS.containsKey( tag) ? TAGS.get( tag).getName() : super.toString()) + "[tag=" + tag + ",offset=" + data.position() + ",count=" + count + "]";
+			return ( TAGS.containsKey( tag) ? TAGS.get( tag).getName() : super.toString()) + "[tag=" + tag + ",count=" + count + "]";
 		}
 	}
 
@@ -170,7 +223,7 @@ public abstract class AbstractHeader {
 			setValues( values);
 		}
 		public void write() {
-			Util.pad( data, 0x1);
+			Util.pad( data, 1);
 			index.putInt( tag).putInt( 3).putInt( data.position()).putInt( values.length);
 			for ( short s : values) data.putShort( s);
 		}
@@ -189,7 +242,7 @@ public abstract class AbstractHeader {
 			setValues( values);
 		}
 		public void write() {
-			Util.pad( data, 0x3);
+			Util.pad( data, 3);
 			index.putInt( tag).putInt( 4).putInt( data.position()).putInt( values.length);
 			for ( int i : values) data.putInt( i);
 		}
@@ -208,7 +261,7 @@ public abstract class AbstractHeader {
 			setValues( values);
 		}
 		public void write() {
-			Util.pad( data, 0x7);
+			Util.pad( data, 7);
 			index.putInt( tag).putInt( 5).putInt( data.position()).putInt( values.length);
 			for ( long l : values) data.putLong( l);
 		}
@@ -257,7 +310,7 @@ public abstract class AbstractHeader {
 			setValues( values);
 		}
 		public void write() {
-			index.putInt( tag).putInt( 6).putInt( data.position()).putInt( values.length);
+			index.putInt( tag).putInt( 7).putInt( data.position()).putInt( values.length);
 			data.put( values);
 		}
 		public String toString() {
@@ -280,7 +333,7 @@ public abstract class AbstractHeader {
 			setValues( values);
 		}
 		public void write() {
-			index.putInt( tag).putInt( 6).putInt( data.position()).putInt( values.length);
+			index.putInt( tag).putInt( 8).putInt( data.position()).putInt( values.length);
 			for ( String s : values) data.put( Charset.forName( "US-ASCII").encode( s)).put(( byte) 0);
 		}
 		public String toString() {
@@ -305,7 +358,7 @@ public abstract class AbstractHeader {
 			setValues( values);
 		}
 		public void write() {
-			index.putInt( tag).putInt( 6).putInt( data.position()).putInt( values.length);
+			index.putInt( tag).putInt( 9).putInt( data.position()).putInt( values.length);
 			for ( String s : values) data.put( Charset.forName( "US-ASCII").encode( s)).put(( byte) 0);
 		}
 		public String toString() {
