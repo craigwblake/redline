@@ -18,11 +18,11 @@ public class Lead {
 	protected short os;
 	protected short sigtype;
 
-	public void setMajor( int major) {
+	public void setMajor( byte major) {
 		this.major = major;
 	}
 
-	public void setMinor( int minor) {
+	public void setMinor( byte minor) {
 		this.minor = minor;
 	}
 

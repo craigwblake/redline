@@ -73,17 +73,17 @@ public abstract class AbstractHeader {
 	}
 
 	public void addEntry( Tag tag, char c) {
-		Entry<char[]> entry = createEntry( tag.getCode(), 1, 0, 1);
+		Entry< char[]> entry = createEntry( tag.getCode(), 1, 0, 1);
 		entry.setValues( new char[] { c});
 	}
 
 	public void addEntry( Tag tag, byte b) {
-		Entry<byte[]> entry = createEntry( tag.getCode(), 2, 0, 1);
+		Entry< byte[]> entry = createEntry( tag.getCode(), 2, 0, 1);
 		entry.setValues( new byte[] { b});
 	}
 
 	public void addEntry( Tag tag, short s) {
-		Entry<short> entry = createEntry( tag.getCode(), 3, 0, 1);
+		Entry< short[]> entry = createEntry( tag.getCode(), 3, 0, 1);
 		entry.setValues( new short[] { s});
 	}
 

@@ -13,7 +13,7 @@ public class Copier {
 	}
 
 	public void run( ReadableByteChannel in, WritableByteChannel out) throws Exception {
-		Format format = new Scanner().run( in);
-		format.write( out);
+		Rpm rpm = new Scanner().run( in);
+		rpm.write( out);
 	}
 }

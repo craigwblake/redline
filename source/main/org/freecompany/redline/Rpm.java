@@ -1,16 +1,17 @@
-package org.freecompany.redline.header;
+package org.freecompany.redline;
 
+import org.freecompany.redline.header.*;
 import org.freecompany.redline.payload.*;
 import java.io.*;
 import java.nio.channels.*;
 import java.util.*;
 
-public class Format {
+public class Rpm {
 
 	protected Lead lead = new Lead();
 	protected Header header = new Header();
 	protected Signature signature = new Signature();
-	protected Map< Payload, ByteChannel> payloads = new ConcurrentHashMap< Payload, ByteChannel>();
+	protected List< Payload> payloads = new LinkedList< Payload>();
 
 	public Lead getLead() {
 		return lead;
@@ -24,8 +25,8 @@ public class Format {
 		return signature;
 	}
 
-	public Map< Payload, ByteChannel> getPayload() {
-		return Collections.unmodifiableMap( payload);
+	public List< Payload> getPayloads() {
+		return Collections.unmodifiableList( payloads);
 	}
 
 	public void read( final ReadableByteChannel channel) throws IOException {
