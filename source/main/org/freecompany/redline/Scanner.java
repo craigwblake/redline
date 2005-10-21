@@ -21,7 +21,7 @@ public class Scanner {
 			header = new CpioHeader();
 			header.read( in);
 			System.out.println( header);
-			compressed.skip( header.getFileSize());
+			if ( compressed.skip( header.getFileSize()) != header.getFileSize()) throw new IllegalStateException( "Didn't skip far enough.");
 		} while ( !header.isLast());
 	}
 

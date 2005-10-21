@@ -48,6 +48,22 @@ public class CpioHeader {
 		return filesize;
 	}
 
+	protected ByteBuffer writeSix( CharSequence data) {
+		return charset.encode( pad( data, 8));
+	}
+
+	protected ByteBuffer writeEight( int data) {
+		return charset.encode( pad( Integer.toHexString( data), 8));
+	}
+
+	protected String readSix( CharBuffer buffer) {
+		return readBytes( buffer, 6);
+	}
+
+	protected int readEight( CharBuffer buffer) {
+		return Integer.parseInt( readBytes( buffer, 8), 16);
+	}
+
 	protected String readBytes( CharBuffer buffer, int length) {
 		if ( buffer.length() < length) throw new IllegalStateException( "Insufficent capacity buffer.");
 		char[] chars = new char[ length];
@@ -65,41 +81,41 @@ public class CpioHeader {
 		ByteBuffer descriptor = Util.fill( channel, CPIO_HEADER);
 		CharBuffer buffer = charset.decode( descriptor);
 
-		String magic = readBytes( buffer, 6);
-		//if ( !Comparison.equals( MAGIC, magic)) throw new IllegalStateException( "Invalid magic number '" + magic + "'.");
-		inode = Integer.parseInt( readBytes( buffer, 8), 16);
-		mode = Integer.parseInt( readBytes( buffer, 8), 16);
-		uid = Integer.parseInt( readBytes( buffer, 8), 16);
-		gid = Integer.parseInt( readBytes( buffer, 8), 16);
-		nlink = Integer.parseInt( readBytes( buffer, 8), 16);
-		mtime = 1000L * Integer.parseInt( readBytes( buffer, 8), 16);
-		filesize = Integer.parseInt( readBytes( buffer, 8), 16);
-		devMajor = Integer.parseInt( readBytes( buffer, 8), 16);
-		devMinor = Integer.parseInt( readBytes( buffer, 8), 16);
-		rdevMajor = Integer.parseInt( readBytes( buffer, 8), 16);
-		rdevMinor = Integer.parseInt( readBytes( buffer, 8), 16);
-		int namesize = Integer.parseInt( readBytes( buffer, 8), 16);
-		checksum = Integer.parseInt( readBytes( buffer, 8), 16);
+		String magic = readSix( buffer);
+		if ( !Comparison.equals( MAGIC, magic)) throw new IllegalStateException( "Invalid magic number '" + magic + "'.");
+		inode = readEight( buffer);
+		mode = readEight( buffer);
+		uid = readEight( buffer);
+		gid = readEight( buffer);
+		nlink = readEight( buffer);
+		mtime = 1000L * readEight( buffer);
+		filesize = readEight( buffer);
+		devMajor = readEight( buffer);
+		devMinor = readEight( buffer);
+		rdevMajor = readEight( buffer);
+		rdevMinor = readEight( buffer);
+		int namesize = readEight( buffer);
+		checksum = readEight( buffer);
 
 		name = charset.decode(( ByteBuffer) Util.fill( channel, Util.round( namesize, 1)).limit( namesize));
 	}
 
 	public void write( final WritableByteChannel channel) throws IOException {
 		ByteBuffer descriptor = ByteBuffer.allocate( CPIO_HEADER);
-		descriptor.put( charset.encode( pad( MAGIC, 6)));
-		descriptor.put( charset.encode( pad( Integer.toHexString( inode), 8)));
-		descriptor.put( charset.encode( pad( Integer.toHexString( mode), 8)));
-		descriptor.put( charset.encode( pad( Integer.toHexString( uid), 8)));
-		descriptor.put( charset.encode( pad( Integer.toHexString( gid), 8)));
-		descriptor.put( charset.encode( pad( Integer.toHexString( nlink), 8)));
-		descriptor.put( charset.encode( pad( Integer.toHexString(( int) ( mtime / 1000)), 8)));
-		descriptor.put( charset.encode( pad( Integer.toHexString( filesize), 8)));
-		descriptor.put( charset.encode( pad( Integer.toHexString( devMajor), 8)));
-		descriptor.put( charset.encode( pad( Integer.toHexString( devMinor), 8)));
-		descriptor.put( charset.encode( pad( Integer.toHexString( rdevMajor), 8)));
-		descriptor.put( charset.encode( pad( Integer.toHexString( rdevMinor), 8)));
-		descriptor.put( charset.encode( pad( Integer.toHexString( name.length()), 8)));
-		descriptor.put( charset.encode( pad( Integer.toHexString( checksum), 8)));
+		descriptor.put( writeSix( MAGIC));
+		descriptor.put( writeEight( inode));
+		descriptor.put( writeEight( mode));
+		descriptor.put( writeEight( uid));
+		descriptor.put( writeEight( gid));
+		descriptor.put( writeEight( nlink));
+		descriptor.put( writeEight(( int) ( mtime / 1000)));
+		descriptor.put( writeEight( filesize));
+		descriptor.put( writeEight( devMajor));
+		descriptor.put( writeEight( devMinor));
+		descriptor.put( writeEight( rdevMajor));
+		descriptor.put( writeEight( rdevMinor));
+		descriptor.put( writeEight( name.length()));
+		descriptor.put( writeEight( checksum));
 		descriptor.put( charset.encode( CharBuffer.wrap( name)));
 	}
 
