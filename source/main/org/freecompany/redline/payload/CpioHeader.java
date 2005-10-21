@@ -38,7 +38,8 @@ public class CpioHeader {
 
 	/**
 	 * Test to see if this is the last header, and is therefore the end of the
-	 * archive.
+	 * archive.  Uses the CPIO magic trailer value to denote the last header of
+	 * the stream.
 	 */
 	public boolean isLast() {
 		return Comparison.equals( "TRAILER!!!", name);
@@ -69,6 +70,7 @@ public class CpioHeader {
 		char[] chars = new char[ length];
 		buffer.get( chars);
 		Util.dump( chars);
+		System.out.println();
 		return new String( chars);
 	}
 
@@ -97,9 +99,14 @@ public class CpioHeader {
 		int namesize = readEight( buffer);
 		checksum = readEight( buffer);
 
-		name = charset.decode(( ByteBuffer) Util.fill( channel, Util.round( namesize, 1)).limit( namesize));
+		System.out.println( "Reading '" + Util.round( namesize, 1) + "' bytes for name.");
+		name = charset.decode(( ByteBuffer) Util.fill( channel, Util.round( namesize, 1)).limit( namesize - 1));
 	}
 
+	/**
+	 * Writed the content for the CPIO header, including the name immediately following.  The name data is reounded
+	 * to the nearest 2 byte boundary as CPIO requires by appending a null when needed.
+	 */
 	public void write( final WritableByteChannel channel) throws IOException {
 		ByteBuffer descriptor = ByteBuffer.allocate( CPIO_HEADER);
 		descriptor.put( writeSix( MAGIC));
@@ -116,7 +123,8 @@ public class CpioHeader {
 		descriptor.put( writeEight( rdevMinor));
 		descriptor.put( writeEight( name.length()));
 		descriptor.put( writeEight( checksum));
-		descriptor.put( charset.encode( CharBuffer.wrap( name)));
+		channel.write( charset.encode( CharBuffer.wrap( name)));
+		if ( Util.round( name.length(), 1) != name.length()) channel.write( ByteBuffer.wrap( new byte[] { 0}));
 	}
 
 	public String toString() {
@@ -132,7 +140,7 @@ public class CpioHeader {
 		builder.append( "DevMajor: ").append( devMajor).append( "\n");
 		builder.append( "RDevMinor: ").append( rdevMinor).append( "\n");
 		builder.append( "RDevMajor: ").append( rdevMajor).append( "\n");
-		builder.append( "NameSize: ").append( name.length()).append( "\n");
+		builder.append( "NameSize: ").append( name.length() + 1).append( "\n");
 		builder.append( "Name: ").append( name).append( "\n");
 		return builder.toString();
 	}
