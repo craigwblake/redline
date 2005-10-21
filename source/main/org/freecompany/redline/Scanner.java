@@ -10,9 +10,11 @@ import java.nio.channels.*;
 public class Scanner {
 
 	public static void main( String[] args) throws Exception {
-		Rpm rpm = new Scanner().run( Channels.newChannel( System.in));
+		ReadableByteChannel in = Channels.newChannel( System.in);
+		Rpm rpm = new Scanner().run( );
 		System.out.println( rpm);
-		for ( Payload payload : rpm.getPayloads()) System.out.println( payload);
+		CpioHeader header;
+		while (( header = CpioHeader.read( in)) != null) System.out.println( header);
 	}
 
 	public Rpm run( ReadableByteChannel in) throws IOException {

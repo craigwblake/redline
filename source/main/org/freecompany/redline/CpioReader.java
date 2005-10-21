@@ -6,22 +6,27 @@ import java.nio.*;
 import java.nio.channels.*;
 import java.nio.charset.*;
 
-public class Payload {
+/**
+ * This class provides a means to read file content from the compressed CPIO stream
+ * that is the body of an RPM distributable.  Iterative calls to to read header will
+ * result in a header description being returned which includes a count of how many bytes
+ * to read from the channel for the file content.
+ */
+public class CpioReader {
 
 	protected static final int CPIO_HEADER = 76;
-
-	public enum Permission { ON, OFF };
 
 	protected ByteChannel channel;
 	protected CharSequence header;
 
-	public void read( ReadableByteChannel channel) throws IOException {
+	public static CpioHeader read( ReadableByteChannel channel) throws IOException {
 		ByteBuffer descriptor = Util.fill( channel, CPIO_HEADER);
 		header = Charset.forName( "US-ASCII").decode( descriptor).toString();
 		System.out.println( "Header:\n" + header);
+		return new CpioHeader();
 	}
 
-	public void write( WritableByteChannel channel) throws IOException {
+	public static void write( WritableByteChannel channel, CpioHeader header) throws IOException {
 		ByteBuffer descriptor = ByteBuffer.allocate( CPIO_HEADER);
 	}
 
