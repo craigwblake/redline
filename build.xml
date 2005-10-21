@@ -10,6 +10,8 @@
 
 	<imp:import uri='urn:brimstone:freecompany/imp/builder-0.4.0.template'/>
 
-	<imp:index name='redline' group='freecompany/redline' types='jar'/>
+	<imp:index name='redline' group='freecompany/redline' types='jar'>
+		<imp:dependency types='compile,test,run' uri='urn:brimstone:freecompany/util/util-text-0.1.1.jar'/>
+	</imp:index>
 
 </project>

@@ -1,32 +1,26 @@
-package org.freecompany.redline;
+package org.freecompany.redline.header;
 
-import org.freecompany.redline.header.*;
 import org.freecompany.redline.payload.*;
 import java.io.*;
 import java.nio.channels.*;
 import java.util.*;
 
-public class Rpm {
+public class Format {
 
 	protected Lead lead = new Lead();
-	protected Header header = new Header();
 	protected Signature signature = new Signature();
-	protected List< Payload> payloads = new LinkedList< Payload>();
+	protected Header header = new Header();
 
 	public Lead getLead() {
 		return lead;
-	}
-
-	public Header getHeader() {
-		return header;
 	}
 
 	public Signature getSignature() {
 		return signature;
 	}
 
-	public List< Payload> getPayloads() {
-		return Collections.unmodifiableList( payloads);
+	public Header getHeader() {
+		return header;
 	}
 
 	public void read( final ReadableByteChannel channel) throws IOException {

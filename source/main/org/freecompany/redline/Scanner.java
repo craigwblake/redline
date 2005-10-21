@@ -6,20 +6,28 @@ import java.io.*;
 import java.net.*;
 import java.nio.*;
 import java.nio.channels.*;
+import java.util.zip.*;
 
 public class Scanner {
 
 	public static void main( String[] args) throws Exception {
 		ReadableByteChannel in = Channels.newChannel( System.in);
-		Rpm rpm = new Scanner().run( );
-		System.out.println( rpm);
+		Format format = new Scanner().run( in);
+		System.out.println( format);
+		InputStream compressed = new GZIPInputStream( System.in);
+		in = Channels.newChannel( compressed); 
 		CpioHeader header;
-		while (( header = CpioHeader.read( in)) != null) System.out.println( header);
+		do {
+			header = new CpioHeader();
+			header.read( in);
+			System.out.println( header);
+			compressed.skip( header.getFileSize());
+		} while ( !header.isLast());
 	}
 
-	public Rpm run( ReadableByteChannel in) throws IOException {
-		Rpm rpm = new Rpm();
-		rpm.read( in);
-		return rpm;
+	public Format run( ReadableByteChannel in) throws IOException {
+		Format format = new Format();
+		format.read( in);
+		return format;
 	}
 }
