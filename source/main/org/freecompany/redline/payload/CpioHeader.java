@@ -69,8 +69,8 @@ public class CpioHeader {
 		if ( buffer.length() < length) throw new IllegalStateException( "Insufficent capacity buffer.");
 		char[] chars = new char[ length];
 		buffer.get( chars);
-		Util.dump( chars);
-		System.out.println();
+		//Util.dump( chars);
+		//System.out.println();
 		return new String( chars);
 	}
 
