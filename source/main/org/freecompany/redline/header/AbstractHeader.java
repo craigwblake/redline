@@ -23,8 +23,8 @@ public abstract class AbstractHeader {
 	protected static final Map< Integer, Tag> TAGS = new HashMap< Integer, Tag>();
 
 	private final List< Entry> entries = new ArrayList< Entry>();
-	private ByteBuffer index;
-	private ByteBuffer data;
+	protected ByteBuffer index;
+	protected ByteBuffer data;
 
 	public void read( ReadableByteChannel in) throws IOException {
 		ByteBuffer header = Util.fill( in, HEADER_HEADER_SIZE);
@@ -52,6 +52,7 @@ public abstract class AbstractHeader {
 		buffer.putInt( entries.size());
 
 		index = ByteBuffer.allocate( entries.size() * ENTRY_SIZE);
+		// TODO: Handle larger data.
 		data = ByteBuffer.allocate( 10000);
 		for ( Entry entry : entries) entry.write();
 		buffer.putInt( data.position());
@@ -113,7 +114,7 @@ public abstract class AbstractHeader {
 	}
 
 	public void addI18NEntry( Tag tag, String[] value) {
-		Entry< String[]> entry = createEntry( tag.getCode(), 8, 0, value.length);
+		Entry< String[]> entry = createEntry( tag.getCode(), 9, 0, value.length);
 		entry.setValues( value);
 	}
 
@@ -155,7 +156,7 @@ public abstract class AbstractHeader {
 		throw new IllegalStateException( "Unknown entry type '" + type + "'.");
 	}
 	
-	public abstract class Entry< T> {
+	public static abstract class Entry< T> {
 		protected int tag;
 		protected int count;
 		protected T values;

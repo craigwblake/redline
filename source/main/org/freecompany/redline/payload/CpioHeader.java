@@ -50,7 +50,7 @@ public class CpioHeader {
 	}
 
 	protected ByteBuffer writeSix( CharSequence data) {
-		return charset.encode( pad( data, 8));
+		return charset.encode( pad( data, 6));
 	}
 
 	protected ByteBuffer writeEight( int data) {
@@ -99,7 +99,6 @@ public class CpioHeader {
 		int namesize = readEight( buffer);
 		checksum = readEight( buffer);
 
-		System.out.println( "Reading '" + Util.round( namesize, 1) + "' bytes for name.");
 		name = charset.decode(( ByteBuffer) Util.fill( channel, Util.round( namesize, 1)).limit( namesize - 1));
 	}
 
@@ -108,6 +107,7 @@ public class CpioHeader {
 	 * to the nearest 2 byte boundary as CPIO requires by appending a null when needed.
 	 */
 	public void write( final WritableByteChannel channel) throws IOException {
+		int length = name.length() + 1;
 		ByteBuffer descriptor = ByteBuffer.allocate( CPIO_HEADER);
 		descriptor.put( writeSix( MAGIC));
 		descriptor.put( writeEight( inode));
@@ -121,10 +121,13 @@ public class CpioHeader {
 		descriptor.put( writeEight( devMinor));
 		descriptor.put( writeEight( rdevMajor));
 		descriptor.put( writeEight( rdevMinor));
-		descriptor.put( writeEight( name.length()));
+		descriptor.put( writeEight( length));
 		descriptor.put( writeEight( checksum));
-		channel.write( charset.encode( CharBuffer.wrap( name)));
-		if ( Util.round( name.length(), 1) != name.length()) channel.write( ByteBuffer.wrap( new byte[] { 0}));
+		
+		descriptor.flip();
+		Util.empty( channel, descriptor);
+		Util.empty( channel, charset.encode( CharBuffer.wrap( name)));
+		Util.empty( channel, ByteBuffer.wrap( Util.round( length, 1) != length ? new byte[] { 0, 0} : new byte[] { 0}));
 	}
 
 	public String toString() {
