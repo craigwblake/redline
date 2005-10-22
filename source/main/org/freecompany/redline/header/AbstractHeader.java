@@ -181,19 +181,19 @@ public abstract class AbstractHeader {
 		}
 	}
 
-	class CharEntry extends Entry< char[]> {
+	class CharEntry extends Entry< byte[]> {
 		public void read( final ByteBuffer buffer) {
-			char[] values = new char[ count];
-			for ( int x = 0; x < count; x++) values[ x] = ( char) buffer.get();
+			byte[] values = new byte[ count];
+			for ( int x = 0; x < count; x++) values[ x] = ( byte) buffer.get();
 			setValues( values);
 		}
 		public void write() {
 			index.putInt( tag).putInt( 1).putInt( data.position()).putInt( values.length);
-			for ( char c : values) data.put(( byte) c);
+			for ( byte c : values) data.put(( byte) c);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
-			for ( char c : values) builder.append( c);
+			for ( byte c : values) builder.append( c);
 			builder.append( "\n\t");
 			return builder.toString();
 		}
