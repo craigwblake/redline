@@ -103,7 +103,7 @@ public class CpioHeader {
 	}
 
 	/**
-	 * Writed the content for the CPIO header, including the name immediately following.  The name data is reounded
+	 * Writed the content for the CPIO header, including the name immediately following.  The name data is rounded
 	 * to the nearest 2 byte boundary as CPIO requires by appending a null when needed.
 	 */
 	public void write( final WritableByteChannel channel) throws IOException {

@@ -7,6 +7,8 @@ import java.util.*;
 
 public class Format {
 
+	protected Signature dsa = Signature.getInstance( "DSA");
+	protected Signature sha = Signature.getInstance( "SHA1");
 	protected Lead lead = new Lead();
 	protected Signature signature = new Signature();
 	protected Header header = new Header();
@@ -33,6 +35,15 @@ public class Format {
 		lead.write( channel);
 		signature.write( channel);
 		header.write( channel);
+	}
+
+	public WritableByteChannel wrapForsignatures( final WritableByteChannel channel) throws IOException {
+		return new WritableByteChannel() {
+			public int write( final ByteBuffer buffer) throws IOException {
+				dsa.update( buffer.duplicate());
+				sha.update( buffer.duplicate());
+			}
+		};
 	}
 
 	public String toString() {

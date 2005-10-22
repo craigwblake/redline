@@ -52,7 +52,7 @@ public abstract class AbstractHeader {
 		buffer.putInt( entries.size());
 
 		index = ByteBuffer.allocate( entries.size() * ENTRY_SIZE);
-		// TODO: Handle larger data.
+		// TODO: Handle larger data sections.
 		data = ByteBuffer.allocate( 10000);
 		for ( Entry entry : entries) entry.write();
 		buffer.putInt( data.position());

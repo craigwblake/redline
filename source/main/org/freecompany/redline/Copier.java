@@ -36,6 +36,7 @@ public class Copier {
 				if ( buffer.limit() != buffer.capacity()) buffer.reset();
 			}
 		} while ( !header.isLast());
+		Util.empty( out, ByteBuffer.wrap( new byte[] { 0, 0}));
 		out.close();
 		in.close();
 	}
