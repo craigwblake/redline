@@ -19,13 +19,12 @@ public class AbstractHeaderTest extends TestCase {
 		entry.read( buffer);
 		assertEquals( 1, entry.values[ 0]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 1);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 1);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testCharMultiple() throws Exception {
@@ -41,13 +40,12 @@ public class AbstractHeaderTest extends TestCase {
 		assertEquals( 1, entry.values[ 0]);
 		assertEquals( 2, entry.values[ 1]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 2);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 2);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testInt8Single() throws Exception {
@@ -61,13 +59,12 @@ public class AbstractHeaderTest extends TestCase {
 		entry.read( buffer);
 		assertEquals( 1, entry.values[ 0]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 1);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 1);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testInt8Multiple() throws Exception {
@@ -83,13 +80,12 @@ public class AbstractHeaderTest extends TestCase {
 		assertEquals( 1, entry.values[ 0]);
 		assertEquals( 2, entry.values[ 1]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 2);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 2);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testInt16Single() throws Exception {
@@ -103,13 +99,12 @@ public class AbstractHeaderTest extends TestCase {
 		entry.read( buffer);
 		assertEquals( 1, entry.values[ 0]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 2);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 2);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testInt16Multiple() throws Exception {
@@ -125,13 +120,12 @@ public class AbstractHeaderTest extends TestCase {
 		assertEquals( 1, entry.values[ 0]);
 		assertEquals( 2, entry.values[ 1]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 4);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 4);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testInt32Single() throws Exception {
@@ -145,13 +139,12 @@ public class AbstractHeaderTest extends TestCase {
 		entry.read( buffer);
 		assertEquals( 1, entry.values[ 0]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 4);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 4);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testInt32Multiple() throws Exception {
@@ -167,13 +160,12 @@ public class AbstractHeaderTest extends TestCase {
 		assertEquals( 1, entry.values[ 0]);
 		assertEquals( 2, entry.values[ 1]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 8);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 8);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testInt64Single() throws Exception {
@@ -187,13 +179,12 @@ public class AbstractHeaderTest extends TestCase {
 		entry.read( buffer);
 		assertEquals( 1, entry.values[ 0]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 8);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 8);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testInt64Multiple() throws Exception {
@@ -209,13 +200,12 @@ public class AbstractHeaderTest extends TestCase {
 		assertEquals( 1, entry.values[ 0]);
 		assertEquals( 2, entry.values[ 1]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 16);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 16);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testStringSingle() throws Exception {
@@ -229,13 +219,12 @@ public class AbstractHeaderTest extends TestCase {
 		entry.read( buffer);
 		assertEquals( "1234567", entry.values[ 0]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 8);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 8);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testStringMultiple() throws Exception {
@@ -251,13 +240,12 @@ public class AbstractHeaderTest extends TestCase {
 		assertEquals( "1234567", entry.values[ 0]);
 		assertEquals( "7654321", entry.values[ 1]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 16);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 16);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testBinary() throws Exception {
@@ -271,13 +259,12 @@ public class AbstractHeaderTest extends TestCase {
 		entry.read( buffer);
 		assertTrue( ByteBuffer.wrap( "12345678".getBytes()).equals( ByteBuffer.wrap( entry.values)));
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 8);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 8);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testStringArraySingle() throws Exception {
@@ -291,13 +278,12 @@ public class AbstractHeaderTest extends TestCase {
 		entry.read( buffer);
 		assertEquals( "1234567", entry.values[ 0]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 8);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 8);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testStringArrayMultiple() throws Exception {
@@ -313,13 +299,12 @@ public class AbstractHeaderTest extends TestCase {
 		assertEquals( "1234567", entry.values[ 0]);
 		assertEquals( "7654321", entry.values[ 1]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 16);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 16);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testI18NStringSingle() throws Exception {
@@ -333,13 +318,12 @@ public class AbstractHeaderTest extends TestCase {
 		entry.read( buffer);
 		assertEquals( "1234567", entry.values[ 0]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 8);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 8);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public void testI18NStringMultiple() throws Exception {
@@ -355,13 +339,12 @@ public class AbstractHeaderTest extends TestCase {
 		assertEquals( "1234567", entry.values[ 0]);
 		assertEquals( "7654321", entry.values[ 1]);
 
-		header.index = ByteBuffer.allocate( 16);
-		header.data = ByteBuffer.allocate( 16);
-		entry.write();
+		ByteBuffer data = ByteBuffer.allocate( 16);
+		entry.write( data);
 
-		header.data.flip();
+		data.flip();
 		buffer.flip();
-		assertTrue( buffer.equals( header.data));
+		assertTrue( buffer.equals( data));
 	}
 
 	public class TestHeader extends AbstractHeader {}
