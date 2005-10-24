@@ -36,6 +36,6 @@ public class Format {
 	}
 
 	public String toString() {
-		return lead.toString() + header + signature;
+		return lead.toString() + signature + header;
 	}
 }

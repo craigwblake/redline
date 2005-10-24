@@ -8,7 +8,9 @@ import java.util.*;
 
 public class Header extends AbstractHeader {
 
-	static { for ( HeaderTag tag : HeaderTag.values()) TAGS.put( tag.getCode(), tag); }
+	public Header() {
+		for ( HeaderTag tag : HeaderTag.values()) tags.put( tag.getCode(), tag);
+	}
 
 	public enum HeaderTag implements Tag {
 		NAME( 1000, "name"),

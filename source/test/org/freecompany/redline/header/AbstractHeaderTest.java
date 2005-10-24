@@ -17,7 +17,7 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< byte[]> entry = header.createEntry( 1);
 		entry.setCount( 1);
 		entry.read( buffer);
-		assertEquals( 1, entry.values[ 0]);
+		assertEquals( 1, entry.getValues()[ 0]);
 
 		ByteBuffer data = ByteBuffer.allocate( 1);
 		entry.write( data);
@@ -37,8 +37,8 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< byte[]> entry = header.createEntry( 1);
 		entry.setCount( 2);
 		entry.read( buffer);
-		assertEquals( 1, entry.values[ 0]);
-		assertEquals( 2, entry.values[ 1]);
+		assertEquals( 1, entry.getValues()[ 0]);
+		assertEquals( 2, entry.getValues()[ 1]);
 
 		ByteBuffer data = ByteBuffer.allocate( 2);
 		entry.write( data);
@@ -57,7 +57,7 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< byte[]> entry = header.createEntry( 2);
 		entry.setCount( 1);
 		entry.read( buffer);
-		assertEquals( 1, entry.values[ 0]);
+		assertEquals( 1, entry.getValues()[ 0]);
 
 		ByteBuffer data = ByteBuffer.allocate( 1);
 		entry.write( data);
@@ -77,8 +77,8 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< byte[]> entry = header.createEntry( 2);
 		entry.setCount( 2);
 		entry.read( buffer);
-		assertEquals( 1, entry.values[ 0]);
-		assertEquals( 2, entry.values[ 1]);
+		assertEquals( 1, entry.getValues()[ 0]);
+		assertEquals( 2, entry.getValues()[ 1]);
 
 		ByteBuffer data = ByteBuffer.allocate( 2);
 		entry.write( data);
@@ -97,7 +97,7 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< short[]> entry = header.createEntry( 3);
 		entry.setCount( 1);
 		entry.read( buffer);
-		assertEquals( 1, entry.values[ 0]);
+		assertEquals( 1, entry.getValues()[ 0]);
 
 		ByteBuffer data = ByteBuffer.allocate( 2);
 		entry.write( data);
@@ -117,8 +117,8 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< short[]> entry = header.createEntry( 3);
 		entry.setCount( 2);
 		entry.read( buffer);
-		assertEquals( 1, entry.values[ 0]);
-		assertEquals( 2, entry.values[ 1]);
+		assertEquals( 1, entry.getValues()[ 0]);
+		assertEquals( 2, entry.getValues()[ 1]);
 
 		ByteBuffer data = ByteBuffer.allocate( 4);
 		entry.write( data);
@@ -137,7 +137,7 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< int[]> entry = header.createEntry( 4);
 		entry.setCount( 1);
 		entry.read( buffer);
-		assertEquals( 1, entry.values[ 0]);
+		assertEquals( 1, entry.getValues()[ 0]);
 
 		ByteBuffer data = ByteBuffer.allocate( 4);
 		entry.write( data);
@@ -157,8 +157,8 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< int[]> entry = header.createEntry( 4);
 		entry.setCount( 2);
 		entry.read( buffer);
-		assertEquals( 1, entry.values[ 0]);
-		assertEquals( 2, entry.values[ 1]);
+		assertEquals( 1, entry.getValues()[ 0]);
+		assertEquals( 2, entry.getValues()[ 1]);
 
 		ByteBuffer data = ByteBuffer.allocate( 8);
 		entry.write( data);
@@ -177,7 +177,7 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< long[]> entry = header.createEntry( 5);
 		entry.setCount( 1);
 		entry.read( buffer);
-		assertEquals( 1, entry.values[ 0]);
+		assertEquals( 1, entry.getValues()[ 0]);
 
 		ByteBuffer data = ByteBuffer.allocate( 8);
 		entry.write( data);
@@ -197,8 +197,8 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< long[]> entry = header.createEntry( 5);
 		entry.setCount( 2);
 		entry.read( buffer);
-		assertEquals( 1, entry.values[ 0]);
-		assertEquals( 2, entry.values[ 1]);
+		assertEquals( 1, entry.getValues()[ 0]);
+		assertEquals( 2, entry.getValues()[ 1]);
 
 		ByteBuffer data = ByteBuffer.allocate( 16);
 		entry.write( data);
@@ -217,7 +217,7 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< String[]> entry = header.createEntry( 6);
 		entry.setCount( 1);
 		entry.read( buffer);
-		assertEquals( "1234567", entry.values[ 0]);
+		assertEquals( "1234567", entry.getValues()[ 0]);
 
 		ByteBuffer data = ByteBuffer.allocate( 8);
 		entry.write( data);
@@ -237,8 +237,8 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< String[]> entry = header.createEntry( 6);
 		entry.setCount( 2);
 		entry.read( buffer);
-		assertEquals( "1234567", entry.values[ 0]);
-		assertEquals( "7654321", entry.values[ 1]);
+		assertEquals( "1234567", entry.getValues()[ 0]);
+		assertEquals( "7654321", entry.getValues()[ 1]);
 
 		ByteBuffer data = ByteBuffer.allocate( 16);
 		entry.write( data);
@@ -257,7 +257,7 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< byte[]> entry = header.createEntry( 7);
 		entry.setCount( 8);
 		entry.read( buffer);
-		assertTrue( ByteBuffer.wrap( "12345678".getBytes()).equals( ByteBuffer.wrap( entry.values)));
+		assertTrue( ByteBuffer.wrap( "12345678".getBytes()).equals( ByteBuffer.wrap( entry.getValues())));
 
 		ByteBuffer data = ByteBuffer.allocate( 8);
 		entry.write( data);
@@ -276,7 +276,7 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< String[]> entry = header.createEntry( 8);
 		entry.setCount( 1);
 		entry.read( buffer);
-		assertEquals( "1234567", entry.values[ 0]);
+		assertEquals( "1234567", entry.getValues()[ 0]);
 
 		ByteBuffer data = ByteBuffer.allocate( 8);
 		entry.write( data);
@@ -296,8 +296,8 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< String[]> entry = header.createEntry( 8);
 		entry.setCount( 2);
 		entry.read( buffer);
-		assertEquals( "1234567", entry.values[ 0]);
-		assertEquals( "7654321", entry.values[ 1]);
+		assertEquals( "1234567", entry.getValues()[ 0]);
+		assertEquals( "7654321", entry.getValues()[ 1]);
 
 		ByteBuffer data = ByteBuffer.allocate( 16);
 		entry.write( data);
@@ -316,7 +316,7 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< String[]> entry = header.createEntry( 9);
 		entry.setCount( 1);
 		entry.read( buffer);
-		assertEquals( "1234567", entry.values[ 0]);
+		assertEquals( "1234567", entry.getValues()[ 0]);
 
 		ByteBuffer data = ByteBuffer.allocate( 8);
 		entry.write( data);
@@ -336,8 +336,8 @@ public class AbstractHeaderTest extends TestCase {
 		Entry< String[]> entry = header.createEntry( 9);
 		entry.setCount( 2);
 		entry.read( buffer);
-		assertEquals( "1234567", entry.values[ 0]);
-		assertEquals( "7654321", entry.values[ 1]);
+		assertEquals( "1234567", entry.getValues()[ 0]);
+		assertEquals( "7654321", entry.getValues()[ 1]);
 
 		ByteBuffer data = ByteBuffer.allocate( 16);
 		entry.write( data);

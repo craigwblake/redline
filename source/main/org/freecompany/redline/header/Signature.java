@@ -8,7 +8,9 @@ import java.util.*;
 
 public class Signature extends AbstractHeader {
 
-	static { for ( SignatureTag tag : SignatureTag.values()) TAGS.put( tag.getCode(), tag); }
+	public Signature() {
+		for ( SignatureTag tag : SignatureTag.values()) tags.put( tag.getCode(), tag);
+	}
 
 	public enum SignatureTag implements Tag {
 		SIGNATURES( 62, "signatures"),

@@ -1,6 +1,7 @@
 package org.freecompany.redline.header;
 
 import org.freecompany.redline.*;
+import java.lang.reflect.*;
 import java.io.*;
 import java.net.*;
 import java.nio.*;
@@ -20,9 +21,10 @@ public abstract class AbstractHeader {
 	protected static final int HEADER_HEADER_SIZE = 16;
 	protected static final int ENTRY_SIZE = 16;
 	protected static final int MAGIC_WORD = 0x8EADE801;
-	protected static final Map< Integer, Tag> TAGS = new HashMap< Integer, Tag>();
 
-	private final Map< Integer, Entry> entries = new LinkedHashMap< Integer, Entry>();
+	protected final Map< Integer, Tag> tags = new HashMap< Integer, Tag>();
+	protected final Map< Integer, Entry> entries = new LinkedHashMap< Integer, Entry>();
+	protected final Map< Entry, ByteBuffer> pending = new LinkedHashMap< Entry, ByteBuffer>();
 
 	public void read( ReadableByteChannel in) throws IOException {
 		ByteBuffer header = Util.fill( in, HEADER_HEADER_SIZE);
@@ -101,84 +103,55 @@ public abstract class AbstractHeader {
 			final int size = entry.size();
 			final ByteBuffer data = out.map( READ_WRITE, out.position(), size);
 			entry.index( index, offset);
-			entry.write( data);
+			if ( entry.ready()) entry.write( data);
+			else {
+				System.out.println( "Adding pending entry: " + entry);
+				pending.put( entry, data);
+			}
 			out.position( out.position() + size);
 			offset += size;
 		}
 		return ( int) ( out.position() - start);
 	}
 
-	public Map< Integer, Entry> entries() {
-		return entries;
+	public void writePending() {
+		for ( Entry< Object> entry : pending.keySet()) entry.write( pending.get( entry));
 	}
 
-	public void addEntry( Tag tag) {
-		createEntry( tag.getCode(), 0, 0, 0);
+	public Map< Entry, ByteBuffer> getPending() {
+		return pending;
 	}
 
-	@SuppressWarnings( "unchecked")
-	public void addEntry( Tag tag, char c) {
-		Entry< char[]> entry = createEntry( tag.getCode(), 1, 0, 1);
-		entry.setValues( new char[] { c});
+	public Entry< Object> getEntry( final Tag tag) {
+		return getEntry( tag.getCode());
 	}
 
-	@SuppressWarnings( "unchecked")
-	public void addEntry( Tag tag, byte b) {
-		Entry< byte[]> entry = createEntry( tag.getCode(), 2, 0, 1);
-		entry.setValues( new byte[] { b});
-	}
-
-	public void addEntry( Tag tag, short s) {
-	@SuppressWarnings( "unchecked")
-		Entry< short[]> entry = createEntry( tag.getCode(), 3, 0, 1);
-		entry.setValues( new short[] { s});
-	}
-
-	public void addEntry( Tag tag, int i) {
-	@SuppressWarnings( "unchecked")
-		Entry< int[]> entry = createEntry( tag.getCode(), 4, 0, 1);
-		entry.setValues( new int[] { i});
-	}
-
-	public void addEntry( Tag tag, long l) {
-	@SuppressWarnings( "unchecked")
-		Entry< long[]> entry = createEntry( tag.getCode(), 5, 0, 1);
-		entry.setValues( new long[] { l});
+	public Entry< Object> getEntry( final int tag) {
+		return entries.get( tag);
 	}
 
 	@SuppressWarnings( "unchecked")
-	public void addEntry( Tag tag, String value) {
-		Entry< String[]> entry = createEntry( tag.getCode(), 6, 0, 1);
-		entry.setValues( new String[] { value});
+	public < T> Entry< T> addEntry( Tag tag, int type, T values) {
+		Entry< T> entry = createEntry( tag.getCode(), type, values.getClass().isArray() ? Array.getLength( values) : 1);
+		entry.setValues( values);
+		return entry;
 	}
 
 	@SuppressWarnings( "unchecked")
-	public void addEntry( Tag tag, byte[] binary) {
-		Entry< byte[]>  entry= createEntry( tag.getCode(), 7, 0, 1);
-		entry.setValues( binary);
-	}
-
-	@SuppressWarnings( "unchecked")
-	public void addEntry( Tag tag, String[] value) {
-		Entry< String[]> entry = createEntry( tag.getCode(), 8, 0, value.length);
-		entry.setValues( value);
-	}
-
-	@SuppressWarnings( "unchecked")
-	public void addI18NEntry( Tag tag, String[] value) {
-		Entry< String[]> entry = createEntry( tag.getCode(), 9, 0, value.length);
-		entry.setValues( value);
+	public < T> Entry< T> addEntry( Tag tag, int type, int count) {
+		Entry< T> entry = createEntry( tag.getCode(), type, count);
+		return entry;
 	}
 
 	public Entry readEntry( final int tag, final int type, final int offset, final int count, final ByteBuffer data) {
-		final Entry entry = createEntry( tag, type, offset, count);
-		ByteBuffer buffer = data.duplicate();
+		final Entry entry = createEntry( tag, type, count);
+		final ByteBuffer buffer = data.duplicate();
 		buffer.position( offset);
 		entry.read( buffer);
 		return entry;
 	}
 
-	public Entry createEntry( final int tag, final int type, final int offset, final int count) {
+	public Entry createEntry( final int tag, final int type, final int count) {
 		final Entry entry = createEntry( type);
 		entry.setTag( tag);
 		entry.setCount( count);
@@ -211,16 +184,42 @@ public abstract class AbstractHeader {
 		}
 		throw new IllegalStateException( "Unknown entry type '" + type + "'.");
 	}
+
+	public interface Entry< T> {
+		void setTag( int tag);
+		void setSize( int size);
+		void setCount( int count);
+		void setValues( T values);
+		T getValues();
+		int getTag();
+		int getType();
+		int size();
+		boolean ready();
+		void read( ByteBuffer buffer);
+		void write( ByteBuffer buffer);
+		void index( ByteBuffer buffer, int position);
+	}
 	
-	public static abstract class Entry< T> {
+	public abstract class AbstractEntry< T> implements Entry< T> {
+		protected int size;
 		protected int tag;
 		protected int count;
 		protected T values;
 
 		public void setTag( Tag tag) { this.tag = tag.getCode(); }
 		public void setTag( int tag) { this.tag = tag; }
+		public void setSize( int size) { this.size = size; }
 		public void setCount( int count) { this.count = count; }
 		public void setValues( T values) { this.values = values; }
+
+		public T getValues() { return values; }
+		public int getTag() { return tag; }
+
+		/**
+		 * Returns true if this entry is ready to write, indicated by the presence of
+		 * a set of values.
+		 */
+		public boolean ready() { return values != null; }
 
 		/**
 		 * Returns the data type of this entry.
@@ -252,18 +251,18 @@ public abstract class AbstractHeader {
 		}
 
 		public String toString() {
-			return ( TAGS.containsKey( tag) ? TAGS.get( tag).getName() : super.toString()) + "[tag=" + tag + ",count=" + count + "]";
+			return ( tags.containsKey( tag) ? tags.get( tag).getName() : super.toString()) + "[tag=" + tag + ",type=" + getType() + ",count=" + count + "]";
 		}
 	}
 
-	class NullEntry extends Entry {
+	class NullEntry extends AbstractEntry {
 		public int getType() { return 0; }
 		public int size() { return 0; }
 		public void read( final ByteBuffer buffer) {}
 		public void write( final ByteBuffer data) {}
 	}
 
-	class CharEntry extends Entry< byte[]> {
+	class CharEntry extends AbstractEntry< byte[]> {
 		public int getType() { return 1; }
 		public int size() { return count * Byte.SIZE; }
 		public void read( final ByteBuffer buffer) {
@@ -282,7 +281,7 @@ public abstract class AbstractHeader {
 		}
 	}
 
-	class Int8Entry extends Entry< byte[]> {
+	class Int8Entry extends AbstractEntry< byte[]> {
 		public int getType() { return 2; }
 		public int size() { return count * Byte.SIZE; }
 		public void read( final ByteBuffer buffer) {
@@ -301,7 +300,7 @@ public abstract class AbstractHeader {
 		}
 	}
 
-	class Int16Entry extends Entry< short[]> {
+	class Int16Entry extends AbstractEntry< short[]> {
 		public int getType() { return 3; }
 		public int size() { return Util.round( count * Short.SIZE, 1); }
 		public void read( final ByteBuffer buffer) {
@@ -320,7 +319,7 @@ public abstract class AbstractHeader {
 		}
 	}
 
-	class Int32Entry extends Entry< int[]> {
+	class Int32Entry extends AbstractEntry< int[]> {
 		public int getType() { return 4; }
 		public int size() { return Util.round( count * Integer.SIZE, 3); }
 		public void read( final ByteBuffer buffer) {
@@ -339,7 +338,7 @@ public abstract class AbstractHeader {
 		}
 	}
 
-	class Int64Entry extends Entry< long[]> {
+	class Int64Entry extends AbstractEntry< long[]> {
 		public int getType() { return 5; }
 		public int size() { return Util.round( count * Long.SIZE, 7); }
 		public void read( final ByteBuffer buffer) {
@@ -363,10 +362,11 @@ public abstract class AbstractHeader {
 	 * entry to store more than one string value, but other recent documents
 	 * indicate that this may not longer be the case.
 	 */
-	class StringEntry extends Entry< String[]> {
+	class StringEntry extends AbstractEntry< String[]> {
 		public int getType() { return 6; }
 		public int size() {
-			int size = 0;
+			if ( size != 0) return size;
+			
 			for ( String string : values) size += string.length() + 1;
 			return size;
 		}
@@ -385,15 +385,17 @@ public abstract class AbstractHeader {
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
-			for ( String s : values) {
-				builder.append( "\n\t");
-				builder.append( s);
+			if ( values != null) {
+				for ( String s : values) {
+					builder.append( "\n\t");
+					builder.append( s);
+				}
 			}
 			return builder.toString();
 		}
 	}
 
-	class BinEntry extends Entry< byte[]> {
+	class BinEntry extends AbstractEntry< byte[]> {
 		public int getType() { return 7; }
 		public int size() { return count; }
 		public void read( final ByteBuffer buffer) {
@@ -406,16 +408,18 @@ public abstract class AbstractHeader {
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
-			builder.append( "\n");
-			Util.dump( values, builder);
+			if ( values != null) {
+				builder.append( "\n");
+				Util.dump( values, builder);
+			}
 			return builder.toString();
 		}
 	}
 
-	class StringArrayEntry extends Entry< String[]> {
+	class StringArrayEntry extends AbstractEntry< String[]> {
 		public int getType() { return 8; }
 		public int size() {
-			int size = 0;
+			if ( size != 0) return size;
 			for ( String string : values) size += string.length() + 1;
 			return size;
 		}
@@ -442,10 +446,10 @@ public abstract class AbstractHeader {
 		}
 	}
 
-	class I18NStringEntry extends Entry< String[]> {
+	class I18NStringEntry extends AbstractEntry< String[]> {
 		public int getType() { return 9; }
 		public int size() {
-			int size = 0;
+			if ( size != 0) return size;
 			for ( String string : values) size += string.length() + 1;
 			return size;
 		}
@@ -474,7 +478,8 @@ public abstract class AbstractHeader {
 
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		for ( int tag : entries().keySet()) builder.append( entries.get( tag)).append( "\n");
+		builder.append( "Start Header ( ").append( getClass()).append( ")").append( "\n");
+		for ( int tag : entries.keySet()) builder.append( entries.get( tag)).append( "\n");
 		return builder.toString();
 	}
 }
