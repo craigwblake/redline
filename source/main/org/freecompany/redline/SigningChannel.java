@@ -10,9 +10,10 @@ public class SigningChannel implements WritableByteChannel {
 	protected final Signature signature;
 	protected final WritableByteChannel channel;
 
-	public SigningChannel( final WritableByteChannel channel, final String protocol) throws NoSuchAlgorithmException {
-		this.signature = Signature.getInstance( protocol);
+	public SigningChannel( final WritableByteChannel channel, final PrivateKey key, final String protocol) throws NoSuchAlgorithmException, InvalidKeyException {
 		this.channel = channel;
+		signature = Signature.getInstance( protocol);
+		signature.initSign( key);
 	}
 
 	public int write( final ByteBuffer buffer) throws IOException {

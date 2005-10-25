@@ -5,18 +5,20 @@ import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
 
+import static org.freecompany.redline.header.Architecture.*;
+
 public class Lead {
 
 	private static final int LEAD_SIZE = 96;
 	private static final int MAGIC = 0xEDABEEDB;
 
-	protected byte major;
+	protected byte major = 3;
 	protected byte minor;
 	protected short type;
-	protected short arch;
+	protected Architecture arch = NOARCH;
 	protected String name;
-	protected short os;
-	protected short sigtype;
+	protected Os os;
+	protected short sigtype = 5;
 
 	public void setMajor( byte major) {
 		this.major = major;
@@ -30,7 +32,7 @@ public class Lead {
 		this.type = type;
 	}
 
-	public void setArch( short arch) {
+	public void setArch( Architecture arch) {
 		this.arch = arch;
 	}
 
@@ -38,7 +40,7 @@ public class Lead {
 		this.name = name;
 	}
 
-	public void setOs( short os) {
+	public void setOs( Os os) {
 		this.os = os;
 	}
 
@@ -54,7 +56,7 @@ public class Lead {
 		major = lead.get();
 		minor = lead.get();
 		type = lead.getShort();
-		arch = lead.getShort();
+		arch = Architecture.values()[ lead.getShort()];
 
 		ByteBuffer data = ByteBuffer.allocate( 66);
 		lead.get( data.array());
@@ -63,7 +65,7 @@ public class Lead {
 		while (( b = data.get()) != 0) builder.append(( char) b);
 		name = builder.toString();
 
-		os = lead.getShort();
+		os = Os.values()[ lead.getShort()];
 		sigtype = lead.getShort();
 		if ( lead.remaining() != 16) throw new IllegalStateException( "Expected 16 remaining, found '" + lead.remaining() + "'.");
 	}
@@ -74,13 +76,13 @@ public class Lead {
 		buffer.put( major);
 		buffer.put( minor);
 		buffer.putShort( type);
-		buffer.putShort( arch);
+		buffer.putShort(( short) arch.ordinal());
 
 		byte[] data = new byte[ 66];
 		System.arraycopy( name.getBytes(), 0, data, 0, name.length());
 		buffer.put( data);
 
-		buffer.putShort( os);
+		buffer.putShort(( short) os.ordinal());
 		buffer.putShort( sigtype);
 		buffer.position( buffer.position() + 16);
 		buffer.flip();

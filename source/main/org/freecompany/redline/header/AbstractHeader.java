@@ -15,6 +15,7 @@ public abstract class AbstractHeader {
 
 	public interface Tag {
 		int getCode();
+		int getType();
 		String getName();
 	}
 
@@ -122,21 +123,51 @@ public abstract class AbstractHeader {
 		return pending;
 	}
 
-	public Entry< Object> getEntry( final Tag tag) {
+	public void removeEntry( final Entry entry) {
+		entries.remove( entry.getTag());
+	}
+
+	public Entry< ?> getEntry( final Tag tag) {
 		return getEntry( tag.getCode());
 	}
 
-	public Entry< Object> getEntry( final int tag) {
+	public Entry< ?> getEntry( final int tag) {
 		return entries.get( tag);
 	}
 
 	@SuppressWarnings( "unchecked")
-	public < T> Entry< T> addEntry( Tag tag, int type, T values) {
-		Entry< T> entry = createEntry( tag.getCode(), type, values.getClass().isArray() ? Array.getLength( values) : 1);
+	public Entry< String[]> addEntry( Tag tag, CharSequence value) {
+		Entry< String[]> entry = createEntry( tag.getCode(), tag.getType(), 1);
+		entry.setValues( new String[] { value.toString()});
+		return entry;
+	}
+
+	@SuppressWarnings( "unchecked")
+	public Entry< int[]> addEntry( Tag tag, int value) {
+		Entry< int[]> entry = createEntry( tag.getCode(), tag.getType(), 1);
+		entry.setValues( new int[] { value});
+		return entry;
+	}
+
+	@SuppressWarnings( "unchecked")
+	public < T> Entry< T> addEntry( Tag tag, T values) {
+		Entry< T> entry = createEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
 		entry.setValues( values);
 		return entry;
 	}
 
+	@SuppressWarnings( "unchecked")
+	public < T> Entry< T> addEntry( int tag, int type, T values) {
+		Entry< T> entry = createEntry( tag, type, values.getClass().isArray() ? Array.getLength( values) : 1);
+		entry.setValues( values);
+		return entry;
+	}
+
+	/**
+	 * Adds a pending entry to this header.  This entry will have the correctly sized buffer allocated, but
+	 * will not be written until the caller writes a value and then invokes {@link writePending} on this
+	 * object.
+	 */
 	@SuppressWarnings( "unchecked")
 	public < T> Entry< T> addEntry( Tag tag, int type, int count) {
 		Entry< T> entry = createEntry( tag.getCode(), type, count);
