@@ -18,10 +18,10 @@ public class CpioHeader {
 	
 	protected static final int CPIO_HEADER = 110;
 	protected static final CharSequence MAGIC = "070701";
+	protected static final CharSequence TRAILER = "TRAILER!!!";
 
 	protected Charset charset = Charset.forName( "US-ASCII");
 
-	protected int magic;
 	protected int inode;
 	protected int mode;
 	protected int uid;
@@ -36,13 +36,30 @@ public class CpioHeader {
 	protected int checksum;
 	protected CharSequence name;
 
+	public CpioHeader() {
+	}
+
+	public CpioHeader( final File file) {
+		mtime = file.lastModified();
+		filesize = ( int ) file.length();
+		name = file.getName();
+	}
+
 	/**
 	 * Test to see if this is the last header, and is therefore the end of the
 	 * archive.  Uses the CPIO magic trailer value to denote the last header of
 	 * the stream.
 	 */
 	public boolean isLast() {
-		return Comparison.equals( "TRAILER!!!", name);
+		return Comparison.equals( TRAILER, name);
+	}
+
+	public void setLast() {
+		name = TRAILER;
+	}
+
+	public void setName( CharSequence name) {
+		this.name = name;
 	}
 	
 	public int getFileSize() {
@@ -69,8 +86,6 @@ public class CpioHeader {
 		if ( buffer.length() < length) throw new IllegalStateException( "Insufficent capacity buffer.");
 		char[] chars = new char[ length];
 		buffer.get( chars);
-		//Util.dump( chars);
-		//System.out.println();
 		return new String( chars);
 	}
 
@@ -83,8 +98,7 @@ public class CpioHeader {
 		ByteBuffer descriptor = Util.fill( channel, CPIO_HEADER);
 		CharBuffer buffer = charset.decode( descriptor);
 
-		String magic = readSix( buffer);
-		if ( !Comparison.equals( MAGIC, magic)) throw new IllegalStateException( "Invalid magic number '" + magic + "'.");
+		if ( !Comparison.equals( MAGIC, readSix( buffer))) throw new IllegalStateException( "Invalid magic number.");
 		inode = readEight( buffer);
 		mode = readEight( buffer);
 		uid = readEight( buffer);

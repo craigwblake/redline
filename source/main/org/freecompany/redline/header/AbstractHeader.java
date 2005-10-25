@@ -136,28 +136,28 @@ public abstract class AbstractHeader {
 	}
 
 	@SuppressWarnings( "unchecked")
-	public Entry< String[]> addEntry( Tag tag, CharSequence value) {
+	public Entry< String[]> createEntry( Tag tag, CharSequence value) {
 		Entry< String[]> entry = createEntry( tag.getCode(), tag.getType(), 1);
 		entry.setValues( new String[] { value.toString()});
 		return entry;
 	}
 
 	@SuppressWarnings( "unchecked")
-	public Entry< int[]> addEntry( Tag tag, int value) {
+	public Entry< int[]> createEntry( Tag tag, int value) {
 		Entry< int[]> entry = createEntry( tag.getCode(), tag.getType(), 1);
 		entry.setValues( new int[] { value});
 		return entry;
 	}
 
 	@SuppressWarnings( "unchecked")
-	public < T> Entry< T> addEntry( Tag tag, T values) {
+	public < T> Entry< T> createEntry( Tag tag, T values) {
 		Entry< T> entry = createEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
 		entry.setValues( values);
 		return entry;
 	}
 
 	@SuppressWarnings( "unchecked")
-	public < T> Entry< T> addEntry( int tag, int type, T values) {
+	public < T> Entry< T> createEntry( int tag, int type, T values) {
 		Entry< T> entry = createEntry( tag, type, values.getClass().isArray() ? Array.getLength( values) : 1);
 		entry.setValues( values);
 		return entry;
@@ -169,8 +169,8 @@ public abstract class AbstractHeader {
 	 * object.
 	 */
 	@SuppressWarnings( "unchecked")
-	public < T> Entry< T> addEntry( Tag tag, int type, int count) {
-		Entry< T> entry = createEntry( tag.getCode(), type, count);
+	public Entry< ?> addEntry( Tag tag, int count) {
+		Entry< ?> entry = createEntry( tag.getCode(), tag.getType(), count);
 		return entry;
 	}
 

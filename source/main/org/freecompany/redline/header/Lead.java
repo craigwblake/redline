@@ -14,7 +14,7 @@ public class Lead {
 
 	protected byte major = 3;
 	protected byte minor;
-	protected short type;
+	protected RpmType type;
 	protected Architecture arch = NOARCH;
 	protected String name;
 	protected Os os;
@@ -28,7 +28,7 @@ public class Lead {
 		this.minor = minor;
 	}
 
-	public void setType( short type) {
+	public void setType( RpmType type) {
 		this.type = type;
 	}
 
@@ -55,7 +55,7 @@ public class Lead {
 
 		major = lead.get();
 		minor = lead.get();
-		type = lead.getShort();
+		type = RpmType.values()[ lead.getShort()];
 		arch = Architecture.values()[ lead.getShort()];
 
 		ByteBuffer data = ByteBuffer.allocate( 66);
@@ -75,7 +75,7 @@ public class Lead {
 		buffer.putInt( MAGIC);
 		buffer.put( major);
 		buffer.put( minor);
-		buffer.putShort( type);
+		buffer.putShort(( short) type.ordinal());
 		buffer.putShort(( short) arch.ordinal());
 
 		byte[] data = new byte[ 66];
