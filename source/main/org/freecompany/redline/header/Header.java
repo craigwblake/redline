@@ -40,9 +40,8 @@ public class Header extends AbstractHeader {
 		RHNPLATFORM( 1131, 6, "rhnplatform"),
 		PLATFORM( 1132, 6, "platform"),
 
-		HEADERSIGNATURES( 62, 6, "headersignatures"),
-		HEADERIMMUTABLE( 63, 6, "headerimmutable"),
-		HEADERI18NTABLE( 100, 6, "headeri18ntable"),
+		HEADERIMMUTABLE( 63, 7, "headerimmutable"),
+		HEADERI18NTABLE( 100, 8, "headeri18ntable"),
 
 		PREINPROG( 1085, 6, "preinprog"),
 		POSTINPROG( 1086, 6, "postinprog"),

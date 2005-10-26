@@ -24,7 +24,7 @@ public abstract class AbstractHeader {
 	protected static final int MAGIC_WORD = 0x8EADE801;
 
 	protected final Map< Integer, Tag> tags = new HashMap< Integer, Tag>();
-	protected final Map< Integer, Entry> entries = new LinkedHashMap< Integer, Entry>();
+	protected final Map< Integer, Entry> entries = new TreeMap< Integer, Entry>();
 	protected final Map< Entry, ByteBuffer> pending = new LinkedHashMap< Entry, ByteBuffer>();
 
 	public void read( ReadableByteChannel in) throws IOException {
@@ -100,23 +100,30 @@ public abstract class AbstractHeader {
 		int offset = 0;
 		final long start = out.position();
 		for ( int tag : entries.keySet()) {
-			Entry entry = entries.get( tag);
-			final int size = entry.size();
-			final ByteBuffer data = out.map( READ_WRITE, out.position(), size);
-			entry.index( index, offset);
-			if ( entry.ready()) entry.write( data);
-			else {
-				System.out.println( "Adding pending entry: " + entry);
-				pending.put( entry, data);
+			final Entry entry = entries.get( tag);
+			try {
+				final int size = entry.size();
+				final ByteBuffer data = out.map( READ_WRITE, out.position(), size);
+				entry.index( index, offset);
+				if ( entry.ready()) entry.write( data);
+				else pending.put( entry, data);
+				out.position( out.position() + size);
+				offset += size;
+			} catch ( Throwable t) {
+				throw new RuntimeException( "Error while writing '" + entry.getTag() + "'.", t);
 			}
-			out.position( out.position() + size);
-			offset += size;
 		}
 		return ( int) ( out.position() - start);
 	}
 
 	public void writePending() {
-		for ( Entry< Object> entry : pending.keySet()) entry.write( pending.get( entry));
+		for ( Entry< Object> entry : pending.keySet()) {
+			try {
+				entry.write( pending.get( entry));
+			} catch ( Throwable t) {
+				throw new RuntimeException( "Error writing pending entry '" + entry.getTag() + "'.", t);
+			}
+		}
 	}
 
 	public Map< Entry, ByteBuffer> getPending() {

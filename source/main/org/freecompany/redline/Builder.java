@@ -10,8 +10,9 @@ import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
 import java.util.zip.*;
-import java.security.*;
+import java.security.PrivateKey;
 
+import static org.freecompany.redline.ChannelWrapper.*;
 import static org.freecompany.redline.header.AbstractHeader.*;
 import static org.freecompany.redline.header.Signature.SignatureTag.*;
 import static org.freecompany.redline.header.Header.HeaderTag.*;
@@ -29,13 +30,21 @@ public class Builder {
 	protected Set< String> filenames = new HashSet< String>();
 	protected Map< String, File> files = new HashMap< String, File>();
 
+	/**
+	 * Initializes the builder and sets some required fields to known values.
+	 */
 	public Builder() {
+		format.getSignature().createEntry( SIGNATURES, new byte[] { ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x3e, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x07, ( byte) 0xff, ( byte) 0xff, ( byte) 0xff, ( byte) 0xb0, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x10});
+		format.getHeader().createEntry( HEADERIMMUTABLE, new byte[] { ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x3f, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x07, ( byte) 0xff, ( byte) 0xff, ( byte) 0xfc, ( byte) 0x50, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x10});
 		format.getHeader().createEntry( BUILDTIME, ( int) ( System.currentTimeMillis() / 1000));
 		format.getHeader().createEntry( RPMVERSION, "4.4.2");
 		format.getHeader().createEntry( PAYLOADFORMAT, "cpio");
 		format.getHeader().createEntry( PAYLOADCOMPRESSOR, "gzip");
 	}
 
+	/**
+	 * Sets the package information, such as the package name and the version.
+	 */
 	public void setPackage( CharSequence name, CharSequence version, CharSequence release) {
 		format.getLead().setName( name + "-" + version + "-" + release);
 		format.getHeader().createEntry( NAME, name);
@@ -108,127 +117,93 @@ public class Builder {
 		format.getHeader().createEntry( DIRNAMES, dirnames.toArray( new String[ dirnames.size()]));
 		format.getHeader().createEntry( BASENAMES, filenames.toArray( new String[ filenames.size()]));
 
+		final WritableChannelWrapper uncompressed = new WritableChannelWrapper( original);
+
+		/*
 		final Map< PrivateKey, Entry< byte[]>> map = new HashMap< PrivateKey, Entry< byte[]>>();
 		for ( PrivateKey key : signatures) {
 			if ( "MD5withRSA".equals( key.getAlgorithm())) map.put( key, ( Entry< byte[]>) format.getSignature().addEntry( GPG, GPGSIZE));
 			else if ( "SHA1withDSA".equals( key.getAlgorithm())) map.put( key, ( Entry< byte[]>) format.getSignature().addEntry( DSAHEADER, DSASIZE));
 			else throw new IOException( "Unknown key type '" + key.getAlgorithm() + "'.");
 		}
+		*/
 
-		// Since the RPM wants the MD5 to be signed to we have to run through each file first.  Yech.
+		// Since the RPM wants the MD5s to be signed to we have to run through each file first.  Yech.
 		final String[] md5s = new String[ filenames.size()];
 		int count = 0;
 		for ( String path : files.keySet()) {
 			final File file = files.get( path);
-			final ReadableByteChannel input = md5Digest( new FileInputStream( file).getChannel(), md5s, count++);
+			final ReadableChannelWrapper input = new ReadableChannelWrapper( new FileInputStream( file).getChannel());
+			final Key< byte[]> key = input.start( "MD5");
 			ByteBuffer buffer = ByteBuffer.allocate( 1024);
 			while ( input.read( buffer) != -1) buffer.rewind();
+			md5s[ count++] = hex( input.finish( key));
 			input.close();
 		}
-		final Entry< String[]> md5 = format.getHeader().createEntry( FILEMD5S, md5s);
+		format.getHeader().createEntry( FILEMD5S, md5s);
 
+		final Entry< int[]> sigsize = ( Entry< int[]>) format.getSignature().addEntry( SIGSIZE, 1);
+		final Entry< int[]> payload = ( Entry< int[]>) format.getSignature().addEntry( PAYLOADSIZE, 1);
+		final Entry< byte[]> md5 = ( Entry< byte[]>) format.getSignature().addEntry( MD5, 16);
 		final Entry< String[]> sha = ( Entry< String[]>) format.getSignature().addEntry( SHA1HEADER, 1);
 		sha.setSize( SHASIZE);
 
 		format.getLead().write( original);
 		format.getSignature().write( original);
 
-		/**
-		 * Wrapping the
-		 */
-		WritableByteChannel channel = new WritableByteChannel() {
-			public int write( final ByteBuffer buffer) throws IOException { return original.write( buffer); }
-			public boolean isOpen() { return original.isOpen(); }
-			public void close() throws IOException {
-				format.getSignature().writePending();
-				format.getHeader().writePending();
-				original.close();
-			}
-		};
+		Key< Integer> sigsizekey = uncompressed.start();
 
+		/*
 		for ( PrivateKey key : map.keySet()) {
-			final Signature signature = Signature.getInstance( key.getAlgorithm());
-			channel = sign( channel, map.get( key), signature);
+			final Entry< byte[]> entry = map.get( key);
+			final WritableByteChannel encrypted = new EncryptionChannel( channel) {
+				public void sign( final byte[] signature) { entry.setValues( signature); }
+			};
 		}
+		*/
 		
-		channel = shaDigest( channel, sha);
+		Key< byte[]> shakey = uncompressed.start( "SHA");
+		Key< byte[]> md5key = uncompressed.start( "MD5");
 		format.getHeader().write( original);
 
+		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( uncompressed));
+		final WritableChannelWrapper compressed = new WritableChannelWrapper( Channels.newChannel( zip));
+		Key< Integer> payloadkey = compressed.start();
+		
 		final ByteBuffer buffer = ByteBuffer.allocate( 4096);
-		final WritableByteChannel zipped = Channels.newChannel( new GZIPOutputStream( Channels.newOutputStream( channel)));
 		for ( String path : files.keySet()) {
 			final File file = files.get( path);
 			final CpioHeader header = new CpioHeader( file);
 			header.setName( path);
-			header.write( zipped);
+			header.write( compressed);
 			
 			FileChannel in = new FileInputStream( file).getChannel();
 			while ( in.read( buffer) != -1) {
 				buffer.flip();
-				while ( buffer.hasRemaining()) zipped.write( buffer);
+				while ( buffer.hasRemaining()) compressed.write( buffer);
 				buffer.clear();
 			}
-			Util.empty( zipped, ByteBuffer.wrap( new byte[ Util.round( header.getFileSize(), 3) - ( int) file.length()]));
+			Util.empty( compressed, ByteBuffer.wrap( new byte[ Util.round( header.getFileSize(), 3) - ( int) file.length()]));
 			in.close();
 		}
 		
 		final CpioHeader trailer = new CpioHeader();
 		trailer.setLast();
-		trailer.write( zipped);
-		Util.empty( zipped, ByteBuffer.wrap( new byte[] { 0, 0}));
-		zipped.close();
+		trailer.write( compressed);
+		Util.empty( compressed, ByteBuffer.wrap( new byte[] { 0, 0}));
+
+		payload.setValues( new int[] { compressed.finish( payloadkey)});
+		zip.finish();
+		
+		md5.setValues( uncompressed.finish( md5key));
+		sha.setValues( new String[] { hex( uncompressed.finish( shakey))});
+		sigsize.setValues( new int[] { uncompressed.finish( sigsizekey)});
+		format.getSignature().writePending();
+		format.getHeader().writePending();
+		uncompressed.close();
 	}
 
-	protected WritableByteChannel sign( final WritableByteChannel channel, final Entry< byte[]> entry, final Signature signature) {
-		return new WritableByteChannel() {
-			public boolean isOpen() { return channel.isOpen(); }
-			public int write( final ByteBuffer buffer) throws IOException {
-				try {
-					signature.update( buffer.duplicate());
-				} catch ( SignatureException e) { throw new RuntimeException( e); }
-				return channel.write( buffer);
-			}
-			public void close() throws IOException {
-				try {
-					entry.setValues( signature.sign());
-				} catch ( SignatureException e) { throw new RuntimeException( e); }
-				channel.close();
-			}
-		};
-	}
-
-	protected WritableByteChannel shaDigest( final WritableByteChannel channel, final Entry< String[]> sha) throws Exception {
-		final MessageDigest digest = MessageDigest.getInstance( "SHA");
-		return new WritableByteChannel() {
-			public boolean isOpen() { return channel.isOpen(); }
-			public int write( final ByteBuffer buffer) throws IOException {
-				digest.update( buffer.duplicate());
-				return channel.write( buffer);
-			}
-			public void close() throws IOException {
-				sha.setValues( new String[] { hex( digest.digest())});
-				channel.close();
-			}
-		};
-	}
-
-	protected ReadableByteChannel md5Digest( final ReadableByteChannel channel, final String[] md5s, final int index) throws Exception {
-		final MessageDigest digest = MessageDigest.getInstance( "MD5");
-		return new ReadableByteChannel() {
-			public boolean isOpen() { return channel.isOpen(); }
-			public int read( final ByteBuffer buffer) throws IOException {
-				final int read = channel.read( buffer);
-				digest.update(( ByteBuffer) buffer.duplicate().flip());
-				return read;
-			}
-			public void close() throws IOException {
-				md5s[ index] = hex( digest.digest());
-				channel.close();
-			}
-		};
-	}
-
-	protected String hex( byte[] data) throws IOException {
+	protected String hex( byte[] data) {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final PrintStream printer = new PrintStream( baos);
 		for ( byte b : data) printer.format( "%02x", b);
