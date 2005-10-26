@@ -22,8 +22,8 @@ public class Test {
 		builder.setLicense( "MIT");
 		builder.setGroup( "Miscellaneous");
 
-		builder.addFile( "/tmp/somefile", new File( args[1]));
-		builder.addFile( "/tmp/anotherfile", new File( args[2]));
+		builder.addFile( "/tmp/AbstractHeader.java", new File( args[1]));
+		builder.addFile( "/tmp/Entry.java", new File( args[2]));
 
 		builder.build( new RandomAccessFile( new File( args[ 0]), "rw").getChannel());
 	}

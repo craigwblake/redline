@@ -343,15 +343,16 @@ public abstract class AbstractHeader {
 	}
 
 	class Int16Entry extends AbstractEntry< short[]> {
+		protected int dataSize() { return count * ( Short.SIZE / 8); }
 		public int getType() { return 3; }
-		public int size() { return Util.round( count * ( Short.SIZE / 8), 1); }
+		public int size() { return Util.round( dataSize(), 1); }
 		public void read( final ByteBuffer buffer) {
 			short[] values = new short[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.getShort();
 			setValues( values);
 		}
 		public void write( final ByteBuffer data) {
-			for ( short s : values) data.putShort( s);
+			for ( short s : values) data.putShort( data.position() + ( size() - dataSize()), s);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
@@ -362,15 +363,16 @@ public abstract class AbstractHeader {
 	}
 
 	class Int32Entry extends AbstractEntry< int[]> {
+		protected int dataSize() { return count * ( Integer.SIZE / 8); }
 		public int getType() { return 4; }
-		public int size() { return Util.round( count * ( Integer.SIZE / 8), 3); }
+		public int size() { return Util.round( dataSize(), 3); }
 		public void read( final ByteBuffer buffer) {
 			int[] values = new int[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.getInt();
 			setValues( values);
 		}
 		public void write( final ByteBuffer data) {
-			for ( int i : values) data.putInt( i);
+			for ( int i : values) data.putInt( data.position() + ( size() - dataSize()), i);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
@@ -381,15 +383,16 @@ public abstract class AbstractHeader {
 	}
 
 	class Int64Entry extends AbstractEntry< long[]> {
+		protected int dataSize() { return count * ( Long.SIZE / 8); }
 		public int getType() { return 5; }
-		public int size() { return Util.round( count * ( Long.SIZE / 8), 7); }
+		public int size() { return Util.round( dataSize(), 7); }
 		public void read( final ByteBuffer buffer) {
 			long[] values = new long[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.getLong();
 			setValues( values);
 		}
 		public void write( final ByteBuffer data) {
-			for ( long l : values) data.putLong( l);
+			for ( long l : values) data.putLong( data.position() + ( size() - dataSize()), l);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
@@ -408,7 +411,6 @@ public abstract class AbstractHeader {
 		public int getType() { return 6; }
 		public int size() {
 			if ( size != 0) return size;
-			
 			for ( String string : values) size += string.length() + 1;
 			return size;
 		}
@@ -458,64 +460,12 @@ public abstract class AbstractHeader {
 		}
 	}
 
-	class StringArrayEntry extends AbstractEntry< String[]> {
+	class StringArrayEntry extends StringEntry {
 		public int getType() { return 8; }
-		public int size() {
-			if ( size != 0) return size;
-			for ( String string : values) size += string.length() + 1;
-			return size;
-		}
-		public void read( final ByteBuffer buffer) {
-			String[] values = new String[ count];
-			for ( int x = 0; x < count; x++) {
-				StringBuilder string = new StringBuilder();
-				byte b;
-				while (( b = buffer.get()) != 0) string.append(( char) b);
-				values[ x] = string.toString();
-			}
-			setValues( values);
-		}
-		public void write( final ByteBuffer data) {
-			for ( String s : values) data.put( Charset.forName( "US-ASCII").encode( s)).put(( byte) 0);
-		}
-		public String toString() {
-			StringBuilder builder = new StringBuilder( super.toString());
-			for ( String s : values) {
-				builder.append( "\n\t");
-				builder.append( s);
-			}
-			return builder.toString();
-		}
 	}
 
-	class I18NStringEntry extends AbstractEntry< String[]> {
+	class I18NStringEntry extends StringEntry {
 		public int getType() { return 9; }
-		public int size() {
-			if ( size != 0) return size;
-			for ( String string : values) size += string.length() + 1;
-			return size;
-		}
-		public void read( final ByteBuffer buffer) {
-			String[] values = new String[ count];
-			for ( int x = 0; x < count; x++) {
-				StringBuilder string = new StringBuilder();
-				byte b;
-				while (( b = buffer.get()) != 0) string.append(( char) b);
-				values[ x] = string.toString();
-			}
-			setValues( values);
-		}
-		public void write( final ByteBuffer data) {
-			for ( String s : values) data.put( Charset.forName( "US-ASCII").encode( s)).put(( byte) 0);
-		}
-		public String toString() {
-			StringBuilder builder = new StringBuilder( super.toString());
-			for ( String s : values) {
-				builder.append( "\n\t");
-				builder.append( s);
-			}
-			return builder.toString();
-		}
 	}
 
 	public String toString() {

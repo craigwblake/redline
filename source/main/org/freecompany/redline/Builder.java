@@ -37,7 +37,8 @@ public class Builder {
 		format.getSignature().createEntry( SIGNATURES, new byte[] { ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x3e, ( byte) 0x00, ( byte) 0x00,
 			( byte) 0x00, ( byte) 0x07, ( byte) 0xff, ( byte) 0xff, ( byte) 0xff, ( byte) 0xb0, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x10});
 		format.getHeader().createEntry( HEADERIMMUTABLE, new byte[] { ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x3f, ( byte) 0x00, ( byte) 0x00,
-			( byte) 0x00, ( byte) 0x07, ( byte) 0xff, ( byte) 0xff, ( byte) 0xfc, ( byte) 0x50, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x10});
+			( byte) 0x00, ( byte) 0x07, ( byte) 0xff, ( byte) 0xff, ( byte) 0xfc, ( byte) 0xc0, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x10});
+		format.getHeader().createEntry( HEADERI18NTABLE, "C");
 		format.getHeader().createEntry( BUILDTIME, ( int) ( System.currentTimeMillis() / 1000));
 		format.getHeader().createEntry( RPMVERSION, "4.4.2");
 		format.getHeader().createEntry( PAYLOADFORMAT, "cpio");
@@ -99,9 +100,9 @@ public class Builder {
 	 */
 	public void addFile( CharSequence target, File source) {
 		File file = new File( target.toString());
-		dirnames.add( file.getParent());
+		dirnames.add( file.getParent() + "/");
 		filenames.add( file.getName());
-		files.put( file.getAbsolutePath(), source);
+		files.put( "." + file.getAbsolutePath(), source);
 	}
 
 	/**
