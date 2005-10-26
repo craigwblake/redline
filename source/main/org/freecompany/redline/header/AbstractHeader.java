@@ -100,13 +100,16 @@ public abstract class AbstractHeader {
 			try {
 				final int size = entry.size();
 				final ByteBuffer buffer = ByteBuffer.allocate( size);
-				buffers.add( buffer);
+				final int shift = entry.getOffset( offset) - offset;
+				if ( shift > 0) buffers.add( ByteBuffer.allocate( shift));
+				offset += shift;
 				entry.index( index, offset);
 				if ( entry.ready()) {
 					entry.write( buffer);
 					buffer.flip();
 				}
 				else pending.put( entry, offset);
+				buffers.add( buffer);
 				offset += size;
 			} catch ( Throwable t) {
 				throw new RuntimeException( "Error while writing '" + entry.getTag() + "'.", t);
@@ -235,6 +238,7 @@ public abstract class AbstractHeader {
 		T getValues();
 		int getTag();
 		int getType();
+		int getOffset( int offset);
 		int size();
 		boolean ready();
 		void read( ByteBuffer buffer);
@@ -256,6 +260,8 @@ public abstract class AbstractHeader {
 
 		public T getValues() { return values; }
 		public int getTag() { return tag; }
+
+		public int getOffset( int offset) { return offset; }
 
 		/**
 		 * Returns true if this entry is ready to write, indicated by the presence of
@@ -293,7 +299,7 @@ public abstract class AbstractHeader {
 		}
 
 		public String toString() {
-			return ( tags.containsKey( tag) ? tags.get( tag).getName() : super.toString()) + "[tag=" + tag + ",type=" + getType() + ",count=" + count + "]";
+			return ( tags.containsKey( tag) ? tags.get( tag).getName() : super.toString()) + "[tag=" + tag + ",type=" + getType() + ",count=" + count + ",size=" + size() + "]";
 		}
 	}
 
@@ -343,16 +349,16 @@ public abstract class AbstractHeader {
 	}
 
 	class Int16Entry extends AbstractEntry< short[]> {
-		protected int dataSize() { return count * ( Short.SIZE / 8); }
+		public int getOffset( int offset) { return Util.round( offset, 1); }
 		public int getType() { return 3; }
-		public int size() { return Util.round( dataSize(), 1); }
+		public int size() { return count * ( Byte.SIZE / 8); }
 		public void read( final ByteBuffer buffer) {
 			short[] values = new short[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.getShort();
 			setValues( values);
 		}
 		public void write( final ByteBuffer data) {
-			for ( short s : values) data.putShort( data.position() + ( size() - dataSize()), s);
+			for ( short s : values) data.putShort( s);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
@@ -363,16 +369,16 @@ public abstract class AbstractHeader {
 	}
 
 	class Int32Entry extends AbstractEntry< int[]> {
-		protected int dataSize() { return count * ( Integer.SIZE / 8); }
+		public int getOffset( int offset) { return Util.round( offset, 3); }
 		public int getType() { return 4; }
-		public int size() { return Util.round( dataSize(), 3); }
+		public int size() { return count * ( Integer.SIZE / 8); }
 		public void read( final ByteBuffer buffer) {
 			int[] values = new int[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.getInt();
 			setValues( values);
 		}
 		public void write( final ByteBuffer data) {
-			for ( int i : values) data.putInt( data.position() + ( size() - dataSize()), i);
+			for ( int i : values) data.putInt( i);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
@@ -383,16 +389,16 @@ public abstract class AbstractHeader {
 	}
 
 	class Int64Entry extends AbstractEntry< long[]> {
-		protected int dataSize() { return count * ( Long.SIZE / 8); }
+		public int getOffset( int offset) { return Util.round( offset, 7); }
 		public int getType() { return 5; }
-		public int size() { return Util.round( dataSize(), 7); }
+		public int size() { return count * ( Long.SIZE / 8); }
 		public void read( final ByteBuffer buffer) {
 			long[] values = new long[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.getLong();
 			setValues( values);
 		}
 		public void write( final ByteBuffer data) {
-			for ( long l : values) data.putLong( data.position() + ( size() - dataSize()), l);
+			for ( long l : values) data.putLong( l);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
