@@ -34,8 +34,10 @@ public class Builder {
 	 * Initializes the builder and sets some required fields to known values.
 	 */
 	public Builder() {
-		format.getSignature().createEntry( SIGNATURES, new byte[] { ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x3e, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x07, ( byte) 0xff, ( byte) 0xff, ( byte) 0xff, ( byte) 0xb0, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x10});
-		format.getHeader().createEntry( HEADERIMMUTABLE, new byte[] { ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x3f, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x07, ( byte) 0xff, ( byte) 0xff, ( byte) 0xfc, ( byte) 0x50, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x10});
+		format.getSignature().createEntry( SIGNATURES, new byte[] { ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x3e, ( byte) 0x00, ( byte) 0x00,
+			( byte) 0x00, ( byte) 0x07, ( byte) 0xff, ( byte) 0xff, ( byte) 0xff, ( byte) 0xb0, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x10});
+		format.getHeader().createEntry( HEADERIMMUTABLE, new byte[] { ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x3f, ( byte) 0x00, ( byte) 0x00,
+			( byte) 0x00, ( byte) 0x07, ( byte) 0xff, ( byte) 0xff, ( byte) 0xfc, ( byte) 0x50, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x10});
 		format.getHeader().createEntry( BUILDTIME, ( int) ( System.currentTimeMillis() / 1000));
 		format.getHeader().createEntry( RPMVERSION, "4.4.2");
 		format.getHeader().createEntry( PAYLOADFORMAT, "cpio");
@@ -142,9 +144,9 @@ public class Builder {
 		}
 		format.getHeader().createEntry( FILEMD5S, md5s);
 
-		final Entry< int[]> sigsize = ( Entry< int[]>) format.getSignature().addEntry( SIGSIZE, 1);
+		final Entry< int[]> sigsize = ( Entry< int[]>) format.getSignature().addEntry( LEGACY_SIGSIZE, 1);
 		final Entry< int[]> payload = ( Entry< int[]>) format.getSignature().addEntry( PAYLOADSIZE, 1);
-		final Entry< byte[]> md5 = ( Entry< byte[]>) format.getSignature().addEntry( MD5, 16);
+		final Entry< byte[]> md5 = ( Entry< byte[]>) format.getSignature().addEntry( LEGACY_MD5, 16);
 		final Entry< String[]> sha = ( Entry< String[]>) format.getSignature().addEntry( SHA1HEADER, 1);
 		sha.setSize( SHASIZE);
 
@@ -164,7 +166,8 @@ public class Builder {
 		
 		Key< byte[]> shakey = uncompressed.start( "SHA");
 		Key< byte[]> md5key = uncompressed.start( "MD5");
-		format.getHeader().write( original);
+		format.getHeader().write( uncompressed);
+		sha.setValues( new String[] { hex( uncompressed.finish( shakey))});
 
 		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( uncompressed));
 		final WritableChannelWrapper compressed = new WritableChannelWrapper( Channels.newChannel( zip));
@@ -196,10 +199,8 @@ public class Builder {
 		zip.finish();
 		
 		md5.setValues( uncompressed.finish( md5key));
-		sha.setValues( new String[] { hex( uncompressed.finish( shakey))});
 		sigsize.setValues( new int[] { uncompressed.finish( sigsizekey)});
-		format.getSignature().writePending();
-		format.getHeader().writePending();
+		format.getSignature().writePending( original);
 		uncompressed.close();
 	}
 

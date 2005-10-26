@@ -9,7 +9,7 @@ import static org.freecompany.redline.header.Architecture.*;
 
 public class Lead {
 
-	private static final int LEAD_SIZE = 96;
+	public static final int LEAD_SIZE = 96;
 	private static final int MAGIC = 0xEDABEEDB;
 
 	protected byte major = 3;

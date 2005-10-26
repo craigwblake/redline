@@ -9,8 +9,6 @@ import java.nio.channels.*;
 import java.nio.charset.*;
 import java.util.*;
 
-import static java.nio.channels.FileChannel.MapMode.*;
-
 public abstract class AbstractHeader {
 
 	public interface Tag {
@@ -25,7 +23,7 @@ public abstract class AbstractHeader {
 
 	protected final Map< Integer, Tag> tags = new HashMap< Integer, Tag>();
 	protected final Map< Integer, Entry> entries = new TreeMap< Integer, Entry>();
-	protected final Map< Entry, ByteBuffer> pending = new LinkedHashMap< Entry, ByteBuffer>();
+	protected final Map< Entry, Integer> pending = new LinkedHashMap< Entry, Integer>();
 
 	public void read( ReadableByteChannel in) throws IOException {
 		ByteBuffer header = Util.fill( in, HEADER_HEADER_SIZE);
@@ -49,10 +47,14 @@ public abstract class AbstractHeader {
 	/**
 	 * Writes this header section to the provided file at the current position.
 	 */
-	public void write( FileChannel out) throws IOException {
-		final ByteBuffer header = mapHeader( out);
-		final ByteBuffer index = mapIndex( out);
-		header.putInt( writeData( index, out));
+	public void write( WritableByteChannel out) throws IOException {
+		final ByteBuffer header = getHeader();
+		final ByteBuffer index = getIndex();
+		final ByteBuffer data = getData( index);
+		header.putInt((( ByteBuffer) data.flip()).remaining());
+		Util.empty( out, ( ByteBuffer) header.flip());
+		Util.empty( out, ( ByteBuffer) index.flip());
+		Util.empty( out, data);
 	}
 
 	/**
@@ -63,9 +65,8 @@ public abstract class AbstractHeader {
 	 * <p/>
 	 * This method must be invoked before mapping the index or data sections.
 	 */
-	protected ByteBuffer mapHeader( final FileChannel out) throws IOException {
-		ByteBuffer buffer = out.map( READ_WRITE, out.position(), HEADER_HEADER_SIZE);
-		out.position( out.position() + HEADER_HEADER_SIZE);
+	protected ByteBuffer getHeader() throws IOException {
+		ByteBuffer buffer = ByteBuffer.allocate( HEADER_HEADER_SIZE);
 		buffer.putInt( MAGIC_WORD);
 		buffer.putInt( 0);
 		buffer.putInt( entries.size());
@@ -79,13 +80,8 @@ public abstract class AbstractHeader {
 	 * <p/>
 	 * This method must be invoked before mapping the data section, but after mapping the header.
 	 */
-	protected ByteBuffer mapIndex( final FileChannel out) throws IOException {
-		final int size = entries.size() * ENTRY_SIZE;
-		try {
-			return out.map( READ_WRITE, out.position(), size);
-		} finally {
-			out.position( out.position() + size);
-		}
+	protected ByteBuffer getIndex() throws IOException {
+		return ByteBuffer.allocate( entries.size() * ENTRY_SIZE);
 	}
 
 	/**
@@ -96,37 +92,45 @@ public abstract class AbstractHeader {
 	 * This method must be invoked before mapping the data section, but after mapping the header.
 	 * @return the total number of bytes written to the data section of the file.
 	 */
-	protected int writeData( final ByteBuffer index, final FileChannel out) throws IOException {
+	protected ByteBuffer getData( final ByteBuffer index) throws IOException {
 		int offset = 0;
-		final long start = out.position();
+		final List< ByteBuffer> buffers = new LinkedList< ByteBuffer>();
 		for ( int tag : entries.keySet()) {
 			final Entry entry = entries.get( tag);
 			try {
 				final int size = entry.size();
-				final ByteBuffer data = out.map( READ_WRITE, out.position(), size);
+				final ByteBuffer buffer = ByteBuffer.allocate( size);
+				buffers.add( buffer);
 				entry.index( index, offset);
-				if ( entry.ready()) entry.write( data);
-				else pending.put( entry, data);
-				out.position( out.position() + size);
+				if ( entry.ready()) {
+					entry.write( buffer);
+					buffer.flip();
+				}
+				else pending.put( entry, offset);
 				offset += size;
 			} catch ( Throwable t) {
 				throw new RuntimeException( "Error while writing '" + entry.getTag() + "'.", t);
 			}
 		}
-		return ( int) ( out.position() - start);
+		ByteBuffer data = ByteBuffer.allocate( offset);
+		for ( ByteBuffer buffer : buffers) data.put( buffer);
+		return data;
 	}
 
-	public void writePending() {
+	public void writePending( final FileChannel channel) {
 		for ( Entry< Object> entry : pending.keySet()) {
 			try {
-				entry.write( pending.get( entry));
+				ByteBuffer data = ByteBuffer.allocate( entry.size());
+				entry.write( data);
+				channel.position( Lead.LEAD_SIZE + HEADER_HEADER_SIZE + entries.size() * ENTRY_SIZE + pending.get( entry));
+				Util.empty( channel, ( ByteBuffer) data.flip());
 			} catch ( Throwable t) {
 				throw new RuntimeException( "Error writing pending entry '" + entry.getTag() + "'.", t);
 			}
 		}
 	}
 
-	public Map< Entry, ByteBuffer> getPending() {
+	public Map< Entry, Integer> getPending() {
 		return pending;
 	}
 
@@ -302,7 +306,7 @@ public abstract class AbstractHeader {
 
 	class CharEntry extends AbstractEntry< byte[]> {
 		public int getType() { return 1; }
-		public int size() { return count * Byte.SIZE; }
+		public int size() { return count * ( Byte.SIZE / 8); }
 		public void read( final ByteBuffer buffer) {
 			byte[] values = new byte[ count];
 			for ( int x = 0; x < count; x++) values[ x] = ( byte) buffer.get();
@@ -321,7 +325,7 @@ public abstract class AbstractHeader {
 
 	class Int8Entry extends AbstractEntry< byte[]> {
 		public int getType() { return 2; }
-		public int size() { return count * Byte.SIZE; }
+		public int size() { return count * ( Byte.SIZE / 8); }
 		public void read( final ByteBuffer buffer) {
 			byte[] values = new byte[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.get();
@@ -340,7 +344,7 @@ public abstract class AbstractHeader {
 
 	class Int16Entry extends AbstractEntry< short[]> {
 		public int getType() { return 3; }
-		public int size() { return Util.round( count * Short.SIZE, 1); }
+		public int size() { return Util.round( count * ( Short.SIZE / 8), 1); }
 		public void read( final ByteBuffer buffer) {
 			short[] values = new short[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.getShort();
@@ -359,7 +363,7 @@ public abstract class AbstractHeader {
 
 	class Int32Entry extends AbstractEntry< int[]> {
 		public int getType() { return 4; }
-		public int size() { return Util.round( count * Integer.SIZE, 3); }
+		public int size() { return Util.round( count * ( Integer.SIZE / 8), 3); }
 		public void read( final ByteBuffer buffer) {
 			int[] values = new int[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.getInt();
@@ -378,7 +382,7 @@ public abstract class AbstractHeader {
 
 	class Int64Entry extends AbstractEntry< long[]> {
 		public int getType() { return 5; }
-		public int size() { return Util.round( count * Long.SIZE, 7); }
+		public int size() { return Util.round( count * ( Long.SIZE / 8), 7); }
 		public void read( final ByteBuffer buffer) {
 			long[] values = new long[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.getLong();
