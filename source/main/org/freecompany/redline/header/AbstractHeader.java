@@ -54,15 +54,15 @@ public abstract class AbstractHeader {
 
 		data.flip();
 		int pad = Util.round( data.remaining(), 7) - data.remaining();
-		System.out.println( "Adding '" + pad + "' zeros.");
-		header.putInt( data.remaining());
-		header.flip();
-		index.flip();
-		int length = header.remaining() + index.remaining() + data.remaining();
-		Util.empty( out, header);
-		Util.empty( out, index);
+		header.putInt( data.remaining() +  pad);
+		Util.empty( out, ( ByteBuffer) header.flip());
+		Util.empty( out, ( ByteBuffer) index.flip());
 		Util.empty( out, data);
 		Util.empty( out, ByteBuffer.allocate( pad));
+	}
+
+	public int count() {
+		return entries.size();
 	}
 
 	/**
@@ -77,7 +77,7 @@ public abstract class AbstractHeader {
 		ByteBuffer buffer = ByteBuffer.allocate( HEADER_HEADER_SIZE);
 		buffer.putInt( MAGIC_WORD);
 		buffer.putInt( 0);
-		buffer.putInt( entries.size());
+		buffer.putInt( count());
 		return buffer;
 	}
 
@@ -89,7 +89,7 @@ public abstract class AbstractHeader {
 	 * This method must be invoked before mapping the data section, but after mapping the header.
 	 */
 	protected ByteBuffer getIndex() throws IOException {
-		return ByteBuffer.allocate( entries.size() * ENTRY_SIZE);
+		return ByteBuffer.allocate( count() * ENTRY_SIZE);
 	}
 
 	/**
@@ -106,7 +106,6 @@ public abstract class AbstractHeader {
 			final Entry entry = entries.get( tag);
 			try {
 				final int shift = entry.getOffset( offset) - offset;
-				System.out.println( "Offset '" + offset + "' shifted by '" + shift + "'.");
 				if ( shift > 0) buffers.add( ByteBuffer.allocate( shift));
 				offset += shift;
 				
@@ -134,7 +133,7 @@ public abstract class AbstractHeader {
 			try {
 				ByteBuffer data = ByteBuffer.allocate( entry.size());
 				entry.write( data);
-				channel.position( Lead.LEAD_SIZE + HEADER_HEADER_SIZE + entries.size() * ENTRY_SIZE + pending.get( entry));
+				channel.position( Lead.LEAD_SIZE + HEADER_HEADER_SIZE + count() * ENTRY_SIZE + pending.get( entry));
 				Util.empty( channel, ( ByteBuffer) data.flip());
 			} catch ( Throwable t) {
 				throw new RuntimeException( "Error writing pending entry '" + entry.getTag() + "'.", t);
@@ -193,8 +192,7 @@ public abstract class AbstractHeader {
 	 */
 	@SuppressWarnings( "unchecked")
 	public Entry< ?> addEntry( Tag tag, int count) {
-		Entry< ?> entry = createEntry( tag.getCode(), tag.getType(), count);
-		return entry;
+		return createEntry( tag.getCode(), tag.getType(), count);
 	}
 
 	public Entry readEntry( final int tag, final int type, final int offset, final int count, final ByteBuffer data) {
@@ -202,7 +200,6 @@ public abstract class AbstractHeader {
 		final ByteBuffer buffer = data.duplicate();
 		buffer.position( offset);
 		entry.read( buffer);
-		System.out.println( "Read offset '" + offset + "' for entry " + entry);
 		return entry;
 	}
 

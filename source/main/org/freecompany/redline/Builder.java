@@ -30,14 +30,32 @@ public class Builder {
 	protected Set< String> filenames = new HashSet< String>();
 	protected Map< String, File> files = new HashMap< String, File>();
 
+	protected Entry< byte[]> signature;
+	protected Entry< byte[]> immutable;
+
+	protected byte[] getSignature( int count) {
+		return getSpecial( 0x0000003E, count);
+	}
+
+	protected byte[] getImmutable( int count) {
+		return getSpecial( 0x0000003F, count);
+	}
+
+	protected byte[] getSpecial( int tag, int count) {
+		final ByteBuffer buffer = ByteBuffer.allocate( 16);
+		buffer.putInt( tag);
+		buffer.putInt( 0x00000007);
+		buffer.putInt( count * -16);
+		buffer.putInt( 0x00000010);
+		return buffer.array();
+	}
+
 	/**
 	 * Initializes the builder and sets some required fields to known values.
 	 */
 	public Builder() {
-		format.getSignature().createEntry( SIGNATURES, new byte[] { ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x3e, ( byte) 0x00, ( byte) 0x00,
-			( byte) 0x00, ( byte) 0x07, ( byte) 0xff, ( byte) 0xff, ( byte) 0xff, ( byte) 0xb0, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x10});
-		format.getHeader().createEntry( HEADERIMMUTABLE, new byte[] { ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x3f, ( byte) 0x00, ( byte) 0x00,
-			( byte) 0x00, ( byte) 0x07, ( byte) 0xff, ( byte) 0xff, ( byte) 0xfc, ( byte) 0xc0, ( byte) 0x00, ( byte) 0x00, ( byte) 0x00, ( byte) 0x10});
+		signature = ( Entry< byte[]>) format.getSignature().addEntry( SIGNATURES, 16);
+		immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
 		format.getHeader().createEntry( HEADERI18NTABLE, "C");
 		format.getHeader().createEntry( BUILDTIME, ( int) ( System.currentTimeMillis() / 1000));
 		format.getHeader().createEntry( RPMVERSION, "4.4.2");
@@ -152,6 +170,7 @@ public class Builder {
 		sha.setSize( SHASIZE);
 
 		format.getLead().write( original);
+		signature.setValues( getSignature( format.getSignature().count()));
 		format.getSignature().write( original);
 
 		Key< Integer> sigsizekey = uncompressed.start();
@@ -167,6 +186,8 @@ public class Builder {
 		
 		Key< byte[]> shakey = uncompressed.start( "SHA");
 		Key< byte[]> md5key = uncompressed.start( "MD5");
+
+		immutable.setValues( getImmutable( format.getHeader().count()));
 		format.getHeader().write( uncompressed);
 		sha.setValues( new String[] { hex( uncompressed.finish( shakey))});
 
