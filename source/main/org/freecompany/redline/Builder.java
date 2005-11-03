@@ -1,9 +1,6 @@
 package org.freecompany.redline;
 
-import org.freecompany.redline.header.Format;
-import org.freecompany.redline.header.RpmType;
-import org.freecompany.redline.header.Architecture;
-import org.freecompany.redline.header.Os;
+import org.freecompany.redline.header.*;
 import org.freecompany.redline.payload.*;
 import java.io.*;
 import java.nio.*;
@@ -173,8 +170,6 @@ public class Builder {
 		signature.setValues( getSignature( format.getSignature().count()));
 		format.getSignature().write( original);
 
-		Key< Integer> sigsizekey = uncompressed.start();
-
 		/*
 		for ( PrivateKey key : map.keySet()) {
 			final Entry< byte[]> entry = map.get( key);
@@ -184,8 +179,9 @@ public class Builder {
 		}
 		*/
 		
-		Key< byte[]> shakey = uncompressed.start( "SHA");
-		Key< byte[]> md5key = uncompressed.start( "MD5");
+		final Key< Integer> sigsizekey = uncompressed.start();
+		final Key< byte[]> shakey = uncompressed.start( "SHA");
+		final Key< byte[]> md5key = uncompressed.start( "MD5");
 
 		immutable.setValues( getImmutable( format.getHeader().count()));
 		format.getHeader().write( uncompressed);
@@ -193,7 +189,7 @@ public class Builder {
 
 		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( uncompressed));
 		final WritableChannelWrapper compressed = new WritableChannelWrapper( Channels.newChannel( zip));
-		Key< Integer> payloadkey = compressed.start();
+		final Key< Integer> payloadkey = compressed.start();
 		
 		final ByteBuffer buffer = ByteBuffer.allocate( 4096);
 		for ( String path : files.keySet()) {
@@ -215,9 +211,13 @@ public class Builder {
 		final CpioHeader trailer = new CpioHeader();
 		trailer.setLast();
 		trailer.write( compressed);
-		Util.empty( compressed, ByteBuffer.wrap( new byte[] { 0, 0}));
 
-		payload.setValues( new int[] { compressed.finish( payloadkey)});
+		int length = compressed.finish( payloadkey);
+		int pad = Util.difference( length, 3);
+		Util.empty( compressed, ByteBuffer.wrap( new byte[ pad]));
+		length += pad;
+
+		payload.setValues( new int[] { length});
 		zip.finish();
 		
 		md5.setValues( uncompressed.finish( md5key));

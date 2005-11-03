@@ -141,7 +141,7 @@ public class CpioHeader {
 		descriptor.flip();
 		Util.empty( channel, descriptor);
 		Util.empty( channel, charset.encode( CharBuffer.wrap( name)));
-		Util.empty( channel, ByteBuffer.wrap( Util.round( length, 1) != length ? new byte[] { 0, 0} : new byte[] { 0}));
+		Util.empty( channel, ByteBuffer.wrap( new byte[ 1 + ( length & 1)]));
 	}
 
 	public String toString() {

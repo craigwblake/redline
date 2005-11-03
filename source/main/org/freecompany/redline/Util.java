@@ -34,6 +34,10 @@ public class Util {
 		if ( expected != actual) throw new IOException( "check expected " + Integer.toHexString( 0xff & expected) + ", found " + Integer.toHexString( 0xff & actual));
 	}
 
+	public static int difference( int start, int boundary) {
+		return (( boundary + 1) - ( start & boundary)) & boundary;
+	}
+
 	public static int round( int start, int boundary) {
 		return ( start + boundary) & ~boundary;
 	}
