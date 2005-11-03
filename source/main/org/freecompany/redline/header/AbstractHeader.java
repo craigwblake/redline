@@ -52,9 +52,15 @@ public abstract class AbstractHeader {
 		final ByteBuffer index = getIndex();
 		final ByteBuffer data = getData( index);
 		header.putInt((( ByteBuffer) data.flip()).remaining());
-		Util.empty( out, ( ByteBuffer) header.flip());
-		Util.empty( out, ( ByteBuffer) index.flip());
+		header.flip();
+		index.flip();
+		int length = header.remaining() + index.remaining() + data.remaining();
+		Util.empty( out, header);
+		Util.empty( out, index);
 		Util.empty( out, data);
+		int pad = Util.round( length, 3) - length;
+		System.out.println( "Adding '" + pad + "' zeros.");
+		Util.empty( out, ByteBuffer.allocate( pad));
 	}
 
 	/**
@@ -98,6 +104,7 @@ public abstract class AbstractHeader {
 			final Entry entry = entries.get( tag);
 			try {
 				final int shift = entry.getOffset( offset) - offset;
+				System.out.println( "Offset '" + offset + "' shifted by '" + shift + "'.");
 				if ( shift > 0) buffers.add( ByteBuffer.allocate( shift));
 				offset += shift;
 				
@@ -262,7 +269,7 @@ public abstract class AbstractHeader {
 		public T getValues() { return values; }
 		public int getTag() { return tag; }
 
-		public int getOffset( int offset) { return offset; }
+		public int getOffset( int offset) { return Util.round( offset, 1); }
 
 		/**
 		 * Returns true if this entry is ready to write, indicated by the presence of
