@@ -8,14 +8,16 @@ import java.nio.*;
 import java.nio.channels.*;
 import java.util.zip.*;
 
+import static org.freecompany.redline.ChannelWrapper.*;
+
 public class Scanner {
 
 	public static void main( String[] args) throws Exception {
-		ReadableByteChannel in = Channels.newChannel( System.in);
+		ReadableChannelWrapper in = new ReadableChannelWrapper( Channels.newChannel( System.in));
 		Format format = new Scanner().run( in);
 		System.out.println( format);
 		InputStream compressed = new GZIPInputStream( System.in);
-		in = Channels.newChannel( compressed); 
+		in = new ReadableChannelWrapper( Channels.newChannel( compressed));
 		CpioHeader header;
 		do {
 			header = new CpioHeader();
@@ -25,9 +27,21 @@ public class Scanner {
 		} while ( !header.isLast());
 	}
 
-	public Format run( ReadableByteChannel in) throws IOException {
+	public Format run( ReadableChannelWrapper in) throws Exception {
 		Format format = new Format();
-		format.read( in);
+		
+		Key< Integer> lead = in.start();
+		format.getLead().read( in);
+		System.out.println( "Lead ended at '" + in.finish( lead) + "'.");
+		
+		Key< Integer> signature = in.start();
+		format.getSignature().read( in);
+		System.out.println( "Signature ended at '" + in.finish( signature) + "'.");
+
+		Key< Integer> header = in.start();
+		format.getHeader().read( in);
+		System.out.println( "Header ended at '" + in.finish( header) + "'.");
+
 		return format;
 	}
 }

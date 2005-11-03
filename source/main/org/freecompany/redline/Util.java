@@ -27,11 +27,11 @@ public class Util {
 	}
 
 	public static void check( int expected, int actual) throws IOException {
-		if ( expected != actual) System.err.println( "check expected " + Integer.toHexString( expected) + ", found " + Integer.toHexString( actual));
+		if ( expected != actual) throw new IOException( "check expected " + Integer.toHexString( 0xff & expected) + ", found " + Integer.toHexString( 0xff & actual));
 	}
 
 	public static void check( byte expected, byte actual) throws IOException {
-		if ( expected != actual) System.err.println( "check expected " + Integer.toHexString( 0xff & expected) + ", found " + Integer.toHexString( 0xff & actual));
+		if ( expected != actual) throw new IOException( "check expected " + Integer.toHexString( 0xff & expected) + ", found " + Integer.toHexString( 0xff & actual));
 	}
 
 	public static int round( int start, int boundary) {

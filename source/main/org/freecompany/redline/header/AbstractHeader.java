@@ -22,7 +22,7 @@ public abstract class AbstractHeader {
 	protected static final int MAGIC_WORD = 0x8EADE801;
 
 	protected final Map< Integer, Tag> tags = new HashMap< Integer, Tag>();
-	protected final Map< Integer, Entry> entries = new TreeMap< Integer, Entry>();
+	protected final Map< Integer, Entry> entries = new LinkedHashMap< Integer, Entry>();
 	protected final Map< Entry, Integer> pending = new LinkedHashMap< Entry, Integer>();
 
 	public void read( ReadableByteChannel in) throws IOException {
@@ -89,7 +89,6 @@ public abstract class AbstractHeader {
 	 * after the header section.  Each entry writes its corresponding index into the provided index buffer
 	 * and then writes its data to the file channel.
 	 * <p/>
-	 * This method must be invoked before mapping the data section, but after mapping the header.
 	 * @return the total number of bytes written to the data section of the file.
 	 */
 	protected ByteBuffer getData( final ByteBuffer index) throws IOException {
@@ -98,11 +97,12 @@ public abstract class AbstractHeader {
 		for ( int tag : entries.keySet()) {
 			final Entry entry = entries.get( tag);
 			try {
-				final int size = entry.size();
-				final ByteBuffer buffer = ByteBuffer.allocate( size);
 				final int shift = entry.getOffset( offset) - offset;
 				if ( shift > 0) buffers.add( ByteBuffer.allocate( shift));
 				offset += shift;
+				
+				final int size = entry.size();
+				final ByteBuffer buffer = ByteBuffer.allocate( size);
 				entry.index( index, offset);
 				if ( entry.ready()) {
 					entry.write( buffer);
@@ -193,6 +193,7 @@ public abstract class AbstractHeader {
 		final ByteBuffer buffer = data.duplicate();
 		buffer.position( offset);
 		entry.read( buffer);
+		System.out.println( "Read offset '" + offset + "' for entry " + entry);
 		return entry;
 	}
 
