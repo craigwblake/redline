@@ -22,7 +22,7 @@ public abstract class AbstractHeader {
 	protected static final int MAGIC_WORD = 0x8EADE801;
 
 	protected final Map< Integer, Tag> tags = new HashMap< Integer, Tag>();
-	protected final Map< Integer, Entry> entries = new LinkedHashMap< Integer, Entry>();
+	protected final Map< Integer, Entry> entries = new TreeMap< Integer, Entry>();
 	protected final Map< Entry, Integer> pending = new LinkedHashMap< Entry, Integer>();
 
 	public void read( ReadableByteChannel in) throws IOException {
@@ -51,15 +51,17 @@ public abstract class AbstractHeader {
 		final ByteBuffer header = getHeader();
 		final ByteBuffer index = getIndex();
 		final ByteBuffer data = getData( index);
-		header.putInt((( ByteBuffer) data.flip()).remaining());
+
+		data.flip();
+		int pad = Util.round( data.remaining(), 7) - data.remaining();
+		System.out.println( "Adding '" + pad + "' zeros.");
+		header.putInt( data.remaining());
 		header.flip();
 		index.flip();
 		int length = header.remaining() + index.remaining() + data.remaining();
 		Util.empty( out, header);
 		Util.empty( out, index);
 		Util.empty( out, data);
-		int pad = Util.round( length, 3) - length;
-		System.out.println( "Adding '" + pad + "' zeros.");
 		Util.empty( out, ByteBuffer.allocate( pad));
 	}
 

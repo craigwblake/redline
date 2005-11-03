@@ -33,7 +33,7 @@ public class Scanner {
 		Key< Integer> lead = in.start();
 		format.getLead().read( in);
 		System.out.println( "Lead ended at '" + in.finish( lead) + "'.");
-		
+
 		Key< Integer> signature = in.start();
 		format.getSignature().read( in);
 		System.out.println( "Signature ended at '" + in.finish( signature) + "'.");
