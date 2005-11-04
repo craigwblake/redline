@@ -179,7 +179,6 @@ public class Builder {
 		}
 		*/
 		
-		final Key< Integer> copy = output.start( new FileOutputStream( "copy.data").getChannel()); 
 		final Key< Integer> sigsizekey = output.start();
 		final Key< byte[]> shakey = output.start( "SHA");
 		final Key< byte[]> md5key = output.start( "MD5");
@@ -200,11 +199,7 @@ public class Builder {
 			header.write( compressor);
 			
 			FileChannel in = new FileInputStream( file).getChannel();
-			while ( in.read( buffer) != -1) {
-				buffer.flip();
-				while ( buffer.hasRemaining()) compressor.write( buffer);
-				buffer.clear();
-			}
+			while ( in.read(( ByteBuffer) buffer.rewind()) > 0) compressor.write(( ByteBuffer) buffer.flip());
 			Util.empty( compressor, ByteBuffer.wrap( new byte[ Util.round( header.getFileSize(), 3) - ( int) file.length()]));
 			in.close();
 		}
@@ -221,7 +216,6 @@ public class Builder {
 		payload.setValues( new int[] { length});
 		zip.finish();
 		
-		System.out.println( "Copied: " + output.finish( copy));
 		md5.setValues( output.finish( md5key));
 		sigsize.setValues( new int[] { output.finish( sigsizekey)});
 		format.getSignature().writePending( original);

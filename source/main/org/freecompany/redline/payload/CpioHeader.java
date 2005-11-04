@@ -23,14 +23,14 @@ public class CpioHeader {
 	protected Charset charset = Charset.forName( "US-ASCII");
 
 	protected int inode;
-	protected int mode;
+	protected int mode = 438;
 	protected int uid;
 	protected int gid;
 	protected int nlink;
 	protected long mtime;
 	protected int filesize;
-	protected int devMinor;
-	protected int devMajor;
+	protected int devMinor = 1;
+	protected int devMajor = 9;
 	protected int rdevMinor;
 	protected int rdevMajor;
 	protected int checksum;

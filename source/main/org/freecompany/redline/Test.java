@@ -15,7 +15,7 @@ public class Test {
 		builder.setPackage( "test", "1.1.2", "1");
 		builder.setType( BINARY);
 		builder.setArch( NOARCH);
-		builder.setOs( UNKNOWN);
+		builder.setOs( LINUX);
 		builder.setSummary( "A test RPM.");
 		builder.setDescription( "A test RPM with several files.");
 		builder.setBuildHost( "localhost");
@@ -25,6 +25,8 @@ public class Test {
 		builder.addFile( "/tmp/AbstractHeader.java", new File( args[1]));
 		builder.addFile( "/tmp/Entry.java", new File( args[2]));
 
-		builder.build( new RandomAccessFile( new File( args[ 0]), "rw").getChannel());
+		File file = new File( args[ 0]);
+		file.delete();
+		builder.build( new RandomAccessFile( file, "rw").getChannel());
 	}
 }
