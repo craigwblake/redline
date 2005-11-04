@@ -24,6 +24,7 @@ public class Builder {
 	protected Format format = new Format();
 	protected Set< PrivateKey> signatures = new HashSet< PrivateKey>();
 	protected IncludeFiles files = new IncludeFiles();
+	protected Map< String, CharSequence> dependencies = new LinkedHashMap< String, CharSequence>();
 
 	protected Entry< byte[]> signature;
 	protected Entry< byte[]> immutable;
@@ -56,6 +57,13 @@ public class Builder {
 		format.getHeader().createEntry( RPMVERSION, "4.4.2");
 		format.getHeader().createEntry( PAYLOADFORMAT, "cpio");
 		format.getHeader().createEntry( PAYLOADCOMPRESSOR, "gzip");
+
+		addDependency( "rpmlib(CompressedFileNames)", "3.0.4-1");
+		addDependency( "rpmlib(PayloadFilesHavePrefix)", "4.0-1");
+	}
+
+	public void addDependency( CharSequence name, CharSequence value) {
+		dependencies.put( name.toString(), value);
 	}
 
 	/**
@@ -66,6 +74,8 @@ public class Builder {
 		format.getHeader().createEntry( NAME, name);
 		format.getHeader().createEntry( VERSION, version);
 		format.getHeader().createEntry( RELEASE, release);
+		format.getHeader().createEntry( PROVIDEVERSION, version + "-" + release);
+		format.getHeader().createEntry( PROVIDEFLAGS, new int[] { 8});
 	}
 	
 	public void setType( RpmType type) {
@@ -121,8 +131,8 @@ public class Builder {
 	}
 
 	/**
-	 * Add the specified files to the repository payload in the provided
-	 * order.  The required header entries will automatically be generated
+	 * Add the specified file to the repository payload in order.
+	 * The required header entries will automatically be generated
 	 * to record the directory names and file names, as well as their
 	 * digests.
 	 *
@@ -156,8 +166,15 @@ public class Builder {
 		}
 		*/
 
+		int[] flags = new int[ dependencies.size()];
+		Arrays.fill( flags, 16777290);
+		format.getHeader().createEntry( REQUIREFLAGS, flags);
+		format.getHeader().createEntry( REQUIRENAME, dependencies.keySet().toArray( new String[ dependencies.size()]));
+		format.getHeader().createEntry( REQUIREVERSION, dependencies.values().toArray( new String[ dependencies.size()]));
+
 		format.getHeader().createEntry( SIZE, files.getTotalSize());
 		format.getHeader().createEntry( DIRNAMES, files.getDirNames());
+		format.getHeader().createEntry( DIRINDEXES, files.getDirIndexes());
 		format.getHeader().createEntry( BASENAMES, files.getBaseNames());
 		format.getHeader().createEntry( FILEMD5S, files.getMD5s());
 		format.getHeader().createEntry( FILESIZES, files.getSizes());

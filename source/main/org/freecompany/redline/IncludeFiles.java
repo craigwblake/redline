@@ -91,13 +91,13 @@ public class IncludeFiles {
 
 	public String[] getUsers() {
 		String[] array = new String[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = "";
+		for ( int x = 0; x < array.length; x++) array[ x] = "unknown";
 		return array;
 	}
 
 	public String[] getGroups() {
 		String[] array = new String[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = "";
+		for ( int x = 0; x < array.length; x++) array[ x] = "unknown";
 		return array;
 	}
 
@@ -109,6 +109,10 @@ public class IncludeFiles {
 		int[] array = new int[ headers.size()];
 		for ( int x = 0; x < array.length; x++) array[ x] = ( int) headers.get( x).getDevMajor();
 		return array;
+	}
+
+	public int[] getDirIndexes() {
+		return new int[ headers.size()];
 	}
 
 	public int[] getInodes() {

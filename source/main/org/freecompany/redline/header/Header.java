@@ -72,7 +72,7 @@ public class Header extends AbstractHeader {
 		FILEDEVICES( 1095, 4, "filedevices"),
 		FILEINODES( 1096, 4, "fileinodes"),
 		FILELANGS( 1097, 8, "filelangs"),
-		DIRINDEXES( 1116, 6, "dirindexes"),
+		DIRINDEXES( 1116, 4, "dirindexes"),
 		BASENAMES( 1117, 8, "basenames"),
 		DIRNAMES( 1118, 8, "dirnames"),
 
