@@ -135,7 +135,7 @@ public class Builder {
 		format.getHeader().createEntry( DIRNAMES, dirnames.toArray( new String[ dirnames.size()]));
 		format.getHeader().createEntry( BASENAMES, filenames.toArray( new String[ filenames.size()]));
 
-		final WritableChannelWrapper uncompressed = new WritableChannelWrapper( original);
+		final WritableChannelWrapper output = new WritableChannelWrapper( original);
 
 		/*
 		final Map< PrivateKey, Entry< byte[]>> map = new HashMap< PrivateKey, Entry< byte[]>>();
@@ -179,51 +179,51 @@ public class Builder {
 		}
 		*/
 		
-		final Key< Integer> sigsizekey = uncompressed.start();
-		final Key< byte[]> shakey = uncompressed.start( "SHA");
-		final Key< byte[]> md5key = uncompressed.start( "MD5");
+		final Key< Integer> sigsizekey = output.start();
+		final Key< byte[]> shakey = output.start( "SHA");
+		final Key< byte[]> md5key = output.start( "MD5");
 
 		immutable.setValues( getImmutable( format.getHeader().count()));
-		format.getHeader().write( uncompressed);
-		sha.setValues( new String[] { hex( uncompressed.finish( shakey))});
+		format.getHeader().write( output);
+		sha.setValues( new String[] { hex( output.finish( shakey))});
 
-		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( uncompressed));
-		final WritableChannelWrapper compressed = new WritableChannelWrapper( Channels.newChannel( zip));
-		final Key< Integer> payloadkey = compressed.start();
+		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( output));
+		final WritableChannelWrapper compressor = new WritableChannelWrapper( Channels.newChannel( zip));
+		final Key< Integer> payloadkey = compressor.start();
 		
 		final ByteBuffer buffer = ByteBuffer.allocate( 4096);
 		for ( String path : files.keySet()) {
 			final File file = files.get( path);
 			final CpioHeader header = new CpioHeader( file);
 			header.setName( path);
-			header.write( compressed);
+			header.write( compressor);
 			
 			FileChannel in = new FileInputStream( file).getChannel();
 			while ( in.read( buffer) != -1) {
 				buffer.flip();
-				while ( buffer.hasRemaining()) compressed.write( buffer);
+				while ( buffer.hasRemaining()) compressor.write( buffer);
 				buffer.clear();
 			}
-			Util.empty( compressed, ByteBuffer.wrap( new byte[ Util.round( header.getFileSize(), 3) - ( int) file.length()]));
+			Util.empty( compressor, ByteBuffer.wrap( new byte[ Util.round( header.getFileSize(), 3) - ( int) file.length()]));
 			in.close();
 		}
 		
 		final CpioHeader trailer = new CpioHeader();
 		trailer.setLast();
-		trailer.write( compressed);
+		trailer.write( compressor);
 
-		int length = compressed.finish( payloadkey);
+		int length = compressor.finish( payloadkey);
 		int pad = Util.difference( length, 3);
-		Util.empty( compressed, ByteBuffer.wrap( new byte[ pad]));
+		Util.empty( compressor, ByteBuffer.wrap( new byte[ pad]));
 		length += pad;
 
 		payload.setValues( new int[] { length});
 		zip.finish();
 		
-		md5.setValues( uncompressed.finish( md5key));
-		sigsize.setValues( new int[] { uncompressed.finish( sigsizekey)});
+		md5.setValues( output.finish( md5key));
+		sigsize.setValues( new int[] { output.finish( sigsizekey)});
 		format.getSignature().writePending( original);
-		uncompressed.close();
+		output.close();
 	}
 
 	protected String hex( byte[] data) {
