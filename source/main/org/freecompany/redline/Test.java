@@ -14,8 +14,7 @@ public class Test {
 		Builder builder = new Builder();
 		builder.setPackage( "test", "1.1.2", "1");
 		builder.setType( BINARY);
-		builder.setArch( NOARCH);
-		builder.setOs( LINUX);
+		builder.setPlatform( NOARCH, LINUX);
 		builder.setSummary( "A test RPM.");
 		builder.setDescription( "A test RPM with several files.");
 		builder.setBuildHost( "localhost");

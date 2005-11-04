@@ -72,14 +72,16 @@ public class Builder {
 		format.getLead().setType( type);
 	}
 
-	public void setArch( Architecture arch) {
+	public void setPlatform( Architecture arch, Os os) {
 		format.getLead().setArch( arch);
-		format.getHeader().createEntry( ARCH, arch.toString().toLowerCase());
-	}
-
-	public void setOs( Os os) {
 		format.getLead().setOs( os);
-		format.getHeader().createEntry( OS, os.toString().toLowerCase());
+		
+		final CharSequence archName = arch.toString().toLowerCase();
+		final CharSequence osName = os.toString().toLowerCase();
+		format.getHeader().createEntry( ARCH, archName);
+		format.getHeader().createEntry( OS, osName);
+		format.getHeader().createEntry( PLATFORM, archName + "-" + osName);
+		format.getHeader().createEntry( RHNPLATFORM, archName);
 	}
 
 	public void setSummary( CharSequence summary) {
