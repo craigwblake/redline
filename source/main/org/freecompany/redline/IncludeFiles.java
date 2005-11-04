@@ -10,6 +10,7 @@ import static org.freecompany.redline.ChannelWrapper.Key;
 
 public class IncludeFiles {
 	
+	protected int total;
 	protected final ByteBuffer buffer = ByteBuffer.allocate( 1024);
 	protected final Map< CpioHeader, File> targets = new HashMap< CpioHeader, File>();
 	protected final Map< CpioHeader, File> sources = new HashMap< CpioHeader, File>();
@@ -22,15 +23,19 @@ public class IncludeFiles {
 		targets.put( header, target);
 		sources.put( header, source);
 		final ReadableChannelWrapper input = new ReadableChannelWrapper( new FileInputStream( source).getChannel());
+		final Key< Integer> size = input.start();
 		final Key< byte[]> key = input.start( "MD5");
 		while ( input.read( buffer) != -1) buffer.rewind();
 		md5s.put( header, Util.hex( input.finish( key)));
+		total += input.finish( size);
 		input.close();
 	}
 
 	public Iterable< CpioHeader> headers() { return headers; }
 	public File target( final CpioHeader header) { return targets.get( header); }
 	public File source( final CpioHeader header) { return sources.get( header); }
+
+	public int getTotalSize() { return total; }
 
 	public String[] getDirNames() {
 		String[] array = new String[ headers.size()];

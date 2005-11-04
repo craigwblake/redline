@@ -156,6 +156,7 @@ public class Builder {
 		}
 		*/
 
+		format.getHeader().createEntry( SIZE, files.getTotalSize());
 		format.getHeader().createEntry( DIRNAMES, files.getDirNames());
 		format.getHeader().createEntry( BASENAMES, files.getBaseNames());
 		format.getHeader().createEntry( FILEMD5S, files.getMD5s());
