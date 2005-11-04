@@ -17,8 +17,9 @@ public class IncludeFiles {
 	protected final Map< CpioHeader, String> md5s = new HashMap< CpioHeader, String>();
 	protected final LinkedList< CpioHeader> headers = new LinkedList< CpioHeader>();
 
-	public synchronized void addFile( final File target, final File source) throws Exception {
+	public synchronized void addFile( final File target, final File source, final int permission) throws Exception {
 		final CpioHeader header = new CpioHeader( source);
+		header.setPermission( permission);
 		headers.add( header);
 		targets.put( header, target);
 		sources.put( header, source);
@@ -149,7 +150,7 @@ public class IncludeFiles {
 
 	public String[] getContexts() {
 		String[] array = new String[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = "";
+		for ( int x = 0; x < array.length; x++) array[ x] = "<<none>>";
 		return array;
 	}
 }

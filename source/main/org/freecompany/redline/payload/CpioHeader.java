@@ -15,6 +15,14 @@ import java.util.*;
  * to read from the channel for the file content.
  */
 public class CpioHeader {
+
+	public static final int FIFO = 1;
+	public static final int CDEV = 2;
+	public static final int DIR = 4;
+	public static final int BDEV = 6;
+	public static final int FILE = 8;
+	public static final int SYMLINK = 10;
+	public static final int SOCKET = 12;
 	
 	protected static final int CPIO_HEADER = 110;
 	protected static final CharSequence MAGIC = "070701";
@@ -23,7 +31,8 @@ public class CpioHeader {
 	protected Charset charset = Charset.forName( "US-ASCII");
 
 	protected int inode;
-	protected int mode = 438;
+	protected int type;
+	protected int permission;
 	protected int uid;
 	protected int gid;
 	protected int nlink;
@@ -43,13 +52,22 @@ public class CpioHeader {
 		mtime = file.lastModified();
 		filesize = ( int ) file.length();
 		name = file.getName();
+		setPermission( 0644);
+		if ( file.isDirectory()) setType( DIR);
+		else setType( FILE);
 	}
 
-	public int getMode() { return mode; }
+	public int getType() { return type; }
+	public int getPermission() { return permission; }
 	public int getRdevMajor() { return rdevMajor; }
 	public int getDevMajor() { return devMajor; }
 	public int getMtime() { return ( int) mtime / 1000; }
 	public int getInode() { return inode; }
+
+	public int getMode() { return ( type << 12) | permission; }
+
+	public void setPermission( int permission) { this.permission = permission; }
+	public void setType( int type) { this.type = type; }
 
 	/**
 	 * Test to see if this is the last header, and is therefore the end of the
@@ -106,7 +124,11 @@ public class CpioHeader {
 
 		if ( !Comparison.equals( MAGIC, readSix( buffer))) throw new IllegalStateException( "Invalid magic number.");
 		inode = readEight( buffer);
-		mode = readEight( buffer);
+		
+		final int mode = readEight( buffer);
+		permission = mode & 07777;
+		type = mode >>> 12;
+		
 		uid = readEight( buffer);
 		gid = readEight( buffer);
 		nlink = readEight( buffer);
@@ -131,7 +153,7 @@ public class CpioHeader {
 		ByteBuffer descriptor = ByteBuffer.allocate( CPIO_HEADER);
 		descriptor.put( writeSix( MAGIC));
 		descriptor.put( writeEight( inode));
-		descriptor.put( writeEight( mode));
+		descriptor.put( writeEight( getMode()));
 		descriptor.put( writeEight( uid));
 		descriptor.put( writeEight( gid));
 		descriptor.put( writeEight( nlink));
@@ -153,7 +175,8 @@ public class CpioHeader {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append( "Inode: ").append( inode).append( "\n");
-		builder.append( "Mode: ").append( mode).append( "\n");
+		builder.append( "Permission: ").append( Integer.toString( permission, 8)).append( "\n");
+		builder.append( "Type: ").append( type).append( "\n");
 		builder.append( "UID: ").append( uid).append( "\n");
 		builder.append( "GID: ").append( gid).append( "\n");
 		builder.append( "Nlink: ").append( nlink).append( "\n");

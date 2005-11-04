@@ -129,7 +129,7 @@ public class Builder {
 	public void setProvides( CharSequence provides) {
 		format.getHeader().createEntry( PROVIDENAME, provides);
 	}
-
+	
 	/**
 	 * Add the specified file to the repository payload in order.
 	 * The required header entries will automatically be generated
@@ -138,9 +138,17 @@ public class Builder {
 	 *
 	 * @param target the absolute path at which to install this file.
 	 * @param file the file content to include in this rpm.
+	 * @param mode the mode of the target file in standard three octet notation
+	 */
+	public void addFile( CharSequence target, File source, int mode) throws Exception {
+		files.addFile( new File( target.toString()), source, mode);
+	}
+
+	/**
+	 * Addes the file to the repository with the default mode of 644.
 	 */
 	public void addFile( CharSequence target, File source) throws Exception {
-		files.addFile( new File( target.toString()), source);
+		addFile( target, source, 0644);
 	}
 
 	/**
