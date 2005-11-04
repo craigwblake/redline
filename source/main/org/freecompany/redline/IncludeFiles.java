@@ -38,9 +38,9 @@ public class IncludeFiles {
 	public int getTotalSize() { return total; }
 
 	public String[] getDirNames() {
-		String[] array = new String[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = targets.get( headers.get( x)).getParent() + "/";
-		return array;
+		final HashSet< String> set = new HashSet< String>();
+		for ( CpioHeader header : headers) set.add( targets.get( header).getParent() + "/");
+		return set.toArray( new String[ set.size()]);
 	}
 
 	public String[] getBaseNames() {
