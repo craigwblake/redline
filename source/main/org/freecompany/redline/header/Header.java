@@ -76,10 +76,10 @@ public class Header extends AbstractHeader {
 		BASENAMES( 1117, 8, "basenames"),
 		DIRNAMES( 1118, 8, "dirnames"),
 
-		PROVIDENAME( 1047, 6, "providename"),
+		PROVIDENAME( 1047, 8, "providename"),
 		REQUIREFLAGS( 1048, 4, "requireflags"),
-		REQUIRENAME( 1049, 6, "requirename"),
-		REQUIREVERSION( 1050, 6, "requireversion"),
+		REQUIRENAME( 1049, 8, "requirename"),
+		REQUIREVERSION( 1050, 8, "requireversion"),
 		CONFLICTFLAGS( 1053, 6, "conflictflags"),
 		CONFLICTNAME( 1054, 6, "conflictname"),
 		CONFLICTVERSION( 1055, 6, "conflictversion"),

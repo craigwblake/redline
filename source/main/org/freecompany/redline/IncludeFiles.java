@@ -101,8 +101,20 @@ public class IncludeFiles {
 		return array;
 	}
 
-	public int[] getVerifyFlags() {
+	public int[] getColors() {
 		return new int[ headers.size()];
+	}
+
+	public int[] getVerifyFlags() {
+		int[] array = new int[ headers.size()];
+		Arrays.fill( array, -1);
+		return array;
+	}
+
+	public int[] getClasses() {
+		int[] array = new int[ headers.size()];
+		Arrays.fill( array, 1);
+		return array;
 	}
 
 	public int[] getDevices() {

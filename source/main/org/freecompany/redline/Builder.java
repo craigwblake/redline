@@ -192,6 +192,10 @@ public class Builder {
 		format.getHeader().createEntry( FILEDEPENDSX, files.getDependsX());
 		format.getHeader().createEntry( FILEDEPENDSN, files.getDependsN());
 		format.getHeader().createEntry( FILECONTEXTS, files.getContexts());
+		format.getHeader().createEntry( FILECOLORS, files.getColors());
+		format.getHeader().createEntry( FILECLASS, files.getClasses());
+
+		format.getHeader().createEntry( PAYLOADFLAGS, new String[] { "9"});
 
 		final Entry< int[]> sigsize = ( Entry< int[]>) format.getSignature().addEntry( LEGACY_SIGSIZE, 1);
 		final Entry< int[]> payload = ( Entry< int[]>) format.getSignature().addEntry( PAYLOADSIZE, 1);
