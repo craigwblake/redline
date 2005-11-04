@@ -64,7 +64,10 @@ public class IncludeFiles {
 
 	public short[] getRdevs() {
 		short[] array = new short[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = ( short) headers.get( x).getRdevMajor();
+		for ( int x = 0; x < array.length; x++) {
+			final CpioHeader header = headers.get( x);
+			array[ x] = ( short) (( header.getRdevMajor() << 8) + header.getRdevMinor());
+		}
 		return array;
 	}
 
@@ -120,7 +123,10 @@ public class IncludeFiles {
 
 	public int[] getDevices() {
 		int[] array = new int[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = ( int) headers.get( x).getDevMajor();
+		for ( int x = 0; x < array.length; x++) {
+			final CpioHeader header = headers.get( x);
+			array[ x] = ( header.getDevMajor() << 8) + header.getDevMinor();
+		}
 		return array;
 	}
 

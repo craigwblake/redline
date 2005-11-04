@@ -60,7 +60,9 @@ public class CpioHeader {
 	public int getType() { return type; }
 	public int getPermission() { return permission; }
 	public int getRdevMajor() { return rdevMajor; }
+	public int getRdevMinor() { return rdevMinor; }
 	public int getDevMajor() { return devMajor; }
+	public int getDevMinor() { return devMinor; }
 	public int getMtime() { return ( int) mtime / 1000; }
 	public int getInode() { return inode; }
 
