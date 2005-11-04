@@ -63,7 +63,7 @@ public class CpioHeader {
 	public int getRdevMinor() { return rdevMinor; }
 	public int getDevMajor() { return devMajor; }
 	public int getDevMinor() { return devMinor; }
-	public int getMtime() { return ( int) mtime / 1000; }
+	public int getMtime() { return ( int) ( mtime / 1000L) ; }
 	public int getInode() { return inode; }
 
 	public int getMode() { return ( type << 12) | permission; }
