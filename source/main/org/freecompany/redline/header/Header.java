@@ -29,7 +29,7 @@ public class Header extends AbstractHeader {
 		OS( 1021, 6, "os"),
 		ARCH( 1022, 6, "arch"),
 		SOURCERPM( 1044, 6, "sourcerpm"),
-		FILEVERIFYFLAGS( 1045, 6, "fileverifyflags"),
+		FILEVERIFYFLAGS( 1045, 4, "fileverifyflags"),
 		ARCHIVESIZE( 1046, 6, "archivesize"),
 		RPMVERSION( 1064, 6, "rpmversion"),
 		CHANGELOGTIME( 1080, 6, "changelogtime"),

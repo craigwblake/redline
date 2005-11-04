@@ -45,6 +45,12 @@ public class CpioHeader {
 		name = file.getName();
 	}
 
+	public int getMode() { return mode; }
+	public int getRdevMajor() { return rdevMajor; }
+	public int getDevMajor() { return devMajor; }
+	public int getMtime() { return ( int) mtime / 1000; }
+	public int getInode() { return inode; }
+
 	/**
 	 * Test to see if this is the last header, and is therefore the end of the
 	 * archive.  Uses the CPIO magic trailer value to denote the last header of

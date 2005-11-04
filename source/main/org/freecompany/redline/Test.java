@@ -21,6 +21,10 @@ public class Test {
 		builder.setBuildHost( "localhost");
 		builder.setLicense( "MIT");
 		builder.setGroup( "Miscellaneous");
+		builder.setVendor( "FreeCompany RPM Repository http://yum.freecompany.org/");
+		builder.setPackager( "Craig Blake <craigwblake@mac.com>");
+		builder.setUrl( "http://www.freecompany.org/test/");
+		builder.setProvides( "test");
 
 		builder.addFile( "/tmp/AbstractHeader.java", new File( args[1]));
 		builder.addFile( "/tmp/Entry.java", new File( args[2]));

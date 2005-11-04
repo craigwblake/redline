@@ -356,9 +356,8 @@ public abstract class AbstractHeader {
 	}
 
 	class Int16Entry extends AbstractEntry< short[]> {
-		public int getOffset( int offset) { return Util.round( offset, 1); }
 		public int getType() { return 3; }
-		public int size() { return count * ( Byte.SIZE / 8); }
+		public int size() { return count * ( Short.SIZE / 8); }
 		public void read( final ByteBuffer buffer) {
 			short[] values = new short[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.getShort();

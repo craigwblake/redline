@@ -23,9 +23,7 @@ public class Builder {
 
 	protected Format format = new Format();
 	protected Set< PrivateKey> signatures = new HashSet< PrivateKey>();
-	protected Set< String> dirnames = new HashSet< String>();
-	protected Set< String> filenames = new HashSet< String>();
-	protected Map< String, File> files = new HashMap< String, File>();
+	protected IncludeFiles files = new IncludeFiles();
 
 	protected Entry< byte[]> signature;
 	protected Entry< byte[]> immutable;
@@ -104,6 +102,22 @@ public class Builder {
 		format.getHeader().createEntry( GROUP, group);
 	}
 
+	public void setVendor( CharSequence vendor) {
+		format.getHeader().createEntry( VENDOR, vendor);
+	}
+
+	public void setPackager( CharSequence packager) {
+		format.getHeader().createEntry( PACKAGER, packager);
+	}
+
+	public void setUrl( CharSequence url) {
+		format.getHeader().createEntry( URL, url);
+	}
+
+	public void setProvides( CharSequence provides) {
+		format.getHeader().createEntry( PROVIDENAME, provides);
+	}
+
 	/**
 	 * Add the specified files to the repository payload in the provided
 	 * order.  The required header entries will automatically be generated
@@ -113,11 +127,8 @@ public class Builder {
 	 * @param target the absolute path at which to install this file.
 	 * @param file the file content to include in this rpm.
 	 */
-	public void addFile( CharSequence target, File source) {
-		File file = new File( target.toString());
-		dirnames.add( file.getParent() + "/");
-		filenames.add( file.getName());
-		files.put( "." + file.getAbsolutePath(), source);
+	public void addFile( CharSequence target, File source) throws Exception {
+		files.addFile( new File( target.toString()), source);
 	}
 
 	/**
@@ -132,9 +143,6 @@ public class Builder {
 	 * Generates the rpm file to the provided writable channel.
 	 */
 	public void build( final FileChannel original) throws Exception {
-		format.getHeader().createEntry( DIRNAMES, dirnames.toArray( new String[ dirnames.size()]));
-		format.getHeader().createEntry( BASENAMES, filenames.toArray( new String[ filenames.size()]));
-
 		final WritableChannelWrapper output = new WritableChannelWrapper( original);
 
 		/*
@@ -146,19 +154,24 @@ public class Builder {
 		}
 		*/
 
-		// Since the RPM wants the MD5s to be signed to we have to run through each file first.  Yech.
-		final String[] md5s = new String[ filenames.size()];
-		int count = 0;
-		for ( String path : files.keySet()) {
-			final File file = files.get( path);
-			final ReadableChannelWrapper input = new ReadableChannelWrapper( new FileInputStream( file).getChannel());
-			final Key< byte[]> key = input.start( "MD5");
-			ByteBuffer buffer = ByteBuffer.allocate( 1024);
-			while ( input.read( buffer) != -1) buffer.rewind();
-			md5s[ count++] = hex( input.finish( key));
-			input.close();
-		}
-		format.getHeader().createEntry( FILEMD5S, md5s);
+		format.getHeader().createEntry( DIRNAMES, files.getDirNames());
+		format.getHeader().createEntry( BASENAMES, files.getBaseNames());
+		format.getHeader().createEntry( FILEMD5S, files.getMD5s());
+		format.getHeader().createEntry( FILESIZES, files.getSizes());
+		format.getHeader().createEntry( FILEMODES, files.getModes());
+		format.getHeader().createEntry( FILERDEVS, files.getRdevs());
+		format.getHeader().createEntry( FILEMTIMES, files.getMtimes());
+		format.getHeader().createEntry( FILELINKTOS, files.getLinkTos());
+		format.getHeader().createEntry( FILEFLAGS, files.getFlags());
+		format.getHeader().createEntry( FILEUSERNAME, files.getUsers());
+		format.getHeader().createEntry( FILEGROUPNAME, files.getGroups());
+		format.getHeader().createEntry( FILEVERIFYFLAGS, files.getVerifyFlags());
+		format.getHeader().createEntry( FILEDEVICES, files.getDevices());
+		format.getHeader().createEntry( FILEINODES, files.getInodes());
+		format.getHeader().createEntry( FILELANGS, files.getLangs());
+		format.getHeader().createEntry( FILEDEPENDSX, files.getDependsX());
+		format.getHeader().createEntry( FILEDEPENDSN, files.getDependsN());
+		format.getHeader().createEntry( FILECONTEXTS, files.getContexts());
 
 		final Entry< int[]> sigsize = ( Entry< int[]>) format.getSignature().addEntry( LEGACY_SIGSIZE, 1);
 		final Entry< int[]> payload = ( Entry< int[]>) format.getSignature().addEntry( PAYLOADSIZE, 1);
@@ -185,22 +198,22 @@ public class Builder {
 
 		immutable.setValues( getImmutable( format.getHeader().count()));
 		format.getHeader().write( output);
-		sha.setValues( new String[] { hex( output.finish( shakey))});
+		sha.setValues( new String[] { Util.hex( output.finish( shakey))});
 
 		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( output));
 		final WritableChannelWrapper compressor = new WritableChannelWrapper( Channels.newChannel( zip));
 		final Key< Integer> payloadkey = compressor.start();
 		
 		final ByteBuffer buffer = ByteBuffer.allocate( 4096);
-		for ( String path : files.keySet()) {
-			final File file = files.get( path);
-			final CpioHeader header = new CpioHeader( file);
+		for ( CpioHeader header : files.headers()) {
+			final File source = files.source( header);
+			final String path = "." + files.target( header).getAbsolutePath();
 			header.setName( path);
 			header.write( compressor);
 			
-			FileChannel in = new FileInputStream( file).getChannel();
+			FileChannel in = new FileInputStream( source).getChannel();
 			while ( in.read(( ByteBuffer) buffer.rewind()) > 0) compressor.write(( ByteBuffer) buffer.flip());
-			Util.empty( compressor, ByteBuffer.wrap( new byte[ Util.round( header.getFileSize(), 3) - ( int) file.length()]));
+			Util.empty( compressor, ByteBuffer.wrap( new byte[ Util.round( header.getFileSize(), 3) - ( int) source.length()]));
 			in.close();
 		}
 		
@@ -220,13 +233,5 @@ public class Builder {
 		sigsize.setValues( new int[] { output.finish( sigsizekey)});
 		format.getSignature().writePending( original);
 		output.close();
-	}
-
-	protected String hex( byte[] data) {
-		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		final PrintStream printer = new PrintStream( baos);
-		for ( byte b : data) printer.format( "%02x", b);
-		printer.flush();
-		return baos.toString();
 	}
 }
