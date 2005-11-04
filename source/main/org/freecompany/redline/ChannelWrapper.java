@@ -17,6 +17,22 @@ public abstract class ChannelWrapper {
 
 	protected Map< Key< ?>, Consumer< ?>> consumers = new HashMap< Key< ?>, Consumer< ?>>();
 
+	public Key< Integer> start( final WritableByteChannel output) {
+		final Key< Integer> object = new Key< Integer>();
+		consumers.put( object, new Consumer< Integer>() {
+			int count;
+			public void consume( final ByteBuffer buffer) {
+				try {
+					count += output.write( buffer);
+				} catch ( IOException e) {
+					throw new RuntimeException( e);
+				}
+			}
+			public Integer finish() { return count; }
+		});
+		return object;
+	}
+
 	/**
 	 * Initializes a byte counter on this channel.
 	 */

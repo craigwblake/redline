@@ -179,6 +179,7 @@ public class Builder {
 		}
 		*/
 		
+		final Key< Integer> copy = output.start( new FileOutputStream( "copy.data").getChannel()); 
 		final Key< Integer> sigsizekey = output.start();
 		final Key< byte[]> shakey = output.start( "SHA");
 		final Key< byte[]> md5key = output.start( "MD5");
@@ -220,6 +221,7 @@ public class Builder {
 		payload.setValues( new int[] { length});
 		zip.finish();
 		
+		System.out.println( "Copied: " + output.finish( copy));
 		md5.setValues( output.finish( md5key));
 		sigsize.setValues( new int[] { output.finish( sigsizekey)});
 		format.getSignature().writePending( original);
