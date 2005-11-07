@@ -12,7 +12,7 @@ public class Test {
 	public static void main( String[] args) throws Exception {
 
 		Builder builder = new Builder();
-		builder.setPackage( "test", "1.1.2", "1");
+		builder.setPackage( "test", "0.0.1", "1");
 		builder.setType( BINARY);
 		builder.setPlatform( NOARCH, LINUX);
 		builder.setSummary( "A test RPM.");
@@ -28,8 +28,6 @@ public class Test {
 		builder.addFile( "/tmp/AbstractHeader.java", new File( args[1]));
 		builder.addFile( "/tmp/Entry.java", new File( args[2]));
 
-		File file = new File( args[ 0]);
-		file.delete();
-		builder.build( new RandomAccessFile( file, "rw").getChannel());
+		builder.build( new File( args[ 0]));
 	}
 }

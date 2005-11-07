@@ -247,7 +247,9 @@ public class Builder {
 	 * @param directory the destination directory for the new RPM file.
 	 */
 	public void build( final File directory) throws Exception {
-		final File file = new File( directory, format.getLead().getName() + format.getLead().getArch().toString().toLowerCase() + ".rpm");
+		final String rpm = format.getLead().getName() + "." + format.getLead().getArch().toString().toLowerCase() + ".rpm";
+		final File file = new File( directory, rpm);
+		if ( file.exists()) file.delete();
 		build( new RandomAccessFile( file, "rw").getChannel());
 	}
 
