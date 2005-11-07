@@ -14,6 +14,13 @@ import static org.freecompany.redline.header.AbstractHeader.*;
 import static org.freecompany.redline.header.Signature.SignatureTag.*;
 import static org.freecompany.redline.header.Header.HeaderTag.*;
 
+/**
+ * The normal entry point to the API used for building and RPM.  The API provides methods to
+ * configure and add files to a new RPM.  The current version of the RPM format (3.0) requires
+ * numerous headers to be set for an RPM to be valid.  All of the required fields are either
+ * set automatically or exposed through setters in this builder class.  Any required fields are
+ * marked in their respective method API documentation.
+ */
 public class Builder {
 
 	private static final int GPGSIZE = 65;
@@ -21,37 +28,18 @@ public class Builder {
 	private static final int SHASIZE = 41;
 	private static final int MD5SIZE = 32;
 
-	protected Format format = new Format();
-	protected Set< PrivateKey> signatures = new HashSet< PrivateKey>();
-	protected IncludeFiles files = new IncludeFiles();
-	protected Map< String, CharSequence> dependencies = new LinkedHashMap< String, CharSequence>();
+	protected final Format format = new Format();
+	protected final Set< PrivateKey> signatures = new HashSet< PrivateKey>();
+	protected final IncludeFiles files = new IncludeFiles();
+	protected final Map< String, CharSequence> dependencies = new LinkedHashMap< String, CharSequence>();
 
-	protected Entry< byte[]> signature;
-	protected Entry< byte[]> immutable;
-
-	protected byte[] getSignature( int count) {
-		return getSpecial( 0x0000003E, count);
-	}
-
-	protected byte[] getImmutable( int count) {
-		return getSpecial( 0x0000003F, count);
-	}
-
-	protected byte[] getSpecial( int tag, int count) {
-		final ByteBuffer buffer = ByteBuffer.allocate( 16);
-		buffer.putInt( tag);
-		buffer.putInt( 0x00000007);
-		buffer.putInt( count * -16);
-		buffer.putInt( 0x00000010);
-		return buffer.array();
-	}
+	protected final Entry< byte[]> signature = ( Entry< byte[]>) format.getSignature().addEntry( SIGNATURES, 16);
+	protected final Entry< byte[]> immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
 
 	/**
 	 * Initializes the builder and sets some required fields to known values.
 	 */
 	public Builder() {
-		signature = ( Entry< byte[]>) format.getSignature().addEntry( SIGNATURES, 16);
-		immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
 		format.getHeader().createEntry( HEADERI18NTABLE, "C");
 		format.getHeader().createEntry( BUILDTIME, ( int) ( System.currentTimeMillis() / 1000));
 		format.getHeader().createEntry( RPMVERSION, "4.4.2");
@@ -67,9 +55,15 @@ public class Builder {
 	}
 
 	/**
-	 * Sets the package information, such as the package name and the version.
+	 * Sets the package information, such as the rpm name, the version, and the release number.
+	 * </p>
+	 * This field is required.
+	 * 
+	 * @param name the name of the RPM package.
+	 * @param version the version of the new package.
+	 * @param release the release number, specified after the version, of the new RPM.
 	 */
-	public void setPackage( CharSequence name, CharSequence version, CharSequence release) {
+	public void setPackage( final CharSequence name, final CharSequence version, final CharSequence release) {
 		format.getLead().setName( name + "-" + version + "-" + release);
 		format.getHeader().createEntry( NAME, name);
 		format.getHeader().createEntry( VERSION, version);
@@ -78,11 +72,27 @@ public class Builder {
 		format.getHeader().createEntry( PROVIDEFLAGS, new int[] { 8});
 	}
 	
-	public void setType( RpmType type) {
+	/**
+	 * Sets the type of the RPM to be either binary or source.
+	 * </p>
+	 * This field is required.
+	 *
+	 * @param type the type of RPM to generate.
+	 */
+	public void setType( final RpmType type) {
 		format.getLead().setType( type);
 	}
 
-	public void setPlatform( Architecture arch, Os os) {
+	/**
+	 * Sets the platform related headers for the resulting RPM.  The platform is specified as a
+	 * combination of target architecture and OS.
+	 * <p/>
+	 * This field is required.
+	 *
+	 * @param arch the target architectur.
+	 * @param os the target operating system.
+	 */
+	public void setPlatform( final Architecture arch, final Os os) {
 		format.getLead().setArch( arch);
 		format.getLead().setOs( os);
 		
@@ -94,39 +104,105 @@ public class Builder {
 		format.getHeader().createEntry( RHNPLATFORM, archName);
 	}
 
-	public void setSummary( CharSequence summary) {
+	/**
+	 * Sets the summary text for the file.  The summary is generally a short, one line description of the
+	 * function of the package, and is often shown by RPM tools.
+	 * <p/>
+	 * This field is required.
+	 *
+	 * @param summary summary text.
+	 */
+	public void setSummary( final CharSequence summary) {
 		format.getHeader().createEntry( SUMMARY, summary);
 	}
 
-	public void setDescription( CharSequence description) {
+	/**
+	 * Sets the description text for the file.  The description is often a paragraph describing the
+	 * package in detail.
+	 * <p/>
+	 * This field is required.
+	 *
+	 * @param description description text.
+	 */
+	public void setDescription( final CharSequence description) {
 		format.getHeader().createEntry( DESCRIPTION, description);
 	}
 
-	public void setBuildHost( CharSequence host) {
+	/**
+	 * Sets the build host for the RPM.  This is an internal field.
+	 * <p/>
+	 * This field is required.
+	 *
+	 * @param host hostname of the build machine.
+	 */
+	public void setBuildHost( final CharSequence host) {
 		format.getHeader().createEntry( BUILDHOST, host);
 	}
 
-	public void setLicense( CharSequence license) {
+	/**
+	 * Lists the license under which this software is distributed.  This field may be
+	 * displayed by RPM tools.
+	 * <p/>
+	 * This field is required.
+	 *
+	 * @param license the chosen distribution license.
+	 */
+	public void setLicense( final CharSequence license) {
 		format.getHeader().createEntry( LICENSE, license);
 	}
 
-	public void setGroup( CharSequence group) {
+	/**
+	 * Software group to which this package belongs.  The group describes what sort of
+	 * function the software package provides.
+	 * <p/>
+	 * This is a required field.
+	 *
+	 * @param group target group.
+	 */
+	public void setGroup( final CharSequence group) {
 		format.getHeader().createEntry( GROUP, group);
 	}
 
-	public void setVendor( CharSequence vendor) {
+	/**
+	 * Vendor tag listing the organization providing this software package.
+	 * <p/>
+	 * This is a required field.
+	 *
+	 * @param vendor software vendor.
+	 */
+	public void setVendor( final CharSequence vendor) {
 		format.getHeader().createEntry( VENDOR, vendor);
 	}
 
-	public void setPackager( CharSequence packager) {
+	/**
+	 * Build packager, usually the username of the account building this RPM.
+	 * <p/>
+	 * This is a required field.
+	 *
+	 * @param packager packager name.
+	 */
+	public void setPackager( final CharSequence packager) {
 		format.getHeader().createEntry( PACKAGER, packager);
 	}
 
+	/**
+	 * Website URL for this package, usually a project site.
+	 * <p/>
+	 * This is a required field.
+	 *
+	 * @param url 
+	 */
 	public void setUrl( CharSequence url) {
 		format.getHeader().createEntry( URL, url);
 	}
 
-	public void setProvides( CharSequence provides) {
+	/**
+	 * Declares a dependency that this package exports, and that other packages can use to
+	 * provide library functions.
+	 *
+	 * @param dependency provided by this package.
+	 */
+	public void setProvides( final CharSequence provides) {
 		format.getHeader().createEntry( PROVIDENAME, provides);
 	}
 	
@@ -136,31 +212,51 @@ public class Builder {
 	 * to record the directory names and file names, as well as their
 	 * digests.
 	 *
-	 * @param target the absolute path at which to install this file.
+	 * @param target the absolute path at which this file will be installed.
 	 * @param file the file content to include in this rpm.
 	 * @param mode the mode of the target file in standard three octet notation
 	 */
-	public void addFile( CharSequence target, File source, int mode) throws Exception {
+	public void addFile( final CharSequence target, final File source, final int mode) throws Exception {
 		files.addFile( new File( target.toString()), source, mode);
 	}
 
 	/**
-	 * Addes the file to the repository with the default mode of 644.
+	 * Addes the file to the repository with the default mode of <code>644</code>.
+	 *
+	 * @param target the absolute path at which this file will be installed.
+	 * @param file the file content to include in this rpm.
 	 */
-	public void addFile( CharSequence target, File source) throws Exception {
+	public void addFile( final CharSequence target, final File source) throws Exception {
 		addFile( target, source, 0644);
 	}
 
 	/**
 	 * Add a key to generate a new signature for the header and payload portions of the
-	 * rpm file.
+	 * rpm file.  Supported algorithms are "MD5withRSA" and "SHAwithDSA".
+	 *
+	 * @param key private key to use in generating a signature.
 	 */
 	public void addSignature( final PrivateKey key) {
 		signatures.add( key);
 	}
 
 	/**
-	 * Generates the rpm file to the provided writable channel.
+	 * Generates an RPM with a standard name consisting of the RPM package name, version, release,
+	 * and type in teh given directory.
+	 *
+	 * @param directory the destination directory for the new RPM file.
+	 */
+	public void build( final File directory) throws Exception {
+		final File file = new File( directory, format.getLead().getName() + format.getLead().getArch().toString().toLowerCase() + ".rpm");
+		build( new RandomAccessFile( file, "rw").getChannel());
+	}
+
+	/**
+	 * Generates the rpm file to the provided file channel.  This file channel must support memory mapping
+	 * and therefore should be created from a {@link RandomAccessFile}, otherwise an {@link IOException} will be
+	 * generated.
+	 *
+	 * @param original the {@link FileChannel} to which the resulting RPM will be written.
 	 */
 	public void build( final FileChannel original) throws Exception {
 		final WritableChannelWrapper output = new WritableChannelWrapper( original);
@@ -265,5 +361,22 @@ public class Builder {
 		sigsize.setValues( new int[] { output.finish( sigsizekey)});
 		format.getSignature().writePending( original);
 		output.close();
+	}
+
+	protected byte[] getSignature( final int count) {
+		return getSpecial( 0x0000003E, count);
+	}
+
+	protected byte[] getImmutable( final int count) {
+		return getSpecial( 0x0000003F, count);
+	}
+
+	protected byte[] getSpecial( final int tag, final int count) {
+		final ByteBuffer buffer = ByteBuffer.allocate( 16);
+		buffer.putInt( tag);
+		buffer.putInt( 0x00000007);
+		buffer.putInt( count * -16);
+		buffer.putInt( 0x00000010);
+		return buffer.array();
 	}
 }

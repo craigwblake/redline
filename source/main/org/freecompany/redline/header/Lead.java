@@ -6,6 +6,7 @@ import java.nio.*;
 import java.nio.channels.*;
 
 import static org.freecompany.redline.header.Architecture.*;
+import static org.freecompany.redline.header.Os.*;
 
 public class Lead {
 
@@ -17,8 +18,11 @@ public class Lead {
 	protected RpmType type;
 	protected Architecture arch = NOARCH;
 	protected String name;
-	protected Os os;
+	protected Os os = LINUX;
 	protected short sigtype = 5;
+
+	public CharSequence getName() { return name; }
+	public Architecture getArch() { return arch; }
 
 	public void setMajor( byte major) {
 		this.major = major;
