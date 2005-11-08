@@ -268,7 +268,7 @@ public abstract class AbstractHeader {
 		public T getValues() { return values; }
 		public int getTag() { return tag; }
 
-		public int getOffset( int offset) { return Util.round( offset, 1); }
+		public int getOffset( int offset) { return offset; }//Util.round( offset, 1); }
 
 		/**
 		 * Returns true if this entry is ready to write, indicated by the presence of
@@ -356,6 +356,7 @@ public abstract class AbstractHeader {
 	}
 
 	class Int16Entry extends AbstractEntry< short[]> {
+		public int getOffset( int offset) { return Util.round( offset, 1); }
 		public int getType() { return 3; }
 		public int size() { return count * ( Short.SIZE / 8); }
 		public void read( final ByteBuffer buffer) {

@@ -11,7 +11,7 @@ public class Test {
 
 	public static void main( String[] args) throws Exception {
 
-		Builder builder = new Builder();
+		final Builder builder = new Builder();
 		builder.setPackage( "test", "0.0.1", "1");
 		builder.setType( BINARY);
 		builder.setPlatform( NOARCH, LINUX);
@@ -25,9 +25,11 @@ public class Test {
 		builder.setUrl( "http://www.freecompany.org/test/");
 		builder.setProvides( "test");
 
-		builder.addFile( "/tmp/AbstractHeader.java", new File( args[1]));
-		builder.addFile( "/tmp/Entry.java", new File( args[2]));
+		for ( int x = 0; x < args.length; x++) {
+			final File file = new File( args[x]);
+			builder.addFile( "/tmp/" + file.getName(), file);
+		}
 
-		builder.build( new File( args[ 0]));
+		builder.build( new File( "."));
 	}
 }
