@@ -1,15 +1,15 @@
 Signature
-62		signatures
-267		dsaheader
-269		sha1header
+62	signatures
+267	dsaheader
+269	sha1header
 1000	sigsize
 1004	md5
 1005	gpg
 1007	payloadsize
 
 Header
-63		headerimmutable
-100		headeri18ntable
+63	headerimmutable
+100	headeri18ntable
 1000	name
 1001	version
 1002	release

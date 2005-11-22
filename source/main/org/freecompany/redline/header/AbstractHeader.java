@@ -200,6 +200,7 @@ public abstract class AbstractHeader {
 		final ByteBuffer buffer = data.duplicate();
 		buffer.position( offset);
 		entry.read( buffer);
+		entry.setOffset( offset);
 		return entry;
 	}
 
@@ -241,6 +242,7 @@ public abstract class AbstractHeader {
 		void setTag( int tag);
 		void setSize( int size);
 		void setCount( int count);
+		void setOffset( int offset);
 		void setValues( T values);
 		T getValues();
 		int getTag();
@@ -257,12 +259,14 @@ public abstract class AbstractHeader {
 		protected int size;
 		protected int tag;
 		protected int count;
+		protected int offset;
 		protected T values;
 
 		public void setTag( Tag tag) { this.tag = tag.getCode(); }
 		public void setTag( int tag) { this.tag = tag; }
 		public void setSize( int size) { this.size = size; }
 		public void setCount( int count) { this.count = count; }
+		public void setOffset( int offset) { this.offset = offset; }
 		public void setValues( T values) { this.values = values; }
 
 		public T getValues() { return values; }
@@ -306,7 +310,7 @@ public abstract class AbstractHeader {
 		}
 
 		public String toString() {
-			return ( tags.containsKey( tag) ? tags.get( tag).getName() : super.toString()) + "[tag=" + tag + ",type=" + getType() + ",count=" + count + ",size=" + size() + "]";
+			return ( tags.containsKey( tag) ? tags.get( tag).getName() : super.toString()) + "[tag=" + tag + ",type=" + getType() + ",count=" + count + ",size=" + size() + ",offset=" + offset + "]";
 		}
 	}
 
