@@ -102,30 +102,42 @@ public abstract class AbstractHeader {
 	protected ByteBuffer getData( final ByteBuffer index) throws IOException {
 		int offset = 0;
 		final List< ByteBuffer> buffers = new LinkedList< ByteBuffer>();
-		for ( int tag : entries.keySet()) {
-			final Entry entry = entries.get( tag);
-			try {
-				final int shift = entry.getOffset( offset) - offset;
-				if ( shift > 0) buffers.add( ByteBuffer.allocate( shift));
-				offset += shift;
-				
-				final int size = entry.size();
-				final ByteBuffer buffer = ByteBuffer.allocate( size);
-				entry.index( index, offset);
-				if ( entry.ready()) {
-					entry.write( buffer);
-					buffer.flip();
-				}
-				else pending.put( entry, offset);
-				buffers.add( buffer);
-				offset += size;
-			} catch ( Throwable t) {
-				throw new RuntimeException( "Error while writing '" + entry.getTag() + "'.", t);
+		final Iterator< Integer> i = entries.keySet().iterator();
+		
+		index.position( 16);
+		final Entry first = entries.get( i.next());
+		Entry entry = null;
+		try {
+			while ( i.hasNext()) {
+				entry = entries.get( i.next());
+				offset = writeData( buffers, index, entry, offset);
 			}
+			index.position( 0);
+			offset = writeData( buffers, index, first, offset);
+			index.position( index.limit());
+		} catch ( Throwable t) {
+			throw new RuntimeException( "Error while writing '" + entry + "'.", t);
 		}
 		ByteBuffer data = ByteBuffer.allocate( offset);
 		for ( ByteBuffer buffer : buffers) data.put( buffer);
 		return data;
+	}
+
+	protected int writeData( final Collection< ByteBuffer> buffers, final ByteBuffer index, final Entry entry, int offset) {
+		final int shift = entry.getOffset( offset) - offset;
+		if ( shift > 0) buffers.add( ByteBuffer.allocate( shift));
+		offset += shift;
+		
+		final int size = entry.size();
+		final ByteBuffer buffer = ByteBuffer.allocate( size);
+		entry.index( index, offset);
+		if ( entry.ready()) {
+			entry.write( buffer);
+			buffer.flip();
+		}
+		else pending.put( entry, offset);
+		buffers.add( buffer);
+		return offset + size;
 	}
 
 	public void writePending( final FileChannel channel) {
