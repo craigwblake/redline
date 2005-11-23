@@ -333,23 +333,25 @@ public class Builder {
 		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( output));
 		final WritableChannelWrapper compressor = new WritableChannelWrapper( Channels.newChannel( zip));
 		final Key< Integer> payloadkey = compressor.start();
-		
+
+		int total = 0;
 		final ByteBuffer buffer = ByteBuffer.allocate( 4096);
 		for ( CpioHeader header : files.headers()) {
 			final File source = files.source( header);
 			final String path = "." + files.target( header).getAbsolutePath();
 			header.setName( path);
-			header.write( compressor);
+			total = header.write( compressor, total);
 			
 			FileChannel in = new FileInputStream( source).getChannel();
-			while ( in.read(( ByteBuffer) buffer.rewind()) > 0) compressor.write(( ByteBuffer) buffer.flip());
-			Util.empty( compressor, ByteBuffer.wrap( new byte[ Util.round( header.getFileSize(), 3) - ( int) source.length()]));
+			while ( in.read(( ByteBuffer) buffer.rewind()) > 0) total += compressor.write(( ByteBuffer) buffer.flip());
+			total += header.skip( compressor, total);
 			in.close();
 		}
 		
 		final CpioHeader trailer = new CpioHeader();
 		trailer.setLast();
-		trailer.write( compressor);
+		total = trailer.write( compressor, total);
+		trailer.skip( compressor, total);
 
 		int length = compressor.finish( payloadkey);
 		int pad = Util.difference( length, 3);

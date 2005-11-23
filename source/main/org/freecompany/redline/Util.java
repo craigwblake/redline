@@ -58,6 +58,10 @@ public class Util {
 		dump( data, System.out);
 	}
 
+	public static void dump( CharSequence data) {
+		dump( Charset.forName( "US-ASCII").encode( CharBuffer.wrap( data)), System.out);
+	}
+
 	public static void dump( char[] data, Appendable out) {
 		dump( Charset.forName( "US-ASCII").encode( CharBuffer.wrap( data)), out);
 	}

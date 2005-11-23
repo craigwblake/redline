@@ -16,14 +16,16 @@ public class Scanner {
 		ReadableChannelWrapper in = new ReadableChannelWrapper( Channels.newChannel( System.in));
 		Format format = new Scanner().run( in);
 		System.out.println( format);
-		InputStream compressed = new GZIPInputStream( System.in);
-		in = new ReadableChannelWrapper( Channels.newChannel( compressed));
+		InputStream uncompressed = new GZIPInputStream( System.in);
+		in = new ReadableChannelWrapper( Channels.newChannel( uncompressed));
 		CpioHeader header;
+		int total = 0;
 		do {
 			header = new CpioHeader();
-			header.read( in);
+			total = header.read( in, total);
 			System.out.println( header);
-			compressed.skip( Util.round( header.getFileSize(), 3));
+			uncompressed.skip( header.getFileSize());
+			total += header.getFileSize();
 		} while ( !header.isLast());
 	}
 

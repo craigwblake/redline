@@ -100,31 +100,49 @@ public class CpioHeader {
 		return charset.encode( pad( Integer.toHexString( data), 8));
 	}
 
-	protected String readSix( CharBuffer buffer) {
-		return readBytes( buffer, 6);
+	protected CharSequence readSix( CharBuffer buffer) {
+		return readChars( buffer, 6);
 	}
 
 	protected int readEight( CharBuffer buffer) {
-		return Integer.parseInt( readBytes( buffer, 8), 16);
+		return Integer.parseInt( readChars( buffer, 8).toString(), 16);
 	}
 
-	protected String readBytes( CharBuffer buffer, int length) {
-		if ( buffer.length() < length) throw new IllegalStateException( "Insufficent capacity buffer.");
-		char[] chars = new char[ length];
-		buffer.get( chars);
-		return new String( chars);
+	protected CharSequence readChars( CharBuffer buffer, int length) {
+		if ( buffer.remaining() < length) throw new IllegalStateException( "Buffer has '" + buffer.remaining() + "' bytes but '" + length + "' are needed.");
+		try {
+			return buffer.subSequence( 0, length);
+		} finally {
+			buffer.position( buffer.position() + length);
+		}
 	}
 
-	protected String pad( CharSequence sequence, int length) {
+	protected String pad( CharSequence sequence, final int length) {
 		while ( sequence.length() < length) sequence = "0" + sequence;
 		return sequence.toString();
 	}
 
-	public void read( final ReadableByteChannel channel) throws IOException {
+	protected int skip( final ReadableByteChannel channel, final int total) throws IOException {
+		int skipped = Util.difference( total, 3);
+		//System.out.println( "Skipping '" + skipped + "' bytes from stream at position '" + total + "'.");
+		Util.fill( channel, skipped);
+		return skipped;
+	}
+
+	public int skip( final WritableByteChannel channel, int total) throws IOException {
+		int skipped = Util.difference( total, 3);
+		Util.empty( channel, ByteBuffer.allocate( skipped));
+		//System.out.println( "Skipping '" + skipped + "' bytes from stream at position '" + total + "'.");
+		return skipped;
+	}
+
+	public int read( final ReadableByteChannel channel, int total) throws IOException {
+		total += skip( channel, total);
 		ByteBuffer descriptor = Util.fill( channel, CPIO_HEADER);
 		CharBuffer buffer = charset.decode( descriptor);
 
-		if ( !Comparison.equals( MAGIC, readSix( buffer))) throw new IllegalStateException( "Invalid magic number.");
+		final CharSequence magic = readSix( buffer);
+		if ( !Comparison.equals( MAGIC, magic)) throw new IllegalStateException( "Invalid magic number '" + magic + "' of length '" + magic.length() + "'.");
 		inode = readEight( buffer);
 		
 		final int mode = readEight( buffer);
@@ -142,15 +160,20 @@ public class CpioHeader {
 		rdevMinor = readEight( buffer);
 		int namesize = readEight( buffer);
 		checksum = readEight( buffer);
+		total += CPIO_HEADER;
 
-		name = charset.decode(( ByteBuffer) Util.fill( channel, Util.round( namesize, 1)).limit( namesize - 1));
+		name = charset.decode( Util.fill( channel, namesize - 1));
+		Util.fill( channel, 1);
+		total += namesize;
+		total += skip( channel, total);
+		return total;
 	}
 
 	/**
 	 * Writed the content for the CPIO header, including the name immediately following.  The name data is rounded
 	 * to the nearest 2 byte boundary as CPIO requires by appending a null when needed.
 	 */
-	public void write( final WritableByteChannel channel) throws IOException {
+	public int write( final WritableByteChannel channel, int total) throws IOException {
 		int length = name.length() + 1;
 		ByteBuffer descriptor = ByteBuffer.allocate( CPIO_HEADER);
 		descriptor.put( writeSix( MAGIC));
@@ -167,11 +190,13 @@ public class CpioHeader {
 		descriptor.put( writeEight( rdevMinor));
 		descriptor.put( writeEight( length));
 		descriptor.put( writeEight( checksum));
-		
 		descriptor.flip();
+
+		total += CPIO_HEADER + length;
 		Util.empty( channel, descriptor);
 		Util.empty( channel, charset.encode( CharBuffer.wrap( name)));
-		Util.empty( channel, ByteBuffer.wrap( new byte[ 1 + ( length & 1)]));
+		Util.empty( channel, ByteBuffer.allocate( 1));
+		return total + skip( channel, total);
 	}
 
 	public String toString() {
