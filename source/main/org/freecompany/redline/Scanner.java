@@ -9,6 +9,9 @@ import java.nio.channels.*;
 import java.util.zip.*;
 
 import static org.freecompany.redline.ChannelWrapper.*;
+import static org.freecompany.redline.header.AbstractHeader.*;
+import static org.freecompany.redline.header.Signature.SignatureTag.*;
+import static org.freecompany.redline.header.Header.HeaderTag.*;
 
 public class Scanner {
 
@@ -37,12 +40,14 @@ public class Scanner {
 		System.out.println( "Lead ended at '" + in.finish( lead) + "'.");
 
 		Key< Integer> signature = in.start();
-		format.getSignature().read( in);
-		System.out.println( "Signature ended at '" + in.finish( signature) + "'.");
+		int count = format.getSignature().read( in);
+		int expected = ByteBuffer.wrap(( byte[]) format.getSignature().getEntry( SIGNATURES).getValues(), 8, 4).getInt() / -16;
+		System.out.println( "Signature ended at '" + in.finish( signature) + "' and contained '" + count + "' headers (expected '" + expected + "').");
 
 		Key< Integer> header = in.start();
-		format.getHeader().read( in);
-		System.out.println( "Header ended at '" + in.finish( header) + "'.");
+		count = format.getHeader().read( in);
+		expected = ByteBuffer.wrap(( byte[]) format.getHeader().getEntry( HEADERIMMUTABLE).getValues(), 8, 4).getInt() / -16;
+		System.out.println( "Header ended at '" + in.finish( header) + " and contained '" + count + "' headers (expected '" + expected + "').");
 
 		return format;
 	}

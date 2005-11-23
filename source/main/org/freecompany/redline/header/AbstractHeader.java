@@ -25,7 +25,11 @@ public abstract class AbstractHeader {
 	protected final Map< Integer, Entry> entries = new TreeMap< Integer, Entry>();
 	protected final Map< Entry, Integer> pending = new LinkedHashMap< Entry, Integer>();
 
-	public void read( ReadableByteChannel in) throws IOException {
+	/**
+	 * Reads the entire header contents for this channel and returns the number of entries
+	 * found.
+	 */
+	public int read( ReadableByteChannel in) throws IOException {
 		ByteBuffer header = Util.fill( in, HEADER_HEADER_SIZE);
 
 		int magic = header.getInt();
@@ -41,7 +45,12 @@ public abstract class AbstractHeader {
 		final ByteBuffer index = Util.fill( in, header.getInt() * ENTRY_SIZE);
 		final ByteBuffer data = Util.fill( in, header.getInt());
 
-		while ( index.remaining() >= ENTRY_SIZE) readEntry( index.getInt(), index.getInt(), index.getInt(), index.getInt(), data);
+		int count = 0;
+		while ( index.remaining() >= ENTRY_SIZE) {
+			readEntry( index.getInt(), index.getInt(), index.getInt(), index.getInt(), data);
+			count++;
+		}
+		return count;
 	}
 
 	/**
