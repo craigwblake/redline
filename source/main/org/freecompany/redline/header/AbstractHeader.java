@@ -200,6 +200,13 @@ public abstract class AbstractHeader {
 	}
 
 	@SuppressWarnings( "unchecked")
+	public < T> Entry< T> createEntry( Tag tag, int type, T values) {
+		Entry< T> entry = createEntry( tag.getCode(), type, values.getClass().isArray() ? Array.getLength( values) : 1);
+		entry.setValues( values);
+		return entry;
+	}
+
+	@SuppressWarnings( "unchecked")
 	public < T> Entry< T> createEntry( int tag, int type, T values) {
 		Entry< T> entry = createEntry( tag, type, values.getClass().isArray() ? Array.getLength( values) : 1);
 		entry.setValues( values);
