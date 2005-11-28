@@ -7,6 +7,7 @@ import java.nio.*;
 import java.nio.channels.*;
 import java.util.*;
 import java.util.zip.*;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 
 import static org.freecompany.redline.ChannelWrapper.*;
@@ -30,11 +31,12 @@ public class Builder {
 
 	protected final Format format = new Format();
 	protected final Set< PrivateKey> signatures = new HashSet< PrivateKey>();
-	protected final IncludeFiles files = new IncludeFiles();
 	protected final Map< String, CharSequence> dependencies = new LinkedHashMap< String, CharSequence>();
 
 	protected final Entry< byte[]> signature = ( Entry< byte[]>) format.getSignature().addEntry( SIGNATURES, 16);
 	protected final Entry< byte[]> immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
+
+	protected IncludeFiles files = new IncludeFiles();
 
 	/**
 	 * Initializes the builder and sets some required fields to known values.
@@ -171,7 +173,7 @@ public class Builder {
 	 * @param vendor software vendor.
 	 */
 	public void setVendor( final CharSequence vendor) {
-		format.getHeader().createEntry( VENDOR, vendor);
+		if ( vendor != null) format.getHeader().createEntry( VENDOR, vendor);
 	}
 
 	/**
@@ -193,7 +195,7 @@ public class Builder {
 	 * @param url 
 	 */
 	public void setUrl( CharSequence url) {
-		format.getHeader().createEntry( URL, url);
+		if ( url != null) format.getHeader().createEntry( URL, url);
 	}
 
 	/**
@@ -204,6 +206,17 @@ public class Builder {
 	 */
 	public void setProvides( final CharSequence provides) {
 		format.getHeader().createEntry( PROVIDENAME, provides);
+	}
+
+	/**
+	 * Sets the group of files to include in this RPM.  Note that this method causes the existing
+	 * file set to be overwritten and therefore should be called before adding any other files via
+	 * the {@link #addFile()} methods.
+	 *
+	 * @param files the set of files to use in constructing this RPM.
+	 */
+	public void setFiles( final IncludeFiles files) {
+		this.files = files;
 	}
 	
 	/**
@@ -246,7 +259,7 @@ public class Builder {
 	 *
 	 * @param directory the destination directory for the new RPM file.
 	 */
-	public void build( final File directory) throws Exception {
+	public void build( final File directory) throws NoSuchAlgorithmException, IOException {
 		final String rpm = format.getLead().getName() + "." + format.getLead().getArch().toString().toLowerCase() + ".rpm";
 		final File file = new File( directory, rpm);
 		if ( file.exists()) file.delete();
@@ -260,7 +273,7 @@ public class Builder {
 	 *
 	 * @param original the {@link FileChannel} to which the resulting RPM will be written.
 	 */
-	public void build( final FileChannel original) throws Exception {
+	public void build( final FileChannel original) throws NoSuchAlgorithmException, IOException {
 		final WritableChannelWrapper output = new WritableChannelWrapper( original);
 
 		/*

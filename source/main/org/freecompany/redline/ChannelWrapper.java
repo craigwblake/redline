@@ -12,7 +12,7 @@ public abstract class ChannelWrapper {
 
 	protected interface Consumer< T> {
 		void consume( ByteBuffer buffer);
-		T finish() throws Exception;
+		T finish();
 	}
 
 	protected Map< Key< ?>, Consumer< ?>> consumers = new HashMap< Key< ?>, Consumer< ?>>();
@@ -36,12 +36,12 @@ public abstract class ChannelWrapper {
 	/**
 	 * Initializes a byte counter on this channel.
 	 */
-	public Key< Integer> start() throws Exception {
+	public Key< Integer> start() {
 		final Key< Integer> object = new Key< Integer>();
 		consumers.put( object, new Consumer< Integer>() {
 			int count;
 			public void consume( final ByteBuffer buffer) { count += buffer.remaining(); }
-			public Integer finish() throws Exception { return count; }
+			public Integer finish() { return count; }
 		});
 		return object;
 	}
@@ -49,7 +49,7 @@ public abstract class ChannelWrapper {
 	/**
 	 * Initialize a signature on this channel.
 	 */
-	public Key< byte[]> start( final PrivateKey key) throws Exception {
+	public Key< byte[]> start( final PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException {
 		final Signature signature = Signature.getInstance( key.getAlgorithm());
 		signature.initSign( key);
 		final Key< byte[]> object = new Key< byte[]>();
@@ -61,8 +61,12 @@ public abstract class ChannelWrapper {
 					throw new RuntimeException( e);
 				}
 			}
-			public byte[] finish() throws Exception {
-				return signature.sign();
+			public byte[] finish() {
+				try {
+					return signature.sign();
+				} catch ( Exception e) {
+					throw new RuntimeException( e);
+				}
 			}
 		});
 		return object;
@@ -71,7 +75,7 @@ public abstract class ChannelWrapper {
 	/**
 	 * Initialize a digest on this channel.
 	 */
-	public Key< byte[]> start( final String algorithm) throws Exception {
+	public Key< byte[]> start( final String algorithm) throws NoSuchAlgorithmException {
 		final MessageDigest digest = MessageDigest.getInstance( algorithm);
 		final Key< byte[]> object = new Key< byte[]>();
 		consumers.put( object, new Consumer() {
@@ -82,14 +86,18 @@ public abstract class ChannelWrapper {
 					throw new RuntimeException( e);
 				}
 			}
-			public byte[] finish() throws Exception {
-				return digest.digest();
+			public byte[] finish() {
+				try {
+					return digest.digest();
+				} catch ( Exception e) {
+					throw new RuntimeException( e);
+				}
 			}
 		});
 		return object;
 	}
 
-	public < T> T finish( final Key< T> object) throws Exception {
+	public < T> T finish( final Key< T> object) {
 		return ( T) consumers.remove( object).finish();
 	}
 

@@ -4,6 +4,7 @@ import org.freecompany.redline.payload.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
+import java.security.*;
 import java.util.*;
 
 import static org.freecompany.redline.ChannelWrapper.Key;
@@ -17,7 +18,7 @@ public class IncludeFiles {
 	protected final Map< CpioHeader, String> md5s = new HashMap< CpioHeader, String>();
 	protected final LinkedList< CpioHeader> headers = new LinkedList< CpioHeader>();
 
-	public synchronized void addFile( final File target, final File source, final int permission) throws Exception {
+	public synchronized void addFile( final File target, final File source, final int permission) throws NoSuchAlgorithmException, IOException {
 		final CpioHeader header = new CpioHeader( source);
 		header.setPermission( permission);
 		headers.add( header);

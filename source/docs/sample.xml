@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<rpm xmlns='http://www.freecompany.org/namespace/redline'>
+	<name>test</name>
+	<version>0.0.1</version>
+	<summary>A test RPM</summary>
+	<description>A test RPM with the default architecture and OS fields.</description>
+	<license>MIT</license>
+	<group>Miscellaneous</group>
+	<vendor>FreeCompany RPM Repository http://yum.freecompany.org/</vendor>
+	<url>http://www.freecompany.org/test/</url>
+	<files parent='/tmp/' permission='0644'>
+		<file permission='0544'>./build.xml</file>
+	</files>
+</rpm>

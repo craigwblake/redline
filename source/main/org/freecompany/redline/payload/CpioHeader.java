@@ -16,6 +16,8 @@ import java.util.*;
  */
 public class CpioHeader {
 
+	public static final int PERMISSION = 0644;
+
 	public static final int FIFO = 1;
 	public static final int CDEV = 2;
 	public static final int DIR = 4;
@@ -52,7 +54,7 @@ public class CpioHeader {
 		mtime = file.lastModified();
 		filesize = ( int ) file.length();
 		name = file.getName();
-		setPermission( 0644);
+		setPermission( PERMISSION);
 		if ( file.isDirectory()) setType( DIR);
 		else setType( FILE);
 	}
