@@ -115,7 +115,7 @@ public class Builder {
 	 * @param summary summary text.
 	 */
 	public void setSummary( final CharSequence summary) {
-		format.getHeader().createEntry( SUMMARY, summary);
+		if ( summary != null) format.getHeader().createEntry( SUMMARY, summary);
 	}
 
 	/**
@@ -127,7 +127,7 @@ public class Builder {
 	 * @param description description text.
 	 */
 	public void setDescription( final CharSequence description) {
-		format.getHeader().createEntry( DESCRIPTION, description);
+		if ( description != null) format.getHeader().createEntry( DESCRIPTION, description);
 	}
 
 	/**
@@ -138,7 +138,7 @@ public class Builder {
 	 * @param host hostname of the build machine.
 	 */
 	public void setBuildHost( final CharSequence host) {
-		format.getHeader().createEntry( BUILDHOST, host);
+		if ( host != null) format.getHeader().createEntry( BUILDHOST, host);
 	}
 
 	/**
@@ -150,7 +150,7 @@ public class Builder {
 	 * @param license the chosen distribution license.
 	 */
 	public void setLicense( final CharSequence license) {
-		format.getHeader().createEntry( LICENSE, license);
+		if ( license != null) format.getHeader().createEntry( LICENSE, license);
 	}
 
 	/**
@@ -162,7 +162,7 @@ public class Builder {
 	 * @param group target group.
 	 */
 	public void setGroup( final CharSequence group) {
-		format.getHeader().createEntry( GROUP, group);
+		if ( group != null) format.getHeader().createEntry( GROUP, group);
 	}
 
 	/**
@@ -184,7 +184,7 @@ public class Builder {
 	 * @param packager packager name.
 	 */
 	public void setPackager( final CharSequence packager) {
-		format.getHeader().createEntry( PACKAGER, packager);
+		if ( packager != null) format.getHeader().createEntry( PACKAGER, packager);
 	}
 
 	/**
@@ -205,7 +205,7 @@ public class Builder {
 	 * @param dependency provided by this package.
 	 */
 	public void setProvides( final CharSequence provides) {
-		format.getHeader().createEntry( PROVIDENAME, provides);
+		if ( provides != null) format.getHeader().createEntry( PROVIDENAME, provides);
 	}
 
 	/**
@@ -229,7 +229,7 @@ public class Builder {
 	 * @param file the file content to include in this rpm.
 	 * @param mode the mode of the target file in standard three octet notation
 	 */
-	public void addFile( final CharSequence target, final File source, final int mode) throws Exception {
+	public void addFile( final CharSequence target, final File source, final int mode) throws NoSuchAlgorithmException, IOException {
 		files.addFile( new File( target.toString()), source, mode);
 	}
 
@@ -239,7 +239,7 @@ public class Builder {
 	 * @param target the absolute path at which this file will be installed.
 	 * @param file the file content to include in this rpm.
 	 */
-	public void addFile( final CharSequence target, final File source) throws Exception {
+	public void addFile( final CharSequence target, final File source) throws NoSuchAlgorithmException, IOException {
 		addFile( target, source, 0644);
 	}
 
@@ -259,11 +259,12 @@ public class Builder {
 	 *
 	 * @param directory the destination directory for the new RPM file.
 	 */
-	public void build( final File directory) throws NoSuchAlgorithmException, IOException {
+	public String build( final File directory) throws NoSuchAlgorithmException, IOException {
 		final String rpm = format.getLead().getName() + "." + format.getLead().getArch().toString().toLowerCase() + ".rpm";
 		final File file = new File( directory, rpm);
 		if ( file.exists()) file.delete();
 		build( new RandomAccessFile( file, "rw").getChannel());
+		return rpm;
 	}
 
 	/**

@@ -24,13 +24,15 @@ public class IncludeFiles {
 		headers.add( header);
 		targets.put( header, target);
 		sources.put( header, source);
-		final ReadableChannelWrapper input = new ReadableChannelWrapper( new FileInputStream( source).getChannel());
-		final Key< Integer> size = input.start();
-		final Key< byte[]> key = input.start( "MD5");
-		while ( input.read( buffer) != -1) buffer.rewind();
-		md5s.put( header, Util.hex( input.finish( key)));
-		total += input.finish( size);
-		input.close();
+		if ( !source.isDirectory()) {
+			final ReadableChannelWrapper input = new ReadableChannelWrapper( new FileInputStream( source).getChannel());
+			final Key< Integer> size = input.start();
+			final Key< byte[]> key = input.start( "MD5");
+			while ( input.read( buffer) != -1) buffer.rewind();
+			md5s.put( header, Util.hex( input.finish( key)));
+			total += input.finish( size);
+			input.close();
+		}
 	}
 
 	public Iterable< CpioHeader> headers() { return headers; }
