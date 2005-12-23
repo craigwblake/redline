@@ -20,8 +20,13 @@ public class Contents {
 	protected final HashMap< CpioHeader, Object> sources = new HashMap< CpioHeader, Object>();
 
 	public void addLink( final CharSequence path, final CharSequence target) {
+		addLink( path, target, -1);
+	}
+
+	public void addLink( final CharSequence path, final CharSequence target, int permissions) {
 		CpioHeader header = new CpioHeader( path);
 		header.setType( SYMLINK);
+		if ( permissions != -1) header.setPermissions( permissions);
 		headers.add( header);
 		sources.put( header, path + "\0");
 	}

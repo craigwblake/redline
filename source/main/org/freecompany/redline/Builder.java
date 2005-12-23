@@ -256,11 +256,21 @@ public class Builder {
 	/**
 	 * Addes a symbolic link to the repository.
 	 *
-	 * @param target the absolute path at which this file will be installed.
-	 * @param file the file content to include in this rpm.
+	 * @param path the absolute path at which this link will be installed.
+	 * @param target the path of the file this link will point to.
 	 */
 	public void addLink( final CharSequence path, final CharSequence target) throws NoSuchAlgorithmException, IOException {
 		contents.addLink( path, target);
+	}
+
+	/**
+	 * Addes a symbolic link to the repository.
+	 *
+	 * @param path the absolute path at which this link will be installed.
+	 * @param target the path of the file this link will point to.
+	 */
+	public void addLink( final CharSequence path, final CharSequence target, int permissions) throws NoSuchAlgorithmException, IOException {
+		contents.addLink( path, target, permissions);
 	}
 
 	/**
