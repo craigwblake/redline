@@ -81,6 +81,7 @@ public class CpioHeader {
 	public void setPermissions( int permissions) { this.permissions = permissions; }
 	public void setType( int type) { this.type = type; }
 	public void setFileSize( int filesize) { this.filesize = filesize; }
+	public void setMtime( long mtime) { this.mtime = mtime; }
 
 	/**
 	 * Test to see if this is the last header, and is therefore the end of the

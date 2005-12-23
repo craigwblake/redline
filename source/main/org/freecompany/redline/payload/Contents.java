@@ -27,6 +27,7 @@ public class Contents {
 		CpioHeader header = new CpioHeader( path);
 		header.setType( SYMLINK);
 		header.setFileSize( target.length());
+		header.setMtime( System.currentTimeMillis());
 		if ( permissions != -1) header.setPermissions( permissions);
 		headers.add( header);
 		sources.put( header, target);
@@ -39,6 +40,7 @@ public class Contents {
 	public void addDirectory( final CharSequence path, int permissions) {
 		CpioHeader header = new CpioHeader( path);
 		header.setType( DIR);
+		header.setMtime( System.currentTimeMillis());
 		if ( permissions != -1) header.setPermissions( permissions);
 		headers.add( header);
 		sources.put( header, null);
@@ -68,10 +70,7 @@ public class Contents {
 
 	public String[] getDirNames() {
 		final HashSet< String> set = new HashSet< String>();
-		for ( CpioHeader header : headers) {
-			String path = new File( header.getName().toString()).getParent();
-			set.add( path);
-		}
+		for ( CpioHeader header : headers) set.add( new File( header.getName().toString()).getParent() + "/");
 		return set.toArray( new String[ set.size()]);
 	}
 
@@ -144,13 +143,13 @@ public class Contents {
 
 	public String[] getUsers() {
 		String[] array = new String[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = "unknown";
+		for ( int x = 0; x < array.length; x++) array[ x] = "root";
 		return array;
 	}
 
 	public String[] getGroups() {
 		String[] array = new String[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = "unknown";
+		for ( int x = 0; x < array.length; x++) array[ x] = "root";
 		return array;
 	}
 
