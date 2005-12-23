@@ -28,7 +28,7 @@ public class Main {
 
 	public void run( XmlEditor editor, File destination) throws NoSuchAlgorithmException, IOException {
 		editor.startPrefixMapping( "http://www.freecompany.org/namespace/redline", "rpm");
-		IncludeFiles include = new IncludeFiles();
+		Contents include = new Contents();
 
 		for ( Node files : editor.findNodes( "rpm:files")) {
 			try {
@@ -40,8 +40,7 @@ public class Main {
 					try {
 						editor.pushContext( file);
 						File source = new File( editor.getValue( "text()"));
-						File target = new File( parent, source.getName());
-						include.addFile( target, source, editor.getInteger( "@permission", permission));
+						include.addFile( new File( parent, source.getName()).getPath(), source, editor.getInteger( "@permission", permission));
 					} finally { 
 						editor.popContext();
 					}
@@ -54,7 +53,7 @@ public class Main {
 		run( editor, editor.getValue( "rpm:name/text()"), editor.getValue( "rpm:version/text()"), editor.getValue( "rpm:release/text()", "1"), include, destination);
 	}
 
-	public void run( XmlEditor editor, String name, String version, String release, IncludeFiles include, File destination) throws NoSuchAlgorithmException, IOException {
+	public void run( XmlEditor editor, String name, String version, String release, Contents include, File destination) throws NoSuchAlgorithmException, IOException {
 		Builder builder = new Builder();
 		builder.setPackage( name, version, release);
 		

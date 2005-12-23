@@ -92,7 +92,7 @@ public class Util {
 		buf.position( pos);
 	}
 
-	protected static String hex( byte[] data) {
+	public static String hex( byte[] data) {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		final PrintStream printer = new PrintStream( baos);
 		for ( byte b : data) printer.format( "%02x", b);

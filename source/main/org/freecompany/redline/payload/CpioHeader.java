@@ -34,7 +34,7 @@ public class CpioHeader {
 
 	protected int inode;
 	protected int type;
-	protected int permission;
+	protected int permissions = PERMISSION;
 	protected int uid;
 	protected int gid;
 	protected int nlink;
@@ -50,27 +50,35 @@ public class CpioHeader {
 	public CpioHeader() {
 	}
 
+	public CpioHeader( final CharSequence name) {
+		this.name = name;
+	}
+
 	public CpioHeader( final File file) {
+		this( file.getAbsolutePath(), file);
+	}
+
+	public CpioHeader( final CharSequence name, final File file) {
 		mtime = file.lastModified();
 		filesize = ( int ) file.length();
-		name = file.getName();
-		setPermission( PERMISSION);
+		this.name = name;
 		if ( file.isDirectory()) setType( DIR);
 		else setType( FILE);
 	}
 
 	public int getType() { return type; }
-	public int getPermission() { return permission; }
+	public int getPermissions() { return permissions; }
 	public int getRdevMajor() { return rdevMajor; }
 	public int getRdevMinor() { return rdevMinor; }
 	public int getDevMajor() { return devMajor; }
 	public int getDevMinor() { return devMinor; }
 	public int getMtime() { return ( int) ( mtime / 1000L) ; }
 	public int getInode() { return inode; }
+	public CharSequence getName() { return name; }
 
-	public int getMode() { return ( type << 12) | permission; }
+	public int getMode() { return ( type << 12) | permissions; }
 
-	public void setPermission( int permission) { this.permission = permission; }
+	public void setPermissions( int permissions) { this.permissions = permissions; }
 	public void setType( int type) { this.type = type; }
 
 	/**
@@ -148,7 +156,7 @@ public class CpioHeader {
 		inode = readEight( buffer);
 		
 		final int mode = readEight( buffer);
-		permission = mode & 07777;
+		permissions = mode & 07777;
 		type = mode >>> 12;
 		
 		uid = readEight( buffer);
@@ -204,7 +212,7 @@ public class CpioHeader {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append( "Inode: ").append( inode).append( "\n");
-		builder.append( "Permission: ").append( Integer.toString( permission, 8)).append( "\n");
+		builder.append( "Permission: ").append( Integer.toString( permissions, 8)).append( "\n");
 		builder.append( "Type: ").append( type).append( "\n");
 		builder.append( "UID: ").append( uid).append( "\n");
 		builder.append( "GID: ").append( gid).append( "\n");

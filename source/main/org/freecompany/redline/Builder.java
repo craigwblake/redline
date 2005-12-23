@@ -17,7 +17,7 @@ import static org.freecompany.redline.header.Header.HeaderTag.*;
 
 /**
  * The normal entry point to the API used for building and RPM.  The API provides methods to
- * configure and add files to a new RPM.  The current version of the RPM format (3.0) requires
+ * configure and add contents to a new RPM.  The current version of the RPM format (3.0) requires
  * numerous headers to be set for an RPM to be valid.  All of the required fields are either
  * set automatically or exposed through setters in this builder class.  Any required fields are
  * marked in their respective method API documentation.
@@ -36,7 +36,7 @@ public class Builder {
 	protected final Entry< byte[]> signature = ( Entry< byte[]>) format.getSignature().addEntry( SIGNATURES, 16);
 	protected final Entry< byte[]> immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
 
-	protected IncludeFiles files = new IncludeFiles();
+	protected Contents contents = new Contents();
 
 	/**
 	 * Initializes the builder and sets some required fields to known values.
@@ -209,14 +209,14 @@ public class Builder {
 	}
 
 	/**
-	 * Sets the group of files to include in this RPM.  Note that this method causes the existing
-	 * file set to be overwritten and therefore should be called before adding any other files via
+	 * Sets the group of contents to include in this RPM.  Note that this method causes the existing
+	 * file set to be overwritten and therefore should be called before adding any other contents via
 	 * the {@link #addFile()} methods.
 	 *
-	 * @param files the set of files to use in constructing this RPM.
+	 * @param contents the set of contents to use in constructing this RPM.
 	 */
-	public void setFiles( final IncludeFiles files) {
-		this.files = files;
+	public void setFiles( final Contents contents) {
+		this.contents = contents;
 	}
 	
 	/**
@@ -229,18 +229,38 @@ public class Builder {
 	 * @param file the file content to include in this rpm.
 	 * @param mode the mode of the target file in standard three octet notation
 	 */
-	public void addFile( final CharSequence target, final File source, final int mode) throws NoSuchAlgorithmException, IOException {
-		files.addFile( new File( target.toString()), source, mode);
+	public void addFile( final CharSequence path, final File source, final int mode) throws NoSuchAlgorithmException, IOException {
+		contents.addFile( path, source, mode);
 	}
 
 	/**
 	 * Addes the file to the repository with the default mode of <code>644</code>.
 	 *
+	 * @param path the absolute path at which this file will be installed.
+	 * @param file the file content to include in this rpm.
+	 */
+	public void addFile( final CharSequence path, final File source) throws NoSuchAlgorithmException, IOException {
+		contents.addFile( path, source);
+	}
+
+	/**
+	 * Addes the directory to the repository with the default mode of <code>644</code>.
+	 *
+	 * @param path the absolute path at which this file will be installed.
+	 * @param file the file content to include in this rpm.
+	 */
+	public void addDirectory( final CharSequence path) throws NoSuchAlgorithmException, IOException {
+		contents.addDirectory( path);
+	}
+
+	/**
+	 * Addes a symbolic link to the repository.
+	 *
 	 * @param target the absolute path at which this file will be installed.
 	 * @param file the file content to include in this rpm.
 	 */
-	public void addFile( final CharSequence target, final File source) throws NoSuchAlgorithmException, IOException {
-		addFile( target, source, 0644);
+	public void addLink( final CharSequence path, final CharSequence target) throws NoSuchAlgorithmException, IOException {
+		contents.addLink( path, target);
 	}
 
 	/**
@@ -292,28 +312,28 @@ public class Builder {
 		format.getHeader().createEntry( REQUIRENAME, dependencies.keySet().toArray( new String[ dependencies.size()]));
 		format.getHeader().createEntry( REQUIREVERSION, dependencies.values().toArray( new String[ dependencies.size()]));
 
-		format.getHeader().createEntry( SIZE, files.getTotalSize());
-		format.getHeader().createEntry( DIRNAMES, files.getDirNames());
-		format.getHeader().createEntry( DIRINDEXES, files.getDirIndexes());
-		format.getHeader().createEntry( BASENAMES, files.getBaseNames());
-		format.getHeader().createEntry( FILEMD5S, files.getMD5s());
-		format.getHeader().createEntry( FILESIZES, files.getSizes());
-		format.getHeader().createEntry( FILEMODES, files.getModes());
-		format.getHeader().createEntry( FILERDEVS, files.getRdevs());
-		format.getHeader().createEntry( FILEMTIMES, files.getMtimes());
-		format.getHeader().createEntry( FILELINKTOS, files.getLinkTos());
-		format.getHeader().createEntry( FILEFLAGS, files.getFlags());
-		format.getHeader().createEntry( FILEUSERNAME, files.getUsers());
-		format.getHeader().createEntry( FILEGROUPNAME, files.getGroups());
-		format.getHeader().createEntry( FILEVERIFYFLAGS, files.getVerifyFlags());
-		format.getHeader().createEntry( FILEDEVICES, files.getDevices());
-		format.getHeader().createEntry( FILEINODES, files.getInodes());
-		format.getHeader().createEntry( FILELANGS, files.getLangs());
-		format.getHeader().createEntry( FILEDEPENDSX, files.getDependsX());
-		format.getHeader().createEntry( FILEDEPENDSN, files.getDependsN());
-		format.getHeader().createEntry( FILECONTEXTS, files.getContexts());
-		format.getHeader().createEntry( FILECOLORS, files.getColors());
-		format.getHeader().createEntry( FILECLASS, files.getClasses());
+		format.getHeader().createEntry( SIZE, contents.getTotalSize());
+		format.getHeader().createEntry( DIRNAMES, contents.getDirNames());
+		format.getHeader().createEntry( DIRINDEXES, contents.getDirIndexes());
+		format.getHeader().createEntry( BASENAMES, contents.getBaseNames());
+		format.getHeader().createEntry( FILEMD5S, contents.getMD5s());
+		format.getHeader().createEntry( FILESIZES, contents.getSizes());
+		format.getHeader().createEntry( FILEMODES, contents.getModes());
+		format.getHeader().createEntry( FILERDEVS, contents.getRdevs());
+		format.getHeader().createEntry( FILEMTIMES, contents.getMtimes());
+		format.getHeader().createEntry( FILELINKTOS, contents.getLinkTos());
+		format.getHeader().createEntry( FILEFLAGS, contents.getFlags());
+		format.getHeader().createEntry( FILEUSERNAME, contents.getUsers());
+		format.getHeader().createEntry( FILEGROUPNAME, contents.getGroups());
+		format.getHeader().createEntry( FILEVERIFYFLAGS, contents.getVerifyFlags());
+		format.getHeader().createEntry( FILEDEVICES, contents.getDevices());
+		format.getHeader().createEntry( FILEINODES, contents.getInodes());
+		format.getHeader().createEntry( FILELANGS, contents.getLangs());
+		format.getHeader().createEntry( FILEDEPENDSX, contents.getDependsX());
+		format.getHeader().createEntry( FILEDEPENDSN, contents.getDependsN());
+		format.getHeader().createEntry( FILECONTEXTS, contents.getContexts());
+		format.getHeader().createEntry( FILECOLORS, contents.getColors());
+		format.getHeader().createEntry( FILECLASS, contents.getClasses());
 
 		format.getHeader().createEntry( PAYLOADFLAGS, new String[] { "9"});
 
@@ -350,16 +370,22 @@ public class Builder {
 
 		int total = 0;
 		final ByteBuffer buffer = ByteBuffer.allocate( 4096);
-		for ( CpioHeader header : files.headers()) {
-			final File source = files.source( header);
-			final String path = "." + files.target( header).getAbsolutePath();
-			header.setName( path);
+		for ( CpioHeader header : contents.headers()) {
+			final String path = header.getName().toString();
+			if ( path.startsWith( "/")) header.setName( "." + path);
 			total = header.write( compressor, total);
 			
-			FileChannel in = new FileInputStream( source).getChannel();
-			while ( in.read(( ByteBuffer) buffer.rewind()) > 0) total += compressor.write(( ByteBuffer) buffer.flip());
-			total += header.skip( compressor, total);
-			in.close();
+			Object object = contents.getSource( header);
+			if ( object instanceof File) {
+				FileChannel in = new FileInputStream(( File) object).getChannel();
+				while ( in.read(( ByteBuffer) buffer.rewind()) > 0) total += compressor.write(( ByteBuffer) buffer.flip());
+				total += header.skip( compressor, total);
+				in.close();
+			} else if ( object instanceof CharSequence) {
+				CharSequence target = ( CharSequence) object;
+				compressor.write( ByteBuffer.wrap( String.valueOf( target).getBytes()));
+				total += header.skip( compressor, target.length());
+			}
 		}
 		
 		final CpioHeader trailer = new CpioHeader();
