@@ -385,15 +385,15 @@ public class Builder {
 			if ( path.startsWith( "/")) header.setName( "." + path);
 			total = header.write( compressor, total);
 			
-			Object object = contents.getSource( header);
+			final Object object = contents.getSource( header);
 			if ( object instanceof File) {
-				FileChannel in = new FileInputStream(( File) object).getChannel();
+				final FileChannel in = new FileInputStream(( File) object).getChannel();
 				while ( in.read(( ByteBuffer) buffer.rewind()) > 0) total += compressor.write(( ByteBuffer) buffer.flip());
 				total += header.skip( compressor, total);
 				in.close();
 			} else if ( object instanceof CharSequence) {
-				CharSequence target = ( CharSequence) object;
-				compressor.write( ByteBuffer.wrap( String.valueOf( target).getBytes()));
+				final CharSequence target = ( CharSequence) object;
+				total += compressor.write( ByteBuffer.wrap( String.valueOf( target).getBytes()));
 				total += header.skip( compressor, target.length());
 			}
 		}

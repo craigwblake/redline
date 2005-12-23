@@ -26,9 +26,10 @@ public class Contents {
 	public void addLink( final CharSequence path, final CharSequence target, int permissions) {
 		CpioHeader header = new CpioHeader( path);
 		header.setType( SYMLINK);
+		header.setFileSize( target.length());
 		if ( permissions != -1) header.setPermissions( permissions);
 		headers.add( header);
-		sources.put( header, path + "\0");
+		sources.put( header, target);
 	}
 
 	public void addDirectory( final CharSequence path) {
@@ -69,7 +70,6 @@ public class Contents {
 		final HashSet< String> set = new HashSet< String>();
 		for ( CpioHeader header : headers) {
 			String path = new File( header.getName().toString()).getParent();
-			System.out.println( "Adding directory '" + path + "'.");
 			set.add( path);
 		}
 		return set.toArray( new String[ set.size()]);
@@ -132,7 +132,7 @@ public class Contents {
 		String[] array = new String[ headers.size()];
 		for ( int x = 0; x < array.length; x++) {
 			Object object = sources.get( headers.get( x));
-			if ( object instanceof CharSequence) array[ x] = String.valueOf( object);
+			if ( object instanceof String) array[ x] = String.valueOf( object);
 			else array[ x] = "";
 		}
 		return array;
