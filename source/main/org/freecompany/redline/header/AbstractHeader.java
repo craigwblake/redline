@@ -338,7 +338,16 @@ public abstract class AbstractHeader {
 		}
 
 		public String toString() {
-			return ( tags.containsKey( tag) ? tags.get( tag).getName() : super.toString()) + "[tag=" + tag + ",type=" + getType() + ",count=" + count + ",size=" + size() + ",offset=" + offset + "]";
+			StringBuilder builder = new StringBuilder();
+			if ( tags.containsKey( tag)) builder.append( tags.get( tag).getName());
+			else builder.append( super.toString());
+			builder.append( "[tag=").append( tag);
+			builder.append( ",type=").append( getType());
+			builder.append( ",count=").append( count);
+			builder.append( ",size=").append( size());
+			builder.append( ",offset=").append( offset);
+			builder.append( "]");
+			return builder.toString();
 		}
 	}
 

@@ -52,8 +52,8 @@ public class Builder {
 		addDependency( "rpmlib(PayloadFilesHavePrefix)", "4.0-1");
 	}
 
-	public void addDependency( CharSequence name, CharSequence value) {
-		dependencies.put( name.toString(), value);
+	public void addDependency( CharSequence name, CharSequence version) {
+		dependencies.put( name.toString(), version);
 	}
 
 	/**
