@@ -11,8 +11,9 @@
 
 	<imp:import uri='urn:brimstone:freecompany/imp/builder-0.4.3.template'/>
 	<imp:import uri='urn:brimstone:freecompany/imp/bundle-0.4.3.template'/>
+	<imp:import uri='urn:brimstone:freecompany/imp/module-0.4.3.template'/>
 
-	<imp:index name='redline' group='freecompany/redline' types='jar,bundle'>
+	<imp:index name='redline' group='freecompany/redline' types='jar,bundle,module'>
 		<imp:dependency types='compile,test,run' uri='urn:brimstone:freecompany/util/util-text-0.1.1.jar'/>
 		<imp:dependency types='compile,test,run' uri='urn:brimstone:freecompany/util/util-xml-editor-0.0.3.jar'/>
 	</imp:index>
