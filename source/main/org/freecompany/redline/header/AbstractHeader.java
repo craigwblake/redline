@@ -525,7 +525,10 @@ public abstract class AbstractHeader {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append( "Start Header ( ").append( getClass()).append( ")").append( "\n");
-		for ( int tag : entries.keySet()) builder.append( entries.get( tag)).append( "\n");
+		int count = 0;
+		for ( int tag : entries.keySet()) {
+			builder.append( count++).append( ": ").append( entries.get( tag)).append( "\n");
+		}
 		return builder.toString();
 	}
 }
