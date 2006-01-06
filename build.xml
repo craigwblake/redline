@@ -4,14 +4,10 @@
 
 	<property name='imp.ssh.host' value='repository.freecompany.org'/>
 	<property name='imp.ssh.location' value='/var/repository/transit'/>
-	<!--<property name='imp.javac.lint' value='unchecked'/>-->
+	<property name='imp.javac.lint' value='unchecked'/>
 	<property name='imp.jar.manifest.mainclass' value='org.freecompany.redline.Scanner'/>
 	<property name='imp.javac.source' value='1.5'/>
 	<property name='imp.javac.target' value='1.5'/>
-
-	<imp:import uri='urn:brimstone:freecompany/imp/builder-0.4.3.template'/>
-	<imp:import uri='urn:brimstone:freecompany/imp/bundle-0.4.3.template'/>
-	<imp:import uri='urn:brimstone:freecompany/imp/module-0.4.3.template'/>
 
 	<imp:index name='redline' group='freecompany/redline' types='jar,bundle,module'>
 		<imp:dependency types='compile,test,run' uri='urn:brimstone:freecompany/util/util-text-0.1.1.jar'/>
