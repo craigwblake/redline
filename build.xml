@@ -2,8 +2,8 @@
 
 <project name='redline' default='install' xmlns:imp='antlib:org.freecompany.imp'>
 
-	<property name='imp.ssh.host' value='repository.freecompany.org'/>
-	<property name='imp.ssh.location' value='/var/repository/transit'/>
+	<property name='imp.deploy.host' value='repository.freecompany.org'/>
+	<property name='imp.deploy.location' value='/external/repositories/brimstone'/>
 	<property name='imp.javac.lint' value='unchecked'/>
 	<property name='imp.jar.manifest.mainclass' value='org.freecompany.redline.Scanner'/>
 	<property name='imp.javac.source' value='1.5'/>
