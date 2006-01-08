@@ -317,7 +317,7 @@ public class Builder {
 		*/
 
 		int[] flags = new int[ dependencies.size()];
-		Arrays.fill( flags, 16777290);
+		Arrays.fill( flags, 0x04);
 		format.getHeader().createEntry( REQUIREFLAGS, flags);
 		format.getHeader().createEntry( REQUIRENAME, dependencies.keySet().toArray( new String[ dependencies.size()]));
 		format.getHeader().createEntry( REQUIREVERSION, dependencies.values().toArray( new String[ dependencies.size()]));
