@@ -1,7 +1,7 @@
 package org.freecompany.redline.payload;
 
 import org.freecompany.redline.*;
-import org.freecompany.util.text.*;
+import org.freecompany.util.text.Comparison;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
