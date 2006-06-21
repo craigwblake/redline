@@ -9,7 +9,7 @@
 	<property name='imp.javac.source' value='1.5'/>
 	<property name='imp.javac.target' value='1.5'/>
 
-	<imp:index name='redline' group='freecompany/redline' types='jar,bundle,module,rpm'>
+	<imp:index name='redline' group='freecompany/redline' types='jar,module,rpm,bundle'>
 		<imp:dependency types='compile,test,run' uri='urn:brimstone:freecompany/util/util-text-0.3.1.jar'/>
 		<imp:dependency types='compile,test,run' uri='urn:brimstone:freecompany/util/util-xml-editor-0.0.3.jar'/>
 	</imp:index>
