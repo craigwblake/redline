@@ -9,6 +9,6 @@ public class Flags {
 	public static int INTERP = 0x100;
 	public static int SCRIPT_PRE = 0x200;
 	public static int SCRIPT_POST = 0x400;
-	public static int SCRIPT_PRERUN = 0x800;
-	public static int SCRIPT_POSTRUN = 0x1000;
+	public static int SCRIPT_PREUN = 0x800;
+	public static int SCRIPT_POSTUN = 0x1000;
 }
