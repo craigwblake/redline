@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 
-<project name='redline' default='install' xmlns:imp='antlib:org.freecompany.imp'>
+<project name='redline' default='install' xmlns:imp='antlib:org.freecompany.imp' xmlns:builder='http://www.freecompany.org/namespace/builder'>
 
 	<property name='imp.deploy.host' value='repository.freecompany.org'/>
 	<property name='imp.deploy.location' value='/external/repositories/brimstone'/>
