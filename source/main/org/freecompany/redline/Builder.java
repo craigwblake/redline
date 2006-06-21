@@ -12,6 +12,7 @@ import java.security.PrivateKey;
 
 import static org.freecompany.redline.ChannelWrapper.*;
 import static org.freecompany.redline.header.AbstractHeader.*;
+import static org.freecompany.redline.header.Flags.*;
 import static org.freecompany.redline.header.Signature.SignatureTag.*;
 import static org.freecompany.redline.header.Header.HeaderTag.*;
 
@@ -32,6 +33,7 @@ public class Builder {
 	protected final Format format = new Format();
 	protected final Set< PrivateKey> signatures = new HashSet< PrivateKey>();
 	protected final Map< String, CharSequence> dependencies = new LinkedHashMap< String, CharSequence>();
+	protected final Map< String, Integer> flags = new LinkedHashMap< String, Integer>();
 
 	protected final Entry< byte[]> signature = ( Entry< byte[]>) format.getSignature().addEntry( SIGNATURES, 16);
 	protected final Entry< byte[]> immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
@@ -48,12 +50,22 @@ public class Builder {
 		format.getHeader().createEntry( PAYLOADFORMAT, "cpio");
 		format.getHeader().createEntry( PAYLOADCOMPRESSOR, "gzip");
 
-		addDependency( "rpmlib(CompressedFileNames)", "3.0.4-1");
-		addDependency( "rpmlib(PayloadFilesHavePrefix)", "4.0-1");
+		addDependencyLess( "rpmlib(VersionedDependencies)", "3.0.3-1");
+		addDependencyLess( "rpmlib(CompressedFileNames)", "3.0.4-1");
+		addDependencyLess( "rpmlib(PayloadFilesHavePrefix)", "4.0-1");
 	}
 
-	public void addDependency( CharSequence name, CharSequence version) {
+	public void addDependencyLess( CharSequence name, CharSequence version) {
+		addDependency( name, version, LESS | EQUAL);
+	}
+
+	public void addDependencyMore( CharSequence name, CharSequence version) {
+		addDependency( name, version, GREATER | EQUAL);
+	}
+
+	protected void addDependency( CharSequence name, CharSequence version, final int flag) {
 		dependencies.put( name.toString(), version);
+		flags.put( name.toString(), flag);
 	}
 
 	/**
@@ -165,6 +177,16 @@ public class Builder {
 		if ( group != null) format.getHeader().createEntry( GROUP, group);
 	}
 
+	/**
+	 * Distribution tag listing the ditributable package.
+	 * <p/>
+	 * This is a required field.
+	 *
+	 * @param distribution the distribution.
+	 */
+	public void setDistribution( final CharSequence distribution) {
+		if ( distribution != null) format.getHeader().createEntry( DISTRIBUTION, distribution);
+	}
 	/**
 	 * Vendor tag listing the organization providing this software package.
 	 * <p/>
@@ -316,11 +338,10 @@ public class Builder {
 		}
 		*/
 
-		int[] flags = new int[ dependencies.size()];
-		Arrays.fill( flags, 0x04);
-		format.getHeader().createEntry( REQUIREFLAGS, flags);
+		format.getHeader().createEntry( EPOCH, 0);
 		format.getHeader().createEntry( REQUIRENAME, dependencies.keySet().toArray( new String[ dependencies.size()]));
 		format.getHeader().createEntry( REQUIREVERSION, dependencies.values().toArray( new String[ dependencies.size()]));
+		format.getHeader().createEntry( REQUIREFLAGS, convert( flags.values().toArray( new Integer[ flags.size()])));
 
 		format.getHeader().createEntry( SIZE, contents.getTotalSize());
 		format.getHeader().createEntry( DIRNAMES, contents.getDirNames());
@@ -432,5 +453,12 @@ public class Builder {
 		buffer.putInt( count * -16);
 		buffer.putInt( 0x00000010);
 		return buffer.array();
+	}
+
+	protected int[] convert( final Integer[] ints) {
+		int[] array = new int[ ints.length];
+		int count = 0;
+		for ( int i : ints) array[ count++] = i;
+		return array;
 	}
 }

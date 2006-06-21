@@ -20,6 +20,7 @@ public class Test {
 		builder.setBuildHost( "localhost");
 		builder.setLicense( "MIT");
 		builder.setGroup( "Miscellaneous");
+		builder.setDistribution( "FreeCompany");
 		builder.setVendor( "FreeCompany RPM Repository http://yum.freecompany.org/");
 		builder.setPackager( "Craig Blake <craigwblake@mac.com>");
 		builder.setUrl( "http://www.freecompany.org/test/");
