@@ -79,7 +79,7 @@ public class Contents {
 	public int[] getDirIndexes() {
 		final List< String> dirs = asList( getDirNames());
 		int[] array = new int[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = dirs.indexOf( new File( headers.get( x).toString()).getParent() + "/");
+		for ( int x = 0; x < array.length; x++) array[ x] = dirs.indexOf( new File( headers.get( x).getName().toString()).getParent() + "/");
 		return array;
 	}
 
