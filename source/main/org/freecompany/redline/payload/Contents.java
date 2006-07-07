@@ -9,6 +9,7 @@ import java.nio.charset.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
+import static java.util.Arrays.asList;
 import static org.freecompany.redline.payload.CpioHeader.*;
 
 /**
@@ -69,9 +70,17 @@ public class Contents {
 	}
 
 	public String[] getDirNames() {
-		final HashSet< String> set = new HashSet< String>();
+		final Set< String> set = new LinkedHashSet< String>();
 		for ( CpioHeader header : headers) set.add( new File( header.getName().toString()).getParent() + "/");
 		return set.toArray( new String[ set.size()]);
+	}
+
+	// TODO: Fix this (as part of general refactoring) to be much better.
+	public int[] getDirIndexes() {
+		final List< String> dirs = asList( getDirNames());
+		int[] array = new int[ headers.size()];
+		for ( int x = 0; x < array.length; x++) array[ x] = dirs.indexOf( new File( headers.get( x).toString()).getParent() + "/");
+		return array;
 	}
 
 	public String[] getBaseNames() {
@@ -176,10 +185,6 @@ public class Contents {
 			array[ x] = ( header.getDevMajor() << 8) + header.getDevMinor();
 		}
 		return array;
-	}
-
-	public int[] getDirIndexes() {
-		return new int[ headers.size()];
 	}
 
 	public int[] getInodes() {
