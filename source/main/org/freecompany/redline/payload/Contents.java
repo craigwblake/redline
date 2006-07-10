@@ -8,8 +8,11 @@ import java.nio.channels.*;
 import java.nio.charset.*;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.logging.Logger;
 
 import static java.util.Arrays.asList;
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Logger.getLogger;
 import static org.freecompany.redline.payload.CpioHeader.*;
 
 /**
@@ -17,14 +20,21 @@ import static org.freecompany.redline.payload.CpioHeader.*;
  */
 public class Contents {
 
+	private Logger logger = getLogger( Contents.class.getName());
+	private int inode = 1;
 	protected final List< CpioHeader> headers = new LinkedList< CpioHeader>();
+	protected final HashSet< String> files = new HashSet< String>();
 	protected final HashMap< CpioHeader, Object> sources = new HashMap< CpioHeader, Object>();
 
-	public void addLink( final CharSequence path, final CharSequence target) {
+	public void addLink( final String path, final String target) {
 		addLink( path, target, -1);
 	}
 
-	public void addLink( final CharSequence path, final CharSequence target, int permissions) {
+	public void addLink( final String path, final String target, int permissions) {
+		if ( files.contains( path)) return;
+		files.add( path);
+		addDirectories( new File( path));
+		logger.log( INFO, "Adding link ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path);
 		header.setType( SYMLINK);
 		header.setFileSize( target.length());
@@ -34,29 +44,47 @@ public class Contents {
 		sources.put( header, target);
 	}
 
-	public void addDirectory( final CharSequence path) {
+	public void addDirectory( final String path) {
 		addDirectory( path, -1);
 	}
 
-	public void addDirectory( final CharSequence path, int permissions) {
+	public void addDirectory( final String path, int permissions) {
+		if ( files.contains( path)) return;
+		files.add( path);
+		addDirectories( new File( path));
+		logger.log( INFO, "Adding directory ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path);
 		header.setType( DIR);
+		header.setInode( inode++);
 		header.setMtime( System.currentTimeMillis());
 		if ( permissions != -1) header.setPermissions( permissions);
 		headers.add( header);
 		sources.put( header, null);
 	}
 
-	public void addFile( final CharSequence path, final File source) throws FileNotFoundException {
+	public void addFile( final String path, final File source) throws FileNotFoundException {
 		addFile( path, source, -1);
 	}
 
-	public void addFile( final CharSequence path, final File source, int permissions) throws FileNotFoundException {
+	public void addFile( final String path, final File source, int permissions) throws FileNotFoundException {
+		if ( files.contains( path)) return;
+		files.add( path);
+		addDirectories( new File( path));
+		logger.log( INFO, "Adding file ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path, source);
 		header.setType( FILE);
+		header.setInode( inode++);
 		if ( permissions != -1) header.setPermissions( permissions);
 		headers.add( header);
 		sources.put( header, source);
+	}
+
+	protected void addDirectories( final File file) {
+		final File parent = file.getParentFile();
+		if ( parent != null && parent.getAbsolutePath().length() > 1) {
+			addDirectory( parent.getAbsolutePath(), PERMISSION);
+			addDirectories( parent);
+		}
 	}
 
 	public int size() { return headers.size(); }
@@ -71,7 +99,11 @@ public class Contents {
 
 	public String[] getDirNames() {
 		final Set< String> set = new LinkedHashSet< String>();
-		for ( CpioHeader header : headers) set.add( new File( header.getName().toString()).getParent() + "/");
+		for ( CpioHeader header : headers) {
+			String parent = new File( header.getName().toString()).getParent();
+			if ( !parent.endsWith( "/")) parent += "/";
+			set.add( parent);
+		}
 		return set.toArray( new String[ set.size()]);
 	}
 
@@ -79,7 +111,11 @@ public class Contents {
 	public int[] getDirIndexes() {
 		final List< String> dirs = asList( getDirNames());
 		int[] array = new int[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = dirs.indexOf( new File( headers.get( x).getName().toString()).getParent() + "/");
+		for ( int x = 0; x < array.length; x++) {
+			String parent = new File( headers.get( x).getName().toString()).getParent();
+			if ( !parent.endsWith( "/")) parent += "/";
+			array[ x] = dirs.indexOf( parent);
+		}
 		return array;
 	}
 

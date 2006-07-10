@@ -251,7 +251,7 @@ public class Builder {
 	 * @param file the file content to include in this rpm.
 	 * @param mode the mode of the target file in standard three octet notation
 	 */
-	public void addFile( final CharSequence path, final File source, final int mode) throws NoSuchAlgorithmException, IOException {
+	public void addFile( final String path, final File source, final int mode) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source, mode);
 	}
 
@@ -261,7 +261,7 @@ public class Builder {
 	 * @param path the absolute path at which this file will be installed.
 	 * @param file the file content to include in this rpm.
 	 */
-	public void addFile( final CharSequence path, final File source) throws NoSuchAlgorithmException, IOException {
+	public void addFile( final String path, final File source) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source);
 	}
 
@@ -271,7 +271,7 @@ public class Builder {
 	 * @param path the absolute path at which this file will be installed.
 	 * @param file the file content to include in this rpm.
 	 */
-	public void addDirectory( final CharSequence path) throws NoSuchAlgorithmException, IOException {
+	public void addDirectory( final String path) throws NoSuchAlgorithmException, IOException {
 		contents.addDirectory( path);
 	}
 
@@ -281,7 +281,7 @@ public class Builder {
 	 * @param path the absolute path at which this link will be installed.
 	 * @param target the path of the file this link will point to.
 	 */
-	public void addLink( final CharSequence path, final CharSequence target) throws NoSuchAlgorithmException, IOException {
+	public void addLink( final String path, final String target) throws NoSuchAlgorithmException, IOException {
 		contents.addLink( path, target);
 	}
 
@@ -291,7 +291,7 @@ public class Builder {
 	 * @param path the absolute path at which this link will be installed.
 	 * @param target the path of the file this link will point to.
 	 */
-	public void addLink( final CharSequence path, final CharSequence target, int permissions) throws NoSuchAlgorithmException, IOException {
+	public void addLink( final String path, final String target, int permissions) throws NoSuchAlgorithmException, IOException {
 		contents.addLink( path, target, permissions);
 	}
 
