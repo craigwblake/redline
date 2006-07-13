@@ -10,6 +10,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.logging.Logger;
 
+import static java.util.Collections.unmodifiableSet;
 import static java.util.Arrays.asList;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Logger.getLogger;
@@ -19,6 +20,22 @@ import static org.freecompany.redline.payload.CpioHeader.*;
  * NOT THREADSAFE
  */
 public class Contents {
+
+	private final static Set< String> known;
+
+	static {
+		Set< String> mutable = new HashSet< String>();
+		mutable.add( "/");
+		mutable.add( "/etc");
+		mutable.add( "/usr");
+		mutable.add( "/usr/bin");
+		mutable.add( "/usr/local");
+		mutable.add( "/usr/local/bin");
+		mutable.add( "/usr/share");
+		mutable.add( "/usr/share/java");
+		mutable.add( "/var");
+		known = unmodifiableSet( mutable);
+	}
 
 	private Logger logger = getLogger( Contents.class.getName());
 	private int inode = 1;
@@ -81,7 +98,7 @@ public class Contents {
 
 	protected void addDirectories( final File file) {
 		final File parent = file.getParentFile();
-		if ( parent != null && parent.getAbsolutePath().length() > 1) {
+		if ( parent != null && !known.contains( parent.getAbsolutePath())) {
 			addDirectory( parent.getAbsolutePath(), PERMISSION);
 			addDirectories( parent);
 		}

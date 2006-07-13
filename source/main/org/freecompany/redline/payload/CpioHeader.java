@@ -37,7 +37,7 @@ public class CpioHeader {
 	protected int permissions = PERMISSION;
 	protected int uid;
 	protected int gid;
-	protected int nlink;
+	protected int nlink = 1;
 	protected long mtime;
 	protected int filesize;
 	protected int devMinor = 1;

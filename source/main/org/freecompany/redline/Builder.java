@@ -360,11 +360,11 @@ public class Builder {
 		format.getHeader().createEntry( FILEDEVICES, contents.getDevices());
 		format.getHeader().createEntry( FILEINODES, contents.getInodes());
 		format.getHeader().createEntry( FILELANGS, contents.getLangs());
-		format.getHeader().createEntry( FILEDEPENDSX, contents.getDependsX());
-		format.getHeader().createEntry( FILEDEPENDSN, contents.getDependsN());
+		//format.getHeader().createEntry( FILEDEPENDSX, contents.getDependsX());
+		//format.getHeader().createEntry( FILEDEPENDSN, contents.getDependsN());
+		//format.getHeader().createEntry( FILECOLORS, contents.getColors());
+		//format.getHeader().createEntry( FILECLASS, contents.getClasses());
 		format.getHeader().createEntry( FILECONTEXTS, contents.getContexts());
-		format.getHeader().createEntry( FILECOLORS, contents.getColors());
-		format.getHeader().createEntry( FILECLASS, contents.getClasses());
 
 		format.getHeader().createEntry( PAYLOADFLAGS, new String[] { "9"});
 
