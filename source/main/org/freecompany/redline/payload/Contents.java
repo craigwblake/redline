@@ -50,7 +50,7 @@ public class Contents {
 	public void addLink( final String path, final String target, int permissions) {
 		if ( files.contains( path)) return;
 		files.add( path);
-		addDirectories( new File( path));
+		//addDirectories( new File( path));
 		logger.log( FINE, "Adding link ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path);
 		header.setType( SYMLINK);
@@ -68,7 +68,7 @@ public class Contents {
 	public void addDirectory( final String path, int permissions) {
 		if ( files.contains( path)) return;
 		files.add( path);
-		addDirectories( new File( path));
+		//addDirectories( new File( path));
 		logger.log( FINE, "Adding directory ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path);
 		header.setType( DIR);
@@ -86,7 +86,7 @@ public class Contents {
 	public void addFile( final String path, final File source, int permissions) throws FileNotFoundException {
 		if ( files.contains( path)) return;
 		files.add( path);
-		addDirectories( new File( path));
+		//addDirectories( new File( path));
 		logger.log( FINE, "Adding file ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path, source);
 		header.setType( FILE);
