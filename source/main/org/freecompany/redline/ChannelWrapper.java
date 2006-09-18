@@ -97,6 +97,7 @@ public abstract class ChannelWrapper {
 		return object;
 	}
 
+	@SuppressWarnings( "unchecked")
 	public < T> T finish( final Key< T> object) {
 		return ( T) consumers.remove( object).finish();
 	}

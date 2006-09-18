@@ -35,7 +35,9 @@ public class Builder {
 	protected final Map< String, CharSequence> dependencies = new LinkedHashMap< String, CharSequence>();
 	protected final Map< String, Integer> flags = new LinkedHashMap< String, Integer>();
 
+	@SuppressWarnings( "unchecked")
 	protected final Entry< byte[]> signature = ( Entry< byte[]>) format.getSignature().addEntry( SIGNATURES, 16);
+	@SuppressWarnings( "unchecked")
 	protected final Entry< byte[]> immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
 
 	protected Contents contents = new Contents();
@@ -326,6 +328,7 @@ public class Builder {
 	 *
 	 * @param original the {@link FileChannel} to which the resulting RPM will be written.
 	 */
+	@SuppressWarnings( "unchecked")
 	public void build( final FileChannel original) throws NoSuchAlgorithmException, IOException {
 		final WritableChannelWrapper output = new WritableChannelWrapper( original);
 

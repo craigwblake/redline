@@ -22,8 +22,8 @@ public abstract class AbstractHeader {
 	protected static final int MAGIC_WORD = 0x8EADE801;
 
 	protected final Map< Integer, Tag> tags = new HashMap< Integer, Tag>();
-	protected final Map< Integer, Entry> entries = new TreeMap< Integer, Entry>();
-	protected final Map< Entry, Integer> pending = new LinkedHashMap< Entry, Integer>();
+	protected final Map< Integer, Entry< ?>> entries = new TreeMap< Integer, Entry< ?>>();
+	protected final Map< Entry< ?>, Integer> pending = new LinkedHashMap< Entry< ?>, Integer>();
 
 	/**
 	 * Reads the entire header contents for this channel and returns the number of entries
@@ -132,7 +132,7 @@ public abstract class AbstractHeader {
 		return data;
 	}
 
-	protected int writeData( final Collection< ByteBuffer> buffers, final ByteBuffer index, final Entry entry, int offset) {
+	protected int writeData( final Collection< ByteBuffer> buffers, final ByteBuffer index, final Entry< ?> entry, int offset) {
 		final int shift = entry.getOffset( offset) - offset;
 		if ( shift > 0) buffers.add( ByteBuffer.allocate( shift));
 		offset += shift;
@@ -149,8 +149,9 @@ public abstract class AbstractHeader {
 		return offset + size;
 	}
 
+	@SuppressWarnings( "unchecked")
 	public void writePending( final FileChannel channel) {
-		for ( Entry< Object> entry : pending.keySet()) {
+		for ( Entry< ?> entry : pending.keySet()) {
 			try {
 				ByteBuffer data = ByteBuffer.allocate( entry.size());
 				entry.write( data);
@@ -162,11 +163,11 @@ public abstract class AbstractHeader {
 		}
 	}
 
-	public Map< Entry, Integer> getPending() {
+	public Map< Entry< ?>, Integer> getPending() {
 		return pending;
 	}
 
-	public void removeEntry( final Entry entry) {
+	public void removeEntry( final Entry< ?> entry) {
 		entries.remove( entry.getTag());
 	}
 
@@ -180,35 +181,35 @@ public abstract class AbstractHeader {
 
 	@SuppressWarnings( "unchecked")
 	public Entry< String[]> createEntry( Tag tag, CharSequence value) {
-		Entry< String[]> entry = createEntry( tag.getCode(), tag.getType(), 1);
+		Entry< String[]> entry = ( Entry< String[]>) createEntry( tag.getCode(), tag.getType(), 1);
 		entry.setValues( new String[] { value.toString()});
 		return entry;
 	}
 
 	@SuppressWarnings( "unchecked")
 	public Entry< int[]> createEntry( Tag tag, int value) {
-		Entry< int[]> entry = createEntry( tag.getCode(), tag.getType(), 1);
+		Entry< int[]> entry = ( Entry< int[]>) createEntry( tag.getCode(), tag.getType(), 1);
 		entry.setValues( new int[] { value});
 		return entry;
 	}
 
 	@SuppressWarnings( "unchecked")
 	public < T> Entry< T> createEntry( Tag tag, T values) {
-		Entry< T> entry = createEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
+		Entry< T> entry = ( Entry< T>) createEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
 		entry.setValues( values);
 		return entry;
 	}
 
 	@SuppressWarnings( "unchecked")
 	public < T> Entry< T> createEntry( Tag tag, int type, T values) {
-		Entry< T> entry = createEntry( tag.getCode(), type, values.getClass().isArray() ? Array.getLength( values) : 1);
+		Entry< T> entry = ( Entry< T>) createEntry( tag.getCode(), type, values.getClass().isArray() ? Array.getLength( values) : 1);
 		entry.setValues( values);
 		return entry;
 	}
 
 	@SuppressWarnings( "unchecked")
 	public < T> Entry< T> createEntry( int tag, int type, T values) {
-		Entry< T> entry = createEntry( tag, type, values.getClass().isArray() ? Array.getLength( values) : 1);
+		Entry< T> entry = ( Entry< T>) createEntry( tag, type, values.getClass().isArray() ? Array.getLength( values) : 1);
 		entry.setValues( values);
 		return entry;
 	}
@@ -223,7 +224,7 @@ public abstract class AbstractHeader {
 		return createEntry( tag.getCode(), tag.getType(), count);
 	}
 
-	public Entry readEntry( final int tag, final int type, final int offset, final int count, final ByteBuffer data) {
+	public Entry< ?> readEntry( final int tag, final int type, final int offset, final int count, final ByteBuffer data) {
 		final Entry entry = createEntry( tag, type, count);
 		final ByteBuffer buffer = data.duplicate();
 		buffer.position( offset);
@@ -232,15 +233,15 @@ public abstract class AbstractHeader {
 		return entry;
 	}
 
-	public Entry createEntry( final int tag, final int type, final int count) {
-		final Entry entry = createEntry( type);
+	public Entry< ?> createEntry( final int tag, final int type, final int count) {
+		final Entry< ?> entry = createEntry( type);
 		entry.setTag( tag);
 		entry.setCount( count);
 		entries.put( tag, entry);
 		return entry;
 	}
 
-	protected Entry createEntry( int type) {
+	protected Entry< ?> createEntry( int type) {
 		switch ( type) {
 			case 0:
 				return new NullEntry();
