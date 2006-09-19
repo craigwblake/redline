@@ -12,7 +12,7 @@ import java.util.logging.Logger;
 
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Arrays.asList;
-import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Logger.getLogger;
 import static org.freecompany.redline.payload.CpioHeader.*;
 
@@ -46,7 +46,7 @@ public class Contents {
 	public void addLink( final String path, final String target, int permissions) {
 		if ( files.contains( path)) return;
 		files.add( path);
-		logger.log( INFO, "Adding link ''{0}''.", path);
+		logger.log( FINE, "Adding link ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path);
 		header.setType( SYMLINK);
 		header.setFileSize( target.length());
@@ -63,7 +63,7 @@ public class Contents {
 	public void addDirectory( final String path, int permissions) {
 		if ( files.contains( path)) return;
 		files.add( path);
-		logger.log( INFO, "Adding directory ''{0}''.", path);
+		logger.log( FINE, "Adding directory ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path);
 		header.setType( DIR);
 		header.setInode( inode++);
@@ -80,7 +80,7 @@ public class Contents {
 	public void addFile( final String path, final File source, int permissions) throws FileNotFoundException {
 		if ( files.contains( path)) return;
 		files.add( path);
-		logger.log( INFO, "Adding file ''{0}''.", path);
+		logger.log( FINE, "Adding file ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path, source);
 		header.setType( FILE);
 		header.setInode( inode++);
