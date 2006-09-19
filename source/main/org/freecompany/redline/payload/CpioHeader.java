@@ -28,7 +28,7 @@ public class CpioHeader {
 	
 	protected static final int CPIO_HEADER = 110;
 	protected static final CharSequence MAGIC = "070701";
-	protected static final CharSequence TRAILER = "TRAILER!!!";
+	protected static final String TRAILER = "TRAILER!!!";
 
 	protected Charset charset = Charset.forName( "US-ASCII");
 
@@ -45,12 +45,12 @@ public class CpioHeader {
 	protected int rdevMinor;
 	protected int rdevMajor;
 	protected int checksum;
-	protected CharSequence name;
+	protected String name;
 
 	public CpioHeader() {
 	}
 
-	public CpioHeader( final CharSequence name) {
+	public CpioHeader( final String name) {
 		this.name = name;
 	}
 
@@ -58,7 +58,7 @@ public class CpioHeader {
 		this( file.getAbsolutePath(), file);
 	}
 
-	public CpioHeader( final CharSequence name, final File file) {
+	public CpioHeader( final String name, final File file) {
 		mtime = file.lastModified();
 		filesize = ( int ) file.length();
 		this.name = name;
@@ -74,7 +74,7 @@ public class CpioHeader {
 	public int getDevMinor() { return devMinor; }
 	public int getMtime() { return ( int) ( mtime / 1000L) ; }
 	public int getInode() { return inode; }
-	public CharSequence getName() { return name; }
+	public String getName() { return name; }
 
 	public int getMode() { return ( type << 12) | permissions; }
 
@@ -97,7 +97,7 @@ public class CpioHeader {
 		name = TRAILER;
 	}
 
-	public void setName( CharSequence name) {
+	public void setName( String name) {
 		this.name = name;
 	}
 	
@@ -175,7 +175,7 @@ public class CpioHeader {
 		checksum = readEight( buffer);
 		total += CPIO_HEADER;
 
-		name = charset.decode( Util.fill( channel, namesize - 1));
+		name = charset.decode( Util.fill( channel, namesize - 1)).toString();
 		Util.fill( channel, 1);
 		total += namesize;
 		total += skip( channel, total);
