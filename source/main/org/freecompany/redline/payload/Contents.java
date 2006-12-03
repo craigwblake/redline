@@ -5,9 +5,15 @@ import org.freecompany.redline.*;
 import java.io.*;
 import java.nio.*;
 import java.nio.channels.*;
-import java.nio.charset.*;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import static java.util.Collections.unmodifiableSet;
@@ -17,33 +23,35 @@ import static java.util.logging.Logger.getLogger;
 import static org.freecompany.redline.payload.CpioHeader.*;
 
 /**
- * NOT THREADSAFE
+ * The contents of an RPM archive. These entries define the files and links that
+ * the RPM contains as well as headers those files require. Note that the RPM format
+ * requires that files in the archive be naturally ordered.
  */
 public class Contents {
 
 	private Logger logger = getLogger( Contents.class.getName());
 	private int inode = 1;
 
-	/**
-	 * The RPM format requires that files in the archive and file lists to be naturally
-	 * ordered.
-	 */
-	protected final TreeSet< CpioHeader> headers = new TreeSet< CpioHeader>( new Comparator< CpioHeader>() {
-		public int compare( final CpioHeader one, final CpioHeader two) {
-			return one.getName().compareTo( two.getName());
-		}
-		public boolean equals( final CpioHeader one, final CpioHeader two) {
-			return one.getName().equals( two.getName());
-		}
-	});
+	protected final TreeSet< CpioHeader> headers = new TreeSet< CpioHeader>( new HeaderComparator());
 	protected final HashSet< String> files = new HashSet< String>();
 	protected final HashMap< CpioHeader, Object> sources = new HashMap< CpioHeader, Object>();
 
-	public void addLink( final String path, final String target) {
+	/**
+	 * Adds a directory entry to the archive with the default permissions of 644.
+	 *
+	 * @param path the destination path for the installed file.
+	 */
+	public synchronized void addLink( final String path, final String target) {
 		addLink( path, target, -1);
 	}
 
-	public void addLink( final String path, final String target, int permissions) {
+	/**
+	 * Adds a directory entry to the archive with the specified permissions.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param permissions the permissions flags.
+	 */
+	public synchronized void addLink( final String path, final String target, int permissions) {
 		if ( files.contains( path)) return;
 		files.add( path);
 		logger.log( FINE, "Adding link ''{0}''.", path);
@@ -56,11 +64,23 @@ public class Contents {
 		sources.put( header, target);
 	}
 
-	public void addDirectory( final String path) {
+	/**
+	 * Adds a directory entry to the archive with the default permissions of 644.
+	 *
+	 * @param path the destination path for the installed file.
+	 */
+	public synchronized void addDirectory( final String path) {
 		addDirectory( path, -1);
 	}
 
-	public void addDirectory( final String path, int permissions) {
+
+	/**
+	 * Adds a directory entry to the archive with the specified permissions.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param permissions the permissions flags.
+	 */
+	public synchronized void addDirectory( final String path, int permissions) {
 		if ( files.contains( path)) return;
 		files.add( path);
 		logger.log( FINE, "Adding directory ''{0}''.", path);
@@ -73,11 +93,24 @@ public class Contents {
 		sources.put( header, null);
 	}
 
-	public void addFile( final String path, final File source) throws FileNotFoundException {
+	/**
+	 * Adds a file entry to the archive with the default permissions of 644.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param source the local file to be included in the package.
+	 */
+	public synchronized void addFile( final String path, final File source) throws FileNotFoundException {
 		addFile( path, source, -1);
 	}
 
-	public void addFile( final String path, final File source, int permissions) throws FileNotFoundException {
+	/**
+	 * Adds a file entry to the archive with the specified permissions.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param source the local file to be included in the package.
+	 * @param permissions the permissions flags.
+	 */
+	public synchronized void addFile( final String path, final File source, int permissions) throws FileNotFoundException {
 		if ( files.contains( path)) return;
 		files.add( path);
 		logger.log( FINE, "Adding file ''{0}''.", path);
@@ -89,10 +122,28 @@ public class Contents {
 		sources.put( header, source);
 	}
 
+	/**
+	 * Retrieve the size of this archive in number of files. This count includes both directory entries and
+	 * soft links.
+	 */
 	public int size() { return headers.size(); }
+
+	/**
+	 * Retrieve the archive headers. The returned {@link Iterable} will iterate in the correct order for
+	 * the final archive.
+	 */
 	public Iterable< CpioHeader> headers() { return headers; }
+
+	/**
+	 * Retrieves the content for this archive entry, which may be a {@link File} if the entry is a regular file or
+	 * a {@link CharSequence} containing the name of the target path if the entry is a link. This is the value to
+	 * be written to the archive as the body of the entry.
+	 */
 	public Object getSource( CpioHeader header) { return sources.get( header); }
 
+	/**
+	 * Accumulated size of all files included in the archive.
+	 */
 	public int getTotalSize() {
 		int total = 0;
 		for ( Object object : sources.values()) if ( object instanceof File) total += (( File) object).length();
@@ -117,8 +168,7 @@ public class Contents {
 		for ( CpioHeader header : headers) {
 			String parent = new File( header.getName().toString()).getParent();
 			if ( !parent.endsWith( "/")) parent += "/";
-			array[ x] = dirs.indexOf( parent);
-			++x;
+			array[ x++] = dirs.indexOf( parent);
 		}
 		return array;
 	}
@@ -126,10 +176,7 @@ public class Contents {
 	public String[] getBaseNames() {
 		String[] array = new String[ headers.size()];
 		int x = 0;
-		for ( CpioHeader header : headers) {
-			array[ x] = new File( header.getName().toString()).getName();
-			++x;
-		}
+		for ( CpioHeader header : headers) array[ x++] = new File( header.getName().toString()).getName();
 		return array;
 	}
 
@@ -147,20 +194,14 @@ public class Contents {
 	public short[] getModes() {
 		short[] array = new short[ headers.size()];
 		int x = 0;
-		for ( CpioHeader header : headers) {
-			array[ x] = ( short) header.getMode();
-			++x;
-		}
+		for ( CpioHeader header : headers) array[ x++] = ( short) header.getMode();
 		return array;
 	}
 
 	public short[] getRdevs() {
 		short[] array = new short[ headers.size()];
 		int x = 0;
-		for ( CpioHeader header : headers) {
-			array[ x] = ( short) (( header.getRdevMajor() << 8) + header.getRdevMinor());
-			++x;
-		}
+		for ( CpioHeader header : headers) array[ x++] = ( short) (( header.getRdevMajor() << 8) + header.getRdevMinor());
 		return array;
 	}
 
@@ -168,27 +209,34 @@ public class Contents {
 		int[] array = new int[ headers.size()];
 		int x = 0;
 		for ( CpioHeader header : headers) {
-			array[ x] = ( int) header.getMtime();
-			++x;
+			array[ x++] = ( int) header.getMtime();
 		}
 		return array;
 	}
 
+	/**
+	 * Caclulates an MD5 hash for each file in the archive.
+	 */
 	public String[] getMD5s() throws FileNotFoundException, NoSuchAlgorithmException, IOException {
+		/**
+		 * This could be more efficiently handled during the output phase using a filtering channel,
+		 * but would require placeholder values in the archive and some state. This is left for a
+		 * later refactoring.
+		 */
 		final ByteBuffer buffer = ByteBuffer.allocate( 4096);
-
 		String[] array = new String[ headers.size()];
 		int x = 0;
 		for ( CpioHeader header : headers) {
 			Object object = sources.get( header);
+			String value = "";
 			if ( object instanceof File) {
 				final ReadableChannelWrapper input = new ReadableChannelWrapper( new FileInputStream(( File) object).getChannel());
 				final Key< byte[]> key = input.start( "MD5");
 				while ( input.read( buffer) != -1) buffer.rewind();
-				array[ x] = new String( Util.hex( input.finish( key)));
+				value = new String( Util.hex( input.finish( key)));
 				input.close();
-			} else array[ x] = "";
-			++x;
+			}
+			array[ x++] = value;
 		}
 		return array;
 	}
@@ -198,9 +246,9 @@ public class Contents {
 		int x = 0;
 		for ( CpioHeader header : headers) {
 			Object object = sources.get( header);
-			if ( object instanceof String) array[ x] = String.valueOf( object);
-			else array[ x] = "";
-			++x;
+			String value = "";
+			if ( object instanceof String) value = String.valueOf( object);
+			array[ x++] = value;
 		}
 		return array;
 	}
@@ -211,13 +259,13 @@ public class Contents {
 
 	public String[] getUsers() {
 		String[] array = new String[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = "root";
+		Arrays.fill( array, "root");
 		return array;
 	}
 
 	public String[] getGroups() {
 		String[] array = new String[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = "root";
+		Arrays.fill( array, "root");
 		return array;
 	}
 
@@ -240,26 +288,20 @@ public class Contents {
 	public int[] getDevices() {
 		int[] array = new int[ headers.size()];
 		int x = 0;
-		for ( CpioHeader header : headers) {
-			array[ x] = ( header.getDevMajor() << 8) + header.getDevMinor();
-			++x;
-		}
+		for ( CpioHeader header : headers) array[ x++] = ( header.getDevMajor() << 8) + header.getDevMinor();
 		return array;
 	}
 
 	public int[] getInodes() {
 		int[] array = new int[ headers.size()];
 		int x = 0;
-		for ( CpioHeader header : headers) {
-			array[ x] = ( int) header.getInode();
-			++x;
-		}
+		for ( CpioHeader header : headers) array[ x++] = ( int) header.getInode();
 		return array;
 	}
 
 	public String[] getLangs() {
 		String[] array = new String[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = "";
+		Arrays.fill( array, "");
 		return array;
 	}
 
@@ -273,7 +315,20 @@ public class Contents {
 
 	public String[] getContexts() {
 		String[] array = new String[ headers.size()];
-		for ( int x = 0; x < array.length; x++) array[ x] = "<<none>>";
+		Arrays.fill( array, "<<none>>");
 		return array;
 	}
+
+	/**
+	 * Comparator that orders files in the CPIO archive by their file name
+	 * as present in th header.
+	 */
+	private static class HeaderComparator implements Comparator< CpioHeader> {
+		public int compare( final CpioHeader one, final CpioHeader two) {
+			return one.getName().compareTo( two.getName());
+		}
+		public boolean equals( final CpioHeader one, final CpioHeader two) {
+			return one.getName().equals( two.getName());
+		}
+	};
 }

@@ -37,6 +37,7 @@ public class Builder {
 
 	@SuppressWarnings( "unchecked")
 	protected final Entry< byte[]> signature = ( Entry< byte[]>) format.getSignature().addEntry( SIGNATURES, 16);
+	
 	@SuppressWarnings( "unchecked")
 	protected final Entry< byte[]> immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
 
@@ -57,23 +58,45 @@ public class Builder {
 		addDependencyLess( "rpmlib(PayloadFilesHavePrefix)", "4.0-1");
 	}
 
-	public void addDependencyLess( CharSequence name, CharSequence version) {
+	/**
+	 * Adds a dependency to the RPM package. This dependecy version will be marked as the maximum
+	 * allowed, and the package will require the named dependency with this version or lower at
+	 * install time.
+	 *
+	 * @param name the name of the dependency.
+	 * @param version the version identifier.
+	 */
+	public void addDependencyLess( final CharSequence name, final CharSequence version) {
 		addDependency( name, version, LESS | EQUAL);
 	}
 
-	public void addDependencyMore( CharSequence name, CharSequence version) {
+	/**
+	 * Adds a dependency to the RPM package. This dependecy version will be marked as the minimum
+	 * allowed, and the package will require the named dependency with this version or higher at
+	 * install time.
+	 *
+	 * @param name the name of the dependency.
+	 * @param version the version identifier.
+	 */
+	public void addDependencyMore( final CharSequence name, final CharSequence version) {
 		addDependency( name, version, GREATER | EQUAL);
 	}
 
-	protected void addDependency( CharSequence name, CharSequence version, final int flag) {
+	/**
+	 * Adds a dependency to the RPM package. This dependecy version will be marked as the exact
+	 * requirement, and the package will require the named dependency with exactly this version at
+	 * install time.
+	 *
+	 * @param name the name of the dependency.
+	 * @param version the version identifier.
+	 */
+	protected void addDependency( final CharSequence name, final CharSequence version, final int flag) {
 		dependencies.put( name.toString(), version);
 		flags.put( name.toString(), flag);
 	}
 
 	/**
-	 * Sets the package information, such as the rpm name, the version, and the release number.
-	 * </p>
-	 * This field is required.
+	 * <b>Required Field</b>. Sets the package information, such as the rpm name, the version, and the release number.
 	 * 
 	 * @param name the name of the RPM package.
 	 * @param version the version of the new package.
@@ -89,9 +112,7 @@ public class Builder {
 	}
 	
 	/**
-	 * Sets the type of the RPM to be either binary or source.
-	 * </p>
-	 * This field is required.
+	 * <b>Required Field</b>. Sets the type of the RPM to be either binary or source.
 	 *
 	 * @param type the type of RPM to generate.
 	 */
@@ -100,10 +121,8 @@ public class Builder {
 	}
 
 	/**
-	 * Sets the platform related headers for the resulting RPM.  The platform is specified as a
+	 * <b>Required Field</b>. Sets the platform related headers for the resulting RPM.  The platform is specified as a
 	 * combination of target architecture and OS.
-	 * <p/>
-	 * This field is required.
 	 *
 	 * @param arch the target architectur.
 	 * @param os the target operating system.
@@ -121,10 +140,8 @@ public class Builder {
 	}
 
 	/**
-	 * Sets the summary text for the file.  The summary is generally a short, one line description of the
+	 * <b>Required Field</b>. Sets the summary text for the file.  The summary is generally a short, one line description of the
 	 * function of the package, and is often shown by RPM tools.
-	 * <p/>
-	 * This field is required.
 	 *
 	 * @param summary summary text.
 	 */
@@ -133,10 +150,8 @@ public class Builder {
 	}
 
 	/**
-	 * Sets the description text for the file.  The description is often a paragraph describing the
+	 * <b>Required Field</b>. Sets the description text for the file.  The description is often a paragraph describing the
 	 * package in detail.
-	 * <p/>
-	 * This field is required.
 	 *
 	 * @param description description text.
 	 */
@@ -145,9 +160,7 @@ public class Builder {
 	}
 
 	/**
-	 * Sets the build host for the RPM.  This is an internal field.
-	 * <p/>
-	 * This field is required.
+	 * <b>Required Field</b>. Sets the build host for the RPM.  This is an internal field.
 	 *
 	 * @param host hostname of the build machine.
 	 */
@@ -156,10 +169,8 @@ public class Builder {
 	}
 
 	/**
-	 * Lists the license under which this software is distributed.  This field may be
+	 * <b>Required Field</b>. Lists the license under which this software is distributed.  This field may be
 	 * displayed by RPM tools.
-	 * <p/>
-	 * This field is required.
 	 *
 	 * @param license the chosen distribution license.
 	 */
@@ -168,10 +179,8 @@ public class Builder {
 	}
 
 	/**
-	 * Software group to which this package belongs.  The group describes what sort of
+	 * <b>Required Field</b>. Software group to which this package belongs.  The group describes what sort of
 	 * function the software package provides.
-	 * <p/>
-	 * This is a required field.
 	 *
 	 * @param group target group.
 	 */
@@ -180,9 +189,7 @@ public class Builder {
 	}
 
 	/**
-	 * Distribution tag listing the ditributable package.
-	 * <p/>
-	 * This is a required field.
+	 * <b>Required Field</b>. Distribution tag listing the ditributable package.
 	 *
 	 * @param distribution the distribution.
 	 */
@@ -190,9 +197,7 @@ public class Builder {
 		if ( distribution != null) format.getHeader().createEntry( DISTRIBUTION, distribution);
 	}
 	/**
-	 * Vendor tag listing the organization providing this software package.
-	 * <p/>
-	 * This is a required field.
+	 * <b>Required Field</b>. Vendor tag listing the organization providing this software package.
 	 *
 	 * @param vendor software vendor.
 	 */
@@ -201,9 +206,7 @@ public class Builder {
 	}
 
 	/**
-	 * Build packager, usually the username of the account building this RPM.
-	 * <p/>
-	 * This is a required field.
+	 * <b>Required Field</b>. Build packager, usually the username of the account building this RPM.
 	 *
 	 * @param packager packager name.
 	 */
@@ -212,9 +215,7 @@ public class Builder {
 	}
 
 	/**
-	 * Website URL for this package, usually a project site.
-	 * <p/>
-	 * This is a required field.
+	 * <b>Required Field</b>. Website URL for this package, usually a project site.
 	 *
 	 * @param url 
 	 */
