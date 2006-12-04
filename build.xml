@@ -17,9 +17,9 @@
 	<target name='src'>
 		<mkdir dir='${imp.project.target.deliverables.zips}'/>
 		<zip file='${imp.project.target.deliverables.zips}/${imp.project.name}-src-${imp.project.version}.zip'>
-			<fileset dir='.'>
+			<zipfileset dir='.' prefix='${imp.project.name}-${imp.project.version}'>
 				<exclude name='target/**'/>
-			</fileset>
+			</zipfileset>
 		</zip>
 	</target>
 
