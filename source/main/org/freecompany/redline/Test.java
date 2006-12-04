@@ -1,7 +1,6 @@
 package org.freecompany.redline;
 
-import java.io.*;
-import java.security.*;
+import java.io.File;
 
 import static org.freecompany.redline.header.RpmType.*;
 import static org.freecompany.redline.header.Architecture.*;

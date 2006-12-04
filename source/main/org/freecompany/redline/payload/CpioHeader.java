@@ -1,12 +1,15 @@
 package org.freecompany.redline.payload;
 
-import org.freecompany.redline.*;
+import org.freecompany.redline.Util;
 import org.freecompany.util.text.Comparison;
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.nio.charset.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
+import java.util.Date;
 
 /**
  * This class provides a means to read file content from the compressed CPIO stream

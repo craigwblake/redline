@@ -1,11 +1,5 @@
 package org.freecompany.redline.header;
 
-import java.io.*;
-import java.net.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.*;
-
 public class Header extends AbstractHeader {
 
 	public Header() {

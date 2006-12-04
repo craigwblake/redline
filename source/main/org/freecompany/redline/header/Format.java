@@ -1,9 +1,11 @@
 package org.freecompany.redline.header;
 
-import org.freecompany.redline.payload.*;
-import java.io.*;
-import java.nio.channels.*;
-import java.util.*;
+import org.freecompany.redline.header.Header;
+import org.freecompany.redline.header.Lead;
+import org.freecompany.redline.header.Signature;
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 
 public class Format {
 

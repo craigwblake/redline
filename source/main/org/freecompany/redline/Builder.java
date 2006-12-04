@@ -1,12 +1,24 @@
 package org.freecompany.redline;
 
-import org.freecompany.redline.header.*;
-import org.freecompany.redline.payload.*;
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.*;
-import java.util.zip.*;
+import org.freecompany.redline.header.Architecture;
+import org.freecompany.redline.header.Format;
+import org.freecompany.redline.header.Os;
+import org.freecompany.redline.header.RpmType;
+import org.freecompany.redline.payload.Contents;
+import org.freecompany.redline.payload.CpioHeader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.zip.GZIPOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 

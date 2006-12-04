@@ -1,9 +1,10 @@
 package org.freecompany.redline.header;
 
-import org.freecompany.redline.*;
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
+import org.freecompany.redline.Util;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 
 import static org.freecompany.redline.header.Architecture.*;
 import static org.freecompany.redline.header.Os.*;

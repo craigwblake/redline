@@ -1,13 +1,18 @@
 package org.freecompany.redline;
 
-import org.freecompany.redline.header.*;
-import org.freecompany.redline.payload.*;
-import org.freecompany.util.xml.editor.*;
-import java.io.*;
-import java.net.*;
-import java.security.*;
-import org.xml.sax.*;
-import org.w3c.dom.*;
+import org.freecompany.redline.header.Architecture;
+import org.freecompany.redline.header.Format;
+import org.freecompany.redline.header.Os;
+import org.freecompany.redline.header.RpmType;
+import org.freecompany.redline.payload.Contents;
+import org.freecompany.redline.payload.CpioHeader;
+import org.freecompany.util.xml.editor.XmlEditor;
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.security.NoSuchAlgorithmException;
+import org.xml.sax.SAXException;
+import org.w3c.dom.Node;
 
 import static org.freecompany.redline.header.RpmType.*;
 import static org.freecompany.redline.header.Architecture.*;

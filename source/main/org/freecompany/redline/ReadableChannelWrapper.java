@@ -1,8 +1,8 @@
 package org.freecompany.redline;
 
-import java.io.*;
-import java.nio.*;
-import java.nio.channels.*;
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.channels.ReadableByteChannel;
 
 public class ReadableChannelWrapper extends ChannelWrapper implements ReadableByteChannel {
 

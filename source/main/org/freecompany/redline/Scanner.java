@@ -1,12 +1,13 @@
 package org.freecompany.redline;
 
-import org.freecompany.redline.header.*;
-import org.freecompany.redline.payload.*;
-import java.io.*;
-import java.net.*;
-import java.nio.*;
-import java.nio.channels.*;
-import java.util.zip.*;
+import org.freecompany.redline.header.Format;
+import org.freecompany.redline.payload.CpioHeader;
+import java.io.InputStream;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.util.zip.GZIPInputStream;
 
 import static org.freecompany.redline.ChannelWrapper.*;
 import static org.freecompany.redline.header.AbstractHeader.*;
