@@ -1,4 +1,4 @@
-package org.freecompany.imp.rpm;
+package org.freecompany.redline.ant;
 
 public class Depends {
 
