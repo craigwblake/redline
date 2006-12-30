@@ -9,7 +9,7 @@
 
 	<c:main>
 		<div class='article'>
-			<p>Please note that the source distribution build script requires Ant 1.6.5 and the <a href='http://repository.freecompany.org/org/freecompany/imp/jars/imp-core-bundle-0.7.7.jar'>Imp library</a> to be present in the Ant lib directory.</p>
+			<p>Please note that the source distribution build script requires Ant 1.6.5 and the <a href='http://repository.freecompany.org/org/freecompany/imp/jars/imp-core-bundle-0.7.8.jar'>Imp library</a> to be present in the Ant lib directory.</p>
 			<ul>
 				<li>Redline @BUILD_VERSION@ <a href='http://repository.freecompany.org/org/freecompany/redline/jars/redline-@BUILD_VERSION@.jar'>Binary</a> | <a href='http://repository.freecompany.org/org/freecompany/redline/zips/redline-src-@BUILD_VERSION@.zip'>Source</a></li>
 				<li>API Documentation <a href='javadoc/index.html'>Browse</a> | <a href='http://repository.freecompany.org/org/freecompany/redline/zips/redline-javadoc-@BUILD_VERSION@.zip'>Download</a></li>
