@@ -12,7 +12,7 @@
 			<p>Please note that the source distribution build script requires Ant 1.6.5 and the <a href='http://repository.freecompany.org/org/freecompany/imp/jars/imp-core-bundle-0.7.7.jar'>Imp library</a> to be present in the Ant lib directory.</p>
 			<ul>
 				<li>Redline @BUILD_VERSION@ <a href='http://repository.freecompany.org/org/freecompany/redline/jars/redline-@BUILD_VERSION@.jar'>Binary</a> | <a href='http://repository.freecompany.org/org/freecompany/redline/zips/redline-src-@BUILD_VERSION@.zip'>Source</a></li>
-				<li>API Documentation <a href='http://www.freecompany.org/redline/javadoc/index.html'>Browse</a> | <a href='http://repository.freecompany.org/org/freecompany/redline/zips/redline-javadoc-@BUILD_VERSION@.zip'>Download</a></li>
+				<li>API Documentation <a href='javadoc/index.html'>Browse</a> | <a href='http://repository.freecompany.org/org/freecompany/redline/zips/redline-javadoc-@BUILD_VERSION@.zip'>Download</a></li>
 				<li>Source Control <a href='https://svn.freecompany.org/public/redline/trunk'>Trunk</a> | <a href='https://svn.freecompany.org/public/redline/branches/redline-@BUILD_VERSION@'>@BUILD_VERSION@</a></li>
 			</ul>
 		</div>
