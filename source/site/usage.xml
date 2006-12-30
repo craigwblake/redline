@@ -10,18 +10,18 @@
 	<c:main>
 		<div class='article'>
 			<h3>Scanner</h3>
-			<p>The scanner tool can be invoked from the command line using the main class <span class='code'>org.freecompany.redline.Scanner</span>. From the command line this class accepts as it's single argument a path to a valid RPM file. If the file specified by the providing path does not exist, or if the file in not a valid RPM archive an exception will be thrown. And example of invoking the scanner follows:</p>
+			<p>The scanner tool can be invoked from the command line using the main class <span class='code'><a href='javadoc/org/freecompany/redline/Scanner.html'>org.freecompany.redline.Scanner</a></span>. From the command line this class accepts as it's single argument a path to a valid RPM file. If the file specified by the providing path does not exist, or if the file in not a valid RPM archive an exception will be thrown. And example of invoking the scanner follows:</p>
 			<div class='code'>
-				java -cp redline.jar org.freecopany.redline.Scanner test.rpm
+				java -cp redline.jar <a href='javadoc/org/freecompany/redline/Scanner.html'>org.freecompany.redline.Scanner</a> test.rpm
 			</div>
-			<p>The scanner is most useful for debugging RPM files and tools such as Redline as it generates a significant amount of output. For more generalized RPM information the standard RPM tools are recommended.</p>
+			<p>The scanner is most useful for debugging RPM files and tools as it generates a significant amount of output. For more generalized RPM information the standard RPM tools are recommended.</p>
 		</div>
 	</c:main>
 
 	<c:main>
 		<div class='article'>
 			<h3>Builder</h3>
-			<p>The builder is the main entry point for constructing RPM files programmatically. The tool is used by constructing an instance of the <span class='code'>org.freecompany.redline.Builder</span> class and adding files and headers to the archive. When the builder is completely configured a final call will generate the RPM file to a given <span class='code'>java.nio.channels.FileChannel</span>.</p>
+			<p>The builder is the main entry point for constructing RPM files programmatically. The tool is used by constructing an instance of the <span class='code'><a href='javadoc/org/freecompany/redline/Builder.html'>org.freecompany.redline.Builder</a></span> class and adding files and headers to the archive. When the builder is configured a final call will generate the RPM file to a given <span class='code'>java.nio.channels.FileChannel</span>.</p>
 		</div>
 	</c:main>
 
