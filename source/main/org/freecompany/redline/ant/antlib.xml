@@ -1,0 +1,7 @@
+<?xml version='1.0'?>
+
+<antlib>
+
+	<taskdef name='rpm' classname='org.freecompany.imp.rpm.RedlineTask'/>
+
+</antlib>

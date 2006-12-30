@@ -1,0 +1,21 @@
+<c:center xmlns='http://www.w3.org/TR/xhtml1/strict' xmlns:c='http://www.freecompany.org/namespace/anorak/content'>
+
+	<c:main>
+		<div class='article'>
+			<h2><a href='redline-@BUILD_VERSION@/index.html'>Redline</a></h2>
+			<p>Redline is a pure Java library for manipulating <a href='http://www.rpm.org'>RPM Package Manager</a> packages. Currently the project supports reading and creating packages and has an included <a href='http://ant.apache.org'>Ant</a> task useful for integration with build systems. Support for package signatures will be added in a future release.</p>
+		</div>
+	</c:main>
+
+	<c:main>
+		<div class='article'>
+			<p>Please note that the source distribution build script requires Ant 1.6.5 and the <a href='http://repository.freecompany.org/org/freecompany/imp/jars/imp-core-bundle-0.7.7.jar'>Imp library</a> to be present in the Ant lib directory.</p>
+			<ul>
+				<li>Redline @BUILD_VERSION@ <a href='http://repository.freecompany.org/org/freecompany/redline/jars/redline-@BUILD_VERSION@.jar'>Binary</a> | <a href='http://repository.freecompany.org/org/freecompany/redline/zips/redline-src-@BUILD_VERSION@.zip'>Source</a></li>
+				<li>API Documentation <a href='http://www.freecompany.org/redline/javadoc/index.html'>Browse</a> | <a href='http://repository.freecompany.org/org/freecompany/redline/zips/redline-javadoc-@BUILD_VERSION@.zip'>Download</a></li>
+				<li>Source Control <a href='https://svn.freecompany.org/public/redline/trunk'>Trunk</a> | <a href='https://svn.freecompany.org/public/redline/branches/redline-@BUILD_VERSION@'>@BUILD_VERSION@</a></li>
+			</ul>
+		</div>
+	</c:main>
+
+</c:center>

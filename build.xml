@@ -6,21 +6,11 @@
 	<property name='imp.deploy.location' value='/external/repositories/brimstone'/>
 	<property name='imp.javac.lint' value='unchecked'/>
 	<property name='imp.jar.manifest.mainclass' value='org.freecompany.redline.Scanner'/>
-	<property name='imp.javac.source' value='1.5'/>
-	<property name='imp.javac.target' value='1.5'/>
 
-	<imp:index group='org/freecompany/redline' types='jar,module,rpm,src'>
-		<imp:dependency types='compile,test,run' uri='urn:brimstone:freecompany/util/util-text-0.3.2.jar'/>
-		<imp:dependency types='compile,test,run' uri='urn:brimstone:freecompany/util/util-xml-editor-0.0.5.module'/>
+	<imp:index group='org/freecompany/redline' types='jar,module,rpm,source,site'>
+		<imp:dependency types='compile' uri='urn:brimstone:ant/ant-1.6.5.jar'/>
+		<imp:dependency types='compile,test,run' uri='urn:brimstone:org/freecompany/util/util-text-0.3.5.jar'/>
+		<imp:dependency types='compile,test,run' uri='urn:brimstone:org/freecompany/util/util-xml-editor-0.0.6.module'/>
 	</imp:index>
-
-	<target name='src'>
-		<mkdir dir='${imp.project.target.deliverables.zips}'/>
-		<zip file='${imp.project.target.deliverables.zips}/${imp.project.name}-src-${imp.project.version}.zip'>
-			<zipfileset dir='.' prefix='${imp.project.name}-${imp.project.version}'>
-				<exclude name='target/**'/>
-			</zipfileset>
-		</zip>
-	</target>
 
 </project>

@@ -7,8 +7,6 @@ import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import org.freecompany.brimstone.module.Module;
-import org.freecompany.imp.Util;
 import org.freecompany.redline.Builder;
 import org.freecompany.redline.header.Architecture;
 import org.freecompany.redline.header.Os;
@@ -24,7 +22,7 @@ import static org.freecompany.redline.header.RpmType.BINARY;
 
 public class RedlineTask extends Task {
 
-	public static final String NAMESPACE = "http://www.freecompany.org/namespace/brimstone/rpm";
+	public static final String NAMESPACE = "http://freecompany.org/namespace/redline";
 
 	protected String name;
 	protected String version;
@@ -89,7 +87,6 @@ public class RedlineTask extends Task {
 			}
 			for ( Link link : links) builder.addLink( link.getPath(), link.getTarget(), link.getPermissions());
 			for ( Depends dependency : depends) builder.addDependencyMore( dependency.getName(), dependency.getVersion());
-			for ( Module module : Util.getModules( getProject())) builder.addDependencyMore( module.getName(), module.getVersion());
 			
 			log( "Created rpm: " + builder.build( destination));
 		} catch ( IOException e) {
