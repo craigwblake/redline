@@ -14,7 +14,7 @@
 			<ul>
 				<li>Redline @BUILD_VERSION@ <a href='http://repository.freecompany.org/org/freecompany/redline/jars/redline-@BUILD_VERSION@.jar'>Binary</a> | <a href='http://repository.freecompany.org/org/freecompany/redline/zips/redline-src-@BUILD_VERSION@.zip'>Source</a> | <a href='http://repository.freecompany.org/org/freecompany/redline/jars/redline-bundle-@BUILD_VERSION@.jar'>Bundle</a></li>
 				<li>API Documentation <a href='javadoc/index.html'>Browse</a> | <a href='http://repository.freecompany.org/org/freecompany/redline/zips/redline-javadoc-@BUILD_VERSION@.zip'>Download</a></li>
-				<li>Source Control <a href='https://svn.freecompany.org/public/redline/trunk'>Trunk</a> | <a href='https://svn.freecompany.org/public/redline/branches/redline-@BUILD_VERSION@'>@BUILD_VERSION@</a></li>
+				<li>Source Control <a href='https://svn.freecompany.org/public/redline/trunk'>Trunk</a> | <a href='https://svn.freecompany.org/public/redline/tags/redline-@BUILD_VERSION@'>@BUILD_VERSION@</a></li>
 			</ul>
 		</div>
 	</c:main>
