@@ -71,7 +71,7 @@ public abstract class AbstractHeader {
 		final ByteBuffer data = getData( index);
 
 		data.flip();
-		int pad = Util.round( data.remaining(), 3) - data.remaining();
+		int pad = Util.round( data.remaining(), 7) - data.remaining();
 		header.putInt( data.remaining() +  pad);
 		Util.empty( out, ( ByteBuffer) header.flip());
 		Util.empty( out, ( ByteBuffer) index.flip());
