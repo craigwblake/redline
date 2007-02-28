@@ -60,7 +60,8 @@ public class Builder {
 	 */
 	public Builder() {
 		format.getHeader().createEntry( HEADERI18NTABLE, "C");
-		format.getHeader().createEntry( BUILDTIME, ( int) ( System.currentTimeMillis() / 1000));
+		//format.getHeader().createEntry( BUILDTIME, ( int) ( System.currentTimeMillis() / 1000));
+		format.getHeader().createEntry( BUILDTIME, 0);
 		format.getHeader().createEntry( RPMVERSION, "4.4.2");
 		format.getHeader().createEntry( PAYLOADFORMAT, "cpio");
 		format.getHeader().createEntry( PAYLOADCOMPRESSOR, "gzip");
@@ -392,7 +393,7 @@ public class Builder {
 
 		format.getLead().write( original);
 		signature.setValues( getSignature( format.getSignature().count()));
-		format.getSignature().write( original);
+		Util.empty( output, ByteBuffer.allocate( format.getSignature().write( original)));
 
 		/*
 		for ( PrivateKey key : map.keySet()) {
@@ -408,8 +409,9 @@ public class Builder {
 		final Key< byte[]> md5key = output.start( "MD5");
 
 		immutable.setValues( getImmutable( format.getHeader().count()));
-		format.getHeader().write( output);
+		int headerPadding = format.getHeader().write( output);
 		sha.setValues( new String[] { Util.hex( output.finish( shakey))});
+		Util.empty( output, ByteBuffer.allocate( headerPadding));
 
 		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( output));
 		final WritableChannelWrapper compressor = new WritableChannelWrapper( Channels.newChannel( zip));
@@ -442,7 +444,7 @@ public class Builder {
 
 		int length = compressor.finish( payloadkey);
 		int pad = Util.difference( length, 3);
-		Util.empty( compressor, ByteBuffer.wrap( new byte[ pad]));
+		Util.empty( compressor, ByteBuffer.allocate( pad));
 		length += pad;
 
 		payload.setValues( new int[] { length});

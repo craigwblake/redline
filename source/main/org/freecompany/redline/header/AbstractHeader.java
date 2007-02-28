@@ -51,8 +51,11 @@ public abstract class AbstractHeader {
 		}
 		Util.check( MAGIC_WORD, magic);
 		header.getInt();
+
 		final ByteBuffer index = Util.fill( in, header.getInt() * ENTRY_SIZE);
-		final ByteBuffer data = Util.fill( in, header.getInt());
+
+		final int total = header.getInt();
+		final ByteBuffer data = Util.fill( in, total + Util.round( total, 7) - total);
 
 		int count = 0;
 		while ( index.remaining() >= ENTRY_SIZE) {
@@ -63,20 +66,22 @@ public abstract class AbstractHeader {
 	}
 
 	/**
-	 * Writes this header section to the provided file at the current position.
+	 * Writes this header section to the provided file at the current position and returns the
+	 * required padding.  The caller is responsible for adding the padding immediately after
+	 * this data.
 	 */
-	public void write( WritableByteChannel out) throws IOException {
+	public int write( WritableByteChannel out) throws IOException {
 		final ByteBuffer header = getHeader();
 		final ByteBuffer index = getIndex();
 		final ByteBuffer data = getData( index);
 
 		data.flip();
 		int pad = Util.round( data.remaining(), 7) - data.remaining();
-		header.putInt( data.remaining() +  pad);
+		header.putInt( data.remaining());
 		Util.empty( out, ( ByteBuffer) header.flip());
 		Util.empty( out, ( ByteBuffer) index.flip());
 		Util.empty( out, data);
-		Util.empty( out, ByteBuffer.allocate( pad));
+		return pad;
 	}
 
 	public int count() {
