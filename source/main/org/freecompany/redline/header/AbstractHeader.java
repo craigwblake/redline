@@ -494,7 +494,7 @@ public abstract class AbstractHeader {
 			setValues( values);
 		}
 		public void write( final ByteBuffer data) {
-			for ( String s : values) data.put( Charset.forName( "US-ASCII").encode( s)).put(( byte) 0);
+			for ( String s : values) data.put( Charset.forName( "UTF-8").encode( s)).put(( byte) 0);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
