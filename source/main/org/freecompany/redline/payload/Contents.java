@@ -24,6 +24,7 @@ import static java.util.Arrays.asList;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Logger.getLogger;
 import static org.freecompany.redline.payload.CpioHeader.*;
+import static org.freecompany.redline.Util.normalizePath;
 
 /**
  * The contents of an RPM archive. These entries define the files and links that
@@ -54,7 +55,8 @@ public class Contents {
 	 * @param path the destination path for the installed file.
 	 * @param permissions the permissions flags.
 	 */
-	public synchronized void addLink( final String path, final String target, int permissions) {
+	public synchronized void addLink( String path, final String target, int permissions) {
+		path = normalizePath( path);
 		if ( files.contains( path)) return;
 		files.add( path);
 		logger.log( FINE, "Adding link ''{0}''.", path);
@@ -83,7 +85,8 @@ public class Contents {
 	 * @param path the destination path for the installed file.
 	 * @param permissions the permissions flags.
 	 */
-	public synchronized void addDirectory( final String path, int permissions) {
+	public synchronized void addDirectory( String path, int permissions) {
+		path = normalizePath( path);
 		if ( files.contains( path)) return;
 		files.add( path);
 		logger.log( FINE, "Adding directory ''{0}''.", path);
@@ -113,7 +116,8 @@ public class Contents {
 	 * @param source the local file to be included in the package.
 	 * @param permissions the permissions flags.
 	 */
-	public synchronized void addFile( final String path, final File source, int permissions) throws FileNotFoundException {
+	public synchronized void addFile( String path, final File source, int permissions) throws FileNotFoundException {
+		path = normalizePath( path);
 		if ( files.contains( path)) return;
 		files.add( path);
 		logger.log( FINE, "Adding file ''{0}''.", path);

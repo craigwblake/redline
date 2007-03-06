@@ -11,6 +11,10 @@ public class Util extends org.freecompany.util.text.Util {
 
 	private Util() {}
 
+	public static String normalizePath( final String path) {
+		return path.replace( '\\', '/');
+	}
+
 	public static ByteBuffer fill( ReadableByteChannel in, int size) throws IOException {
 		return fill( in, ByteBuffer.allocate( size));
 	}
