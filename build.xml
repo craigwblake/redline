@@ -6,6 +6,7 @@
 	<property name='imp.deploy.location' value='/external/repositories/brimstone'/>
 	<property name='imp.javac.lint' value='unchecked'/>
 	<property name='imp.jar.manifest.mainclass' value='org.freecompany.redline.Scanner'/>
+	<property name='imp.junit.usefile' value='false'/>
 	<property name='imp.module.javadoc' value='http://www.freecompany.org/redline/javadoc/'/>
 
 	<imp:index group='org/freecompany/redline' types='jar,module,rpm,bundle,source,site'>

@@ -480,16 +480,20 @@ public abstract class AbstractHeader {
 		public int getType() { return 6; }
 		public int size() {
 			if ( size != 0) return size;
-			for ( String string : values) size += string.length() + 1;
+			for ( String s : values) size += Charset.forName( "UTF-8").encode( s).remaining() + 1;
 			return size;
 		}
 		public void read( final ByteBuffer buffer) {
 			String[] values = new String[ count];
 			for ( int x = 0; x < count; x++) {
-				StringBuilder string = new StringBuilder();
-				byte b;
-				while (( b = buffer.get()) != 0) string.append(( char) b);
-				values[ x] = string.toString();
+				int length = 0;
+				while ( buffer.get( buffer.position() + length) != 0) length++;
+				byte[] bytes = new byte[ length];
+
+				final ByteBuffer slice = buffer.slice();
+				buffer.position( buffer.position() + length + 1);
+				slice.limit( length);
+				values[ x] = Charset.forName( "UTF-8").decode( slice).toString();
 			}
 			setValues( values);
 		}

@@ -241,8 +241,7 @@ public class AbstractHeaderTest extends TestCase {
 	@SuppressWarnings( "unchecked")
 	public void testStringMultiple() throws Exception {
 		ByteBuffer buffer = ByteBuffer.allocate( 16);
-		buffer.put( Charset.forName( "US-ASCII").encode( "1234567\000"));
-		buffer.put( Charset.forName( "US-ASCII").encode( "7654321\000"));
+		buffer.put( Charset.forName( "US-ASCII").encode( "1234567\0007654321\000"));
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
