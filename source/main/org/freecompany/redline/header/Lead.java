@@ -84,7 +84,8 @@ public class Lead {
 		buffer.putShort(( short) arch.ordinal());
 
 		byte[] data = new byte[ 66];
-		System.arraycopy( name.getBytes( "UTF-8"), 0, data, 0, name.length());
+		byte[] encoded = name.getBytes( "UTF-8");
+		System.arraycopy( encoded, 0, data, 0, encoded.length);
 		buffer.put( data);
 
 		buffer.putShort(( short) os.ordinal());

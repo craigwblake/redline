@@ -56,7 +56,6 @@ public class Contents {
 	 * @param permissions the permissions flags.
 	 */
 	public synchronized void addLink( String path, final String target, int permissions) {
-		path = normalizePath( path);
 		if ( files.contains( path)) return;
 		files.add( path);
 		logger.log( FINE, "Adding link ''{0}''.", path);
@@ -86,7 +85,6 @@ public class Contents {
 	 * @param permissions the permissions flags.
 	 */
 	public synchronized void addDirectory( String path, int permissions) {
-		path = normalizePath( path);
 		if ( files.contains( path)) return;
 		files.add( path);
 		logger.log( FINE, "Adding directory ''{0}''.", path);
@@ -117,7 +115,6 @@ public class Contents {
 	 * @param permissions the permissions flags.
 	 */
 	public synchronized void addFile( String path, final File source, int permissions) throws FileNotFoundException {
-		path = normalizePath( path);
 		if ( files.contains( path)) return;
 		files.add( path);
 		logger.log( FINE, "Adding file ''{0}''.", path);
@@ -160,7 +157,7 @@ public class Contents {
 	public String[] getDirNames() {
 		final Set< String> set = new LinkedHashSet< String>();
 		for ( CpioHeader header : headers) {
-			String parent = new File( header.getName().toString()).getParent();
+			String parent = normalizePath( new File( header.getName().toString()).getParent());
 			if ( !parent.endsWith( "/")) parent += "/";
 			set.add( parent);
 		}
@@ -173,7 +170,7 @@ public class Contents {
 		int[] array = new int[ headers.size()];
 		int x = 0;
 		for ( CpioHeader header : headers) {
-			String parent = new File( header.getName().toString()).getParent();
+			String parent = normalizePath( new File( header.getName().toString()).getParent());
 			if ( !parent.endsWith( "/")) parent += "/";
 			array[ x++] = dirs.indexOf( parent);
 		}
@@ -183,7 +180,7 @@ public class Contents {
 	public String[] getBaseNames() {
 		String[] array = new String[ headers.size()];
 		int x = 0;
-		for ( CpioHeader header : headers) array[ x++] = new File( header.getName().toString()).getName();
+		for ( CpioHeader header : headers) array[ x++] = normalizePath( new File( header.getName().toString()).getName());
 		return array;
 	}
 

@@ -11,6 +11,8 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.util.Date;
 
+import static org.freecompany.redline.Util.normalizePath;
+
 /**
  * This class provides a means to read file content from the compressed CPIO stream
  * that is the body of an RPM distributable.  Iterative calls to to read header will
@@ -64,7 +66,7 @@ public class CpioHeader {
 	public CpioHeader( final String name, final File file) {
 		mtime = file.lastModified();
 		filesize = ( int ) file.length();
-		this.name = name;
+		this.name = normalizePath( name);
 		if ( file.isDirectory()) setType( DIR);
 		else setType( FILE);
 	}
