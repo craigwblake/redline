@@ -363,7 +363,9 @@ public class AbstractHeaderTest extends TestCase {
 		assertTrue( buffer.equals( data));
 	}
 
-	public class TestHeader extends AbstractHeader {}
+	public class TestHeader extends AbstractHeader {
+		protected boolean pad() { return false; }
+	}
 
 	public AbstractHeaderTest( String name) {
 		super( name);

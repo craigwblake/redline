@@ -6,6 +6,8 @@ public class Header extends AbstractHeader {
 		for ( HeaderTag tag : HeaderTag.values()) tags.put( tag.getCode(), tag);
 	}
 
+	protected boolean pad() { return false; }
+
 	public enum HeaderTag implements Tag {
 		NAME( 1000, 6, "name"),
 		VERSION( 1001, 6, "version"),

@@ -34,6 +34,8 @@ public abstract class AbstractHeader {
 	protected final Map< Integer, Entry< ?>> entries = new TreeMap< Integer, Entry< ?>>();
 	protected final Map< Entry< ?>, Integer> pending = new LinkedHashMap< Entry< ?>, Integer>();
 
+	protected abstract boolean pad();
+
 	/**
 	 * Reads the entire header contents for this channel and returns the number of entries
 	 * found.
@@ -55,7 +57,8 @@ public abstract class AbstractHeader {
 		final ByteBuffer index = Util.fill( in, header.getInt() * ENTRY_SIZE);
 
 		final int total = header.getInt();
-		final ByteBuffer data = Util.fill( in, total + Util.round( total, 7) - total);
+		final int pad = pad() ? Util.round( total, 7) - total : 0;
+		final ByteBuffer data = Util.fill( in, total + pad);
 
 		int count = 0;
 		while ( index.remaining() >= ENTRY_SIZE) {
@@ -76,7 +79,7 @@ public abstract class AbstractHeader {
 		final ByteBuffer data = getData( index);
 
 		data.flip();
-		int pad = Util.round( data.remaining(), 7) - data.remaining();
+		int pad = pad() ? Util.round( data.remaining(), 7) - data.remaining() : 0;
 		header.putInt( data.remaining());
 		Util.empty( out, ( ByteBuffer) header.flip());
 		Util.empty( out, ( ByteBuffer) index.flip());

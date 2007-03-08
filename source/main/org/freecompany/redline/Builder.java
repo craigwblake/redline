@@ -411,7 +411,7 @@ public class Builder {
 		immutable.setValues( getImmutable( format.getHeader().count()));
 		int headerPadding = format.getHeader().write( output);
 		sha.setValues( new String[] { Util.hex( output.finish( shakey))});
-		Util.empty( output, ByteBuffer.allocate( headerPadding));
+		//Util.empty( output, ByteBuffer.allocate( headerPadding));
 
 		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( output));
 		final WritableChannelWrapper compressor = new WritableChannelWrapper( Channels.newChannel( zip));

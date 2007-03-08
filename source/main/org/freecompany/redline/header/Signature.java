@@ -6,6 +6,8 @@ public class Signature extends AbstractHeader {
 		for ( SignatureTag tag : SignatureTag.values()) tags.put( tag.getCode(), tag);
 	}
 
+	protected boolean pad() { return true; }
+
 	public enum SignatureTag implements Tag {
 		SIGNATURES( 62, 7, "signatures"),
 		SIGSIZE( 257, 4, "sigsize"),
