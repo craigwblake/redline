@@ -16,6 +16,7 @@ import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.ZipFileSet;
 
+import static org.freecompany.redline.Util.normalizePath;
 import static org.freecompany.redline.header.Architecture.NOARCH;
 import static org.freecompany.redline.header.Os.LINUX;
 import static org.freecompany.redline.header.RpmType.BINARY;
@@ -75,7 +76,7 @@ public class RedlineTask extends Task {
 
 		try {
 			for ( ZipFileSet fileset : filesets) {
-				String prefix = fileset.getPrefix( getProject());
+				String prefix = normalizePath( fileset.getPrefix( getProject()));
 				if ( !prefix.endsWith( "/")) prefix += "/";
 				DirectoryScanner scanner = fileset.getDirectoryScanner( getProject());
 				
