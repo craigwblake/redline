@@ -167,8 +167,6 @@ public class Contents {
 		if ( parent == null) return;
 
 		final String path = parent.getAbsolutePath();
-		logger.info( "Path: " + path);
-	
 		if ( builtin.contains( path)) return;
 		addDirectory( path);
 	}
