@@ -21,7 +21,8 @@ import static org.freecompany.redline.Util.normalizePath;
  */
 public class CpioHeader {
 
-	public static final int PERMISSION = 0644;
+	public static final int DEFAULT_FILE_PERMISSION = 0644;
+	public static final int DEFAULT_DIRECTORY_PERMISSION = 0755;
 
 	public static final int FIFO = 1;
 	public static final int CDEV = 2;
@@ -39,7 +40,7 @@ public class CpioHeader {
 
 	protected int inode;
 	protected int type;
-	protected int permissions = PERMISSION;
+	protected int permissions = DEFAULT_FILE_PERMISSION;
 	protected int uid;
 	protected int gid;
 	protected int nlink = 1;

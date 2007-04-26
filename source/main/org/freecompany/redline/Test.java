@@ -26,8 +26,8 @@ public class Test {
 		builder.setUrl( "http://www.freecompany.org/test/");
 		builder.setProvides( "test");
 
-		// Adds each file passed as an argument to the package.
-		for ( String file : args) builder.addFile( file, new File( file));
+		// Adds one file passed as an argument to the package.
+		if ( args.length == 2) builder.addFile( args[ 1], new File( args[ 0]));
 
 		// This generates a RPM file in the current directory named by the package and type settings.
 		builder.build( new File( "."));

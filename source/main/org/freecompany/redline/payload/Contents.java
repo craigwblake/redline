@@ -9,7 +9,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,8 +24,12 @@ import java.util.logging.Logger;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Arrays.asList;
 import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.INFO;
 import static java.util.logging.Logger.getLogger;
-import static org.freecompany.redline.payload.CpioHeader.*;
+import static org.freecompany.redline.payload.CpioHeader.DEFAULT_DIRECTORY_PERMISSION;
+import static org.freecompany.redline.payload.CpioHeader.SYMLINK;
+import static org.freecompany.redline.payload.CpioHeader.DIR;
+import static org.freecompany.redline.payload.CpioHeader.FILE;
 import static org.freecompany.redline.Util.normalizePath;
 
 /**
@@ -32,6 +38,21 @@ import static org.freecompany.redline.Util.normalizePath;
  * requires that files in the archive be naturally ordered.
  */
 public class Contents {
+
+	private static final Set< String> builtin = new HashSet< String>();
+	static {
+		builtin.add( "/");
+		builtin.add( "/bin");
+		builtin.add( "/etc");
+		builtin.add( "/usr");
+		builtin.add( "/usr/bin");
+		builtin.add( "/usr/local");
+		builtin.add( "/usr/share");
+		builtin.add( "/sbin");
+		builtin.add( "/tmp");
+		builtin.add( "/var");
+		builtin.add( "/var/log");
+	}
 
 	private Logger logger = getLogger( Contents.class.getName());
 	private int inode = 1;
@@ -86,6 +107,8 @@ public class Contents {
 	 */
 	public synchronized void addDirectory( String path, int permissions) {
 		if ( files.contains( path)) return;
+		
+		addParents( new File( path));
 		files.add( path);
 		logger.log( FINE, "Adding directory ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path);
@@ -93,6 +116,7 @@ public class Contents {
 		header.setInode( inode++);
 		header.setMtime( System.currentTimeMillis());
 		if ( permissions != -1) header.setPermissions( permissions);
+		else header.setPermissions( DEFAULT_DIRECTORY_PERMISSION);
 		headers.add( header);
 		sources.put( header, null);
 	}
@@ -116,6 +140,8 @@ public class Contents {
 	 */
 	public synchronized void addFile( String path, final File source, int permissions) throws FileNotFoundException {
 		if ( files.contains( path)) return;
+		
+		addParents( new File( path));
 		files.add( path);
 		logger.log( FINE, "Adding file ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path, source);
@@ -124,6 +150,21 @@ public class Contents {
 		if ( permissions != -1) header.setPermissions( permissions);
 		headers.add( header);
 		sources.put( header, source);
+	}
+
+	/**
+	 * Adds entries for parent directories of this file, so that they may be cleaned up when 
+	 * removing the package.
+	 */
+	protected synchronized void addParents( final File file) {
+		final File parent = file.getParentFile();
+		if ( parent == null) return;
+
+		final String path = parent.getAbsolutePath();
+		logger.info( "Path: " + path);
+	
+		if ( builtin.contains( path)) return;
+		addDirectory( path);
 	}
 
 	/**
@@ -157,7 +198,10 @@ public class Contents {
 	public String[] getDirNames() {
 		final Set< String> set = new LinkedHashSet< String>();
 		for ( CpioHeader header : headers) {
-			String parent = normalizePath( new File( header.getName().toString()).getParent());
+			String path = new File( header.getName().toString()).getParent();
+			if ( path == null) continue;
+
+			String parent = normalizePath( path);
 			if ( !parent.endsWith( "/")) parent += "/";
 			set.add( parent);
 		}
@@ -170,7 +214,10 @@ public class Contents {
 		int[] array = new int[ headers.size()];
 		int x = 0;
 		for ( CpioHeader header : headers) {
-			String parent = normalizePath( new File( header.getName().toString()).getParent());
+			String path = new File( header.getName().toString()).getParent();
+			if ( path == null) continue;
+
+			String parent = normalizePath( path);
 			if ( !parent.endsWith( "/")) parent += "/";
 			array[ x++] = dirs.indexOf( parent);
 		}
