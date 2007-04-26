@@ -43,10 +43,16 @@ public class Contents {
 	static {
 		builtin.add( "/");
 		builtin.add( "/bin");
+		builtin.add( "/dev");
 		builtin.add( "/etc");
+		builtin.add( "/lib");
 		builtin.add( "/usr");
 		builtin.add( "/usr/bin");
+		builtin.add( "/usr/lib");
 		builtin.add( "/usr/local");
+		builtin.add( "/usr/local/bin");
+		builtin.add( "/usr/local/lib");
+		builtin.add( "/usr/sbin");
 		builtin.add( "/usr/share");
 		builtin.add( "/sbin");
 		builtin.add( "/tmp");
