@@ -61,7 +61,9 @@ public class Lead {
 		major = lead.get();
 		minor = lead.get();
 		type = RpmType.values()[ lead.getShort()];
-		arch = Architecture.values()[ lead.getShort()];
+
+		final short tmp = lead.getShort();
+		if ( tmp < Architecture.values().length) arch = Architecture.values()[ tmp];
 
 		ByteBuffer data = ByteBuffer.allocate( 66);
 		lead.get( data.array());
