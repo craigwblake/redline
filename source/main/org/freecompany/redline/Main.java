@@ -14,9 +14,10 @@ import java.security.NoSuchAlgorithmException;
 import org.xml.sax.SAXException;
 import org.w3c.dom.Node;
 
-import static org.freecompany.redline.header.RpmType.*;
-import static org.freecompany.redline.header.Architecture.*;
-import static org.freecompany.redline.header.Os.*;
+import static org.freecompany.redline.header.RpmType.BINARY;
+import static org.freecompany.redline.header.Architecture.NOARCH;
+import static org.freecompany.redline.header.Os.LINUX;
+import static org.freecompany.redline.payload.CpioHeader.DEFAULT_FILE_PERMISSION;
 
 public class Main {
 
@@ -38,7 +39,7 @@ public class Main {
 		for ( Node files : editor.findNodes( "rpm:files")) {
 			try {
 				editor.pushContext( files);
-				int permission = editor.getInteger( "@permission", CpioHeader.PERMISSION);
+				int permission = editor.getInteger( "@permission", DEFAULT_FILE_PERMISSION);
 				String parent = editor.getValue( "@parent");
 				if ( !parent.endsWith( "/")) parent += "/";
 				for ( Node file : editor.findNodes( "rpm:file")) {
