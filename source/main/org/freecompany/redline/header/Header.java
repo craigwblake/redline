@@ -52,6 +52,10 @@ public class Header extends AbstractHeader {
 		HEADERIMMUTABLE( 63, 7, "headerimmutable"),
 		HEADERI18NTABLE( 100, 8, "headeri18ntable"),
 
+		PREINSCRIPT( 1023, 6, "prein"),
+		POSTINSCRIPT( 1024, 6, "postin"),
+		PREUNSCRIPT( 1025, 6, "preun"),
+		POSTUNSCRIPT( 1026, 6, "postun"),
 		PREINPROG( 1085, 6, "preinprog"),
 		POSTINPROG( 1086, 6, "postinprog"),
 		PREUNPROG( 1087, 6, "preunprog"),
@@ -70,6 +74,7 @@ public class Header extends AbstractHeader {
 		FILEDEVICES( 1095, 4, "filedevices"),
 		FILEINODES( 1096, 4, "fileinodes"),
 		FILELANGS( 1097, 8, "filelangs"),
+		PREFIXES( 1098, 8, "prefixes"),
 		DIRINDEXES( 1116, 4, "dirindexes"),
 		BASENAMES( 1117, 8, "basenames"),
 		DIRNAMES( 1118, 8, "dirnames"),

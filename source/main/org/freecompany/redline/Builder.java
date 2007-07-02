@@ -29,10 +29,10 @@ import static org.freecompany.redline.header.Signature.SignatureTag.*;
 import static org.freecompany.redline.header.Header.HeaderTag.*;
 
 /**
- * The normal entry point to the API used for building and RPM.  The API provides methods to
- * configure and add contents to a new RPM.  The current version of the RPM format (3.0) requires
- * numerous headers to be set for an RPM to be valid.  All of the required fields are either
- * set automatically or exposed through setters in this builder class.  Any required fields are
+ * The normal entry point to the API used for building and RPM. The API provides methods to
+ * configure and add contents to a new RPM. The current version of the RPM format (3.0) requires
+ * numerous headers to be set for an RPM to be valid. All of the required fields are either
+ * set automatically or exposed through setters in this builder class. Any required fields are
  * marked in their respective method API documentation.
  */
 public class Builder {
@@ -134,7 +134,7 @@ public class Builder {
 	}
 
 	/**
-	 * <b>Required Field</b>. Sets the platform related headers for the resulting RPM.  The platform is specified as a
+	 * <b>Required Field</b>. Sets the platform related headers for the resulting RPM. The platform is specified as a
 	 * combination of target architecture and OS.
 	 *
 	 * @param arch the target architectur.
@@ -153,7 +153,7 @@ public class Builder {
 	}
 
 	/**
-	 * <b>Required Field</b>. Sets the summary text for the file.  The summary is generally a short, one line description of the
+	 * <b>Required Field</b>. Sets the summary text for the file. The summary is generally a short, one line description of the
 	 * function of the package, and is often shown by RPM tools.
 	 *
 	 * @param summary summary text.
@@ -163,7 +163,7 @@ public class Builder {
 	}
 
 	/**
-	 * <b>Required Field</b>. Sets the description text for the file.  The description is often a paragraph describing the
+	 * <b>Required Field</b>. Sets the description text for the file. The description is often a paragraph describing the
 	 * package in detail.
 	 *
 	 * @param description description text.
@@ -173,7 +173,7 @@ public class Builder {
 	}
 
 	/**
-	 * <b>Required Field</b>. Sets the build host for the RPM.  This is an internal field.
+	 * <b>Required Field</b>. Sets the build host for the RPM. This is an internal field.
 	 *
 	 * @param host hostname of the build machine.
 	 */
@@ -182,7 +182,7 @@ public class Builder {
 	}
 
 	/**
-	 * <b>Required Field</b>. Lists the license under which this software is distributed.  This field may be
+	 * <b>Required Field</b>. Lists the license under which this software is distributed. This field may be
 	 * displayed by RPM tools.
 	 *
 	 * @param license the chosen distribution license.
@@ -192,7 +192,7 @@ public class Builder {
 	}
 
 	/**
-	 * <b>Required Field</b>. Software group to which this package belongs.  The group describes what sort of
+	 * <b>Required Field</b>. Software group to which this package belongs.	The group describes what sort of
 	 * function the software package provides.
 	 *
 	 * @param group target group.
@@ -247,7 +247,7 @@ public class Builder {
 	}
 
 	/**
-	 * Sets the group of contents to include in this RPM.  Note that this method causes the existing
+	 * Sets the group of contents to include in this RPM. Note that this method causes the existing
 	 * file set to be overwritten and therefore should be called before adding any other contents via
 	 * the {@link #addFile()} methods.
 	 *
@@ -255,6 +255,113 @@ public class Builder {
 	 */
 	public void setFiles( final Contents contents) {
 		this.contents = contents;
+	}
+	
+	/**
+	* Adds a source rpm.
+	*
+	* @param rpm name of rpm source file
+	*/
+	public void setSourceRpm(final String rpm) {
+		if (rpm != null) format.getHeader().createEntry(SOURCERPM, rpm);
+	}
+	
+	/**
+	 * Sets the package prefix directories to allow any files installed under
+	 * them to be relocatable.
+	 *
+	 * @param prefixes Path prefixes which may be relocated
+	 */
+	public void setPrefixes(final String... prefixes) {
+		if (prefixes != null) format.getHeader().createEntry(PREFIXES, prefixes);
+	}
+
+	/**
+	 * Declares a script to be run as part of the RPM pre-installation. The
+	 * script will be run using the interpretter declared with the
+	 * {@link #setPreInstallProgram(String)} method.
+	 *
+	 * @param script Script contents to run (i.e. shell commands)
+	 */
+	public void setPreInstallScript(final String script) {
+		if (script != null) format.getHeader().createEntry(PREINSCRIPT, script);
+	}
+	
+	/**
+	 * Declares the interpretter to be used when invoking the RPM
+	 * pre-installation script that can be set with the
+	 * {@link #setPreInstallScript(String)} method.
+	 *
+	 * @param program Path to the interpretter
+	 */
+	public void setPreInstallProgram(final String program) {
+		if (program != null) format.getHeader().createEntry(PREINPROG, program);
+	}
+	
+	/**
+	 * Declares a script to be run as part of the RPM post-installation. The
+	 * script will be run using the interpretter declared with the
+	 * {@link #setPostInstallProgram(String)} method.
+	 *
+	 * @param script Script contents to run (i.e. shell commands)
+	 */
+	public void setPostInstallScript(final String script) {
+		if (script != null) format.getHeader().createEntry(POSTINSCRIPT, script);
+	}
+	
+	/**
+	 * Declares the interpretter to be used when invoking the RPM
+	 * post-installation script that can be set with the
+	 * {@link #setPreInstallScript(String)} method.
+	 *
+	 * @param program Path to the interpretter
+	 */
+	public void setPostInstallProgram(final String program) {
+		if (program != null) format.getHeader().createEntry(POSTINPROG, program);
+	}
+
+	/**
+	 * Declares a script to be run as part of the RPM pre-uninstallation. The
+	 * script will be run using the interpretter declared with the
+	 * {@link #setPreUninstallProgram(String)} method.
+	 *
+	 * @param script Script contents to run (i.e. shell commands)
+	 */
+	public void setPreUninstallScript(final String script) {
+		if (script != null) format.getHeader().createEntry(PREUNSCRIPT, script);
+	}
+
+	/**
+	 * Declares the interpretter to be used when invoking the RPM
+	 * pre-uninstallation script that can be set with the
+	 * {@link #setPreUninstallScript(String)} method.
+	 *
+	 * @param program Path to the interpretter
+	 */
+	public void setPreUninstallProgram(final String program) {
+		if (program != null) format.getHeader().createEntry(PREUNPROG, program);
+	}
+	
+	/**
+	 * Declares a script to be run as part of the RPM post-uninstallation. The
+	 * script will be run using the interpretter declared with the
+	 * {@link #setPostUninstallProgram(String)} method.
+	 *
+	 * @param script Script contents to run (i.e. shell commands)
+	 */
+	public void setPostUninstallScript(final String script) {
+		if (script != null) format.getHeader().createEntry(POSTUNSCRIPT, script);
+	}
+	
+	/**
+	 * Declares the interpretter to be used when invoking the RPM
+	 * post-uninstallation script that can be set with the
+	 * {@link #setPostUninstallScript(String)} method.
+	 *
+	 * @param program Path to the interpretter
+	 */
+	public void setPostUninstallProgram(final String program) {
+		if (program != null) format.getHeader().createEntry(POSTUNPROG, program);
 	}
 	
 	/**
@@ -313,7 +420,7 @@ public class Builder {
 
 	/**
 	 * Add a key to generate a new signature for the header and payload portions of the
-	 * rpm file.  Supported algorithms are "MD5withRSA" and "SHAwithDSA".
+	 * rpm file. Supported algorithms are "MD5withRSA" and "SHAwithDSA".
 	 *
 	 * @param key private key to use in generating a signature.
 	 */
@@ -336,7 +443,7 @@ public class Builder {
 	}
 
 	/**
-	 * Generates the rpm file to the provided file channel.  This file channel must support memory mapping
+	 * Generates the rpm file to the provided file channel. This file channel must support memory mapping
 	 * and therefore should be created from a {@link RandomAccessFile}, otherwise an {@link IOException} will be
 	 * generated.
 	 *
@@ -427,7 +534,10 @@ public class Builder {
 			final Object object = contents.getSource( header);
 			if ( object instanceof File) {
 				final FileChannel in = new FileInputStream(( File) object).getChannel();
-				while ( in.read(( ByteBuffer) buffer.rewind()) > 0) total += compressor.write(( ByteBuffer) buffer.flip());
+				while ( in.read(( ByteBuffer) buffer.rewind()) > 0) {
+					total += compressor.write(( ByteBuffer) buffer.flip());
+					buffer.compact();
+				}
 				total += header.skip( compressor, total);
 				in.close();
 			} else if ( object instanceof CharSequence) {
