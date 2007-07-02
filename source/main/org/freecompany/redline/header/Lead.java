@@ -6,8 +6,9 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 
-import static org.freecompany.redline.header.Architecture.*;
-import static org.freecompany.redline.header.Os.*;
+import static org.freecompany.redline.header.Architecture.NOARCH;
+import static org.freecompany.redline.header.Os.LINUX;
+import static org.freecompany.redline.header.RpmType.BINARY;
 
 public class Lead {
 
@@ -16,7 +17,7 @@ public class Lead {
 
 	protected byte major = 3;
 	protected byte minor;
-	protected RpmType type;
+	protected RpmType type = BINARY;
 	protected Architecture arch = NOARCH;
 	protected String name;
 	protected Os os = LINUX;
