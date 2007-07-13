@@ -1,6 +1,7 @@
 package org.freecompany.redline.payload;
 
 import org.freecompany.redline.ChannelWrapper.Key;
+import org.freecompany.redline.header.Flags;
 import org.freecompany.redline.ReadableChannelWrapper;
 import org.freecompany.redline.Util;
 import java.io.File;
@@ -103,7 +104,16 @@ public class Contents {
 	public synchronized void addDirectory( final String path) {
 		addDirectory( path, -1);
 	}
-
+	
+	/**
+	 * Adds a directory entry to the archive with the default permissions of 644.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param directive directive indicating special handling for this directory.
+	 */
+	public synchronized void addDirectory( final String path, final Directive directive) {
+		addDirectory( path, -1, directive);
+	}
 
 	/**
 	 * Adds a directory entry to the archive with the specified permissions.
@@ -111,9 +121,20 @@ public class Contents {
 	 * @param path the destination path for the installed file.
 	 * @param permissions the permissions flags.
 	 */
-	public synchronized void addDirectory( String path, int permissions) {
+	public synchronized void addDirectory( final String path, final int permissions) {
+		addDirectory(path, permissions, null);
+	}
+
+	/**
+	 * Adds a directory entry to the archive with the specified permissions.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param permissions the permissions flags.
+	 * @param directive directive indicating special handling for this directory.
+	 */
+	public synchronized void addDirectory( final String path, final int permissions, final Directive directive) {
 		if ( files.contains( path)) return;
-		
+
 		addParents( new File( path));
 		files.add( path);
 		logger.log( FINE, "Adding directory ''{0}''.", path);
@@ -125,6 +146,7 @@ public class Contents {
 		else header.setPermissions( DEFAULT_DIRECTORY_PERMISSION);
 		headers.add( header);
 		sources.put( header, null);
+		if ( directive != null) header.setFlags( directive.flag());
 	}
 
 	/**
@@ -134,7 +156,7 @@ public class Contents {
 	 * @param source the local file to be included in the package.
 	 */
 	public synchronized void addFile( final String path, final File source) throws FileNotFoundException {
-		addFile( path, source, -1);
+		addFile( path, source, -1, null);
 	}
 
 	/**
@@ -144,9 +166,21 @@ public class Contents {
 	 * @param source the local file to be included in the package.
 	 * @param permissions the permissions flags.
 	 */
-	public synchronized void addFile( String path, final File source, int permissions) throws FileNotFoundException {
+	public synchronized void addFile( final String path, final File source, final int permissions) throws FileNotFoundException {
+		addFile(path, source, permissions, null);
+	}
+
+	/**
+	 * Adds a file entry to the archive with the specified permissions.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param source the local file to be included in the package.
+	 * @param permissions the permissions flags.
+	 * @param directive directive indicating special handling for this file.
+	 */
+	public synchronized void addFile( final String path, final File source, final int permissions, final Directive directive) throws FileNotFoundException {
 		if ( files.contains( path)) return;
-		
+
 		addParents( new File( path));
 		files.add( path);
 		logger.log( FINE, "Adding file ''{0}''.", path);
@@ -156,6 +190,7 @@ public class Contents {
 		if ( permissions != -1) header.setPermissions( permissions);
 		headers.add( header);
 		sources.put( header, source);
+		if ( directive != null) header.setFlags( directive.flag());
 	}
 
 	/**
@@ -309,7 +344,10 @@ public class Contents {
 	}
 
 	public int[] getFlags() {
-		return new int[ headers.size()];
+		int[] array = new int[ headers.size()];
+		int x = 0;
+		for ( CpioHeader header : headers) array[ x++] = header.getFlags();
+		return array;
 	}
 
 	public String[] getUsers() {

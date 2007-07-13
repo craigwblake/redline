@@ -15,7 +15,7 @@ import static org.freecompany.redline.Util.normalizePath;
 
 /**
  * This class provides a means to read file content from the compressed CPIO stream
- * that is the body of an RPM distributable.  Iterative calls to to read header will
+ * that is the body of an RPM distributable. Iterative calls to to read header will
  * result in a header description being returned which includes a count of how many bytes
  * to read from the channel for the file content.
  */
@@ -52,6 +52,7 @@ public class CpioHeader {
 	protected int rdevMajor;
 	protected int checksum;
 	protected String name;
+	protected int flags;
 
 	public CpioHeader() {
 	}
@@ -81,6 +82,7 @@ public class CpioHeader {
 	public int getMtime() { return ( int) ( mtime / 1000L) ; }
 	public int getInode() { return inode; }
 	public String getName() { return name; }
+	public int getFlags() { return flags; }
 
 	public int getMode() { return ( type << 12) | permissions; }
 
@@ -89,10 +91,11 @@ public class CpioHeader {
 	public void setFileSize( int filesize) { this.filesize = filesize; }
 	public void setMtime( long mtime) { this.mtime = mtime; }
 	public void setInode( int inode) { this.inode = inode; }
+	public void setFlags( int flags) { this.flags = flags; }
 
 	/**
 	 * Test to see if this is the last header, and is therefore the end of the
-	 * archive.  Uses the CPIO magic trailer value to denote the last header of
+	 * archive. Uses the CPIO magic trailer value to denote the last header of
 	 * the stream.
 	 */
 	public boolean isLast() {
@@ -189,7 +192,7 @@ public class CpioHeader {
 	}
 
 	/**
-	 * Writed the content for the CPIO header, including the name immediately following.  The name data is rounded
+	 * Writed the content for the CPIO header, including the name immediately following. The name data is rounded
 	 * to the nearest 2 byte boundary as CPIO requires by appending a null when needed.
 	 */
 	public int write( final WritableByteChannel channel, int total) throws IOException {

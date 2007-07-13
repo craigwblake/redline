@@ -6,6 +6,7 @@ import org.freecompany.redline.header.Os;
 import org.freecompany.redline.header.RpmType;
 import org.freecompany.redline.payload.Contents;
 import org.freecompany.redline.payload.CpioHeader;
+import org.freecompany.redline.payload.Directive;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -107,7 +108,7 @@ public class Builder {
 		dependencies.put( name.toString(), version);
 		flags.put( name.toString(), flag);
 	}
-
+	
 	/**
 	 * <b>Required Field</b>. Sets the package information, such as the rpm name, the version, and the release number.
 	 * 
@@ -375,7 +376,22 @@ public class Builder {
 	 * @param mode the mode of the target file in standard three octet notation
 	 */
 	public void addFile( final String path, final File source, final int mode) throws NoSuchAlgorithmException, IOException {
-		contents.addFile( path, source, mode);
+		contents.addFile( path, source, mode, null);
+	}
+	
+	/**
+	 * Add the specified file to the repository payload in order.
+	 * The required header entries will automatically be generated
+	 * to record the directory names and file names, as well as their
+	 * digests.
+	 *
+	 * @param target the absolute path at which this file will be installed.
+	 * @param file the file content to include in this rpm.
+	 * @param mode the mode of the target file in standard three octet notation
+	 * @param directive directive indicating special handling for this file.
+	 */
+	public void addFile( final String path, final File source, final int mode, final Directive directive) throws NoSuchAlgorithmException, IOException {
+		contents.addFile( path, source, mode, directive);
 	}
 
 	/**
@@ -387,7 +403,7 @@ public class Builder {
 	public void addFile( final String path, final File source) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source);
 	}
-
+	
 	/**
 	 * Addes the directory to the repository with the default mode of <code>644</code>.
 	 *
@@ -396,6 +412,17 @@ public class Builder {
 	 */
 	public void addDirectory( final String path) throws NoSuchAlgorithmException, IOException {
 		contents.addDirectory( path);
+	}
+	
+	/**
+	 * Addes the directory to the repository with the default mode of <code>644</code>.
+	 *
+	 * @param path the absolute path at which this file will be installed.
+	 * @param file the file content to include in this rpm.
+	 * @param directive directive indicating special handling for this file.
+	 */
+	public void addDirectory( final String path, final Directive directive) throws NoSuchAlgorithmException, IOException {
+		contents.addDirectory( path, directive);
 	}
 
 	/**
