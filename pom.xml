@@ -1,0 +1,88 @@
+<project>
+	<modelVersion>4.0.0</modelVersion>
+	
+	<groupId>org.freecompany.redline</groupId>
+	<artifactId>redline</artifactId>
+	<version>1.0.9-hms-2</version>
+	<packaging>jar</packaging>
+	<name>Redline</name> 
+	<description>Redline is a pure Java library for manipulating RPM Package Manager packages.</description>
+	<organization>
+		<name>FreeCompany</name>
+		<url>http://www.freecompany.org/index.html</url>
+	</organization>
+	<url>http://www.freecompany.org/redline/index.html</url>	
+
+	<repositories>
+		<repository>
+			<id>freecompany</id>
+			<name>FreeCompany Repository</name>
+			<url>http://repository.freecompany.org</url>
+			<layout>legacy</layout>
+		</repository>
+	</repositories>
+	
+	<build>
+		<defaultGoal>install</defaultGoal>
+		<sourceDirectory>source/main</sourceDirectory>
+		<testSourceDirectory>source/test</testSourceDirectory>
+		<plugins>
+			<plugin>
+				<!-- Note, "deprecations" is disabled here due to two bugs which
+						 interact to cause problems.	The current plexus javac compiler
+						 plugin (used by maven) fails a compilation when a warning is
+						 generated.	The current java compiler generates deprecation
+						 warnings for imports of deprecated classes, which cannot be
+						 suppressed.	Together, these bugs make deprecation warnings
+						 unusable.	-->
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.5</source>
+					<target>1.5</target>
+					<compilerArgument>-Xlint:all,-deprecation</compilerArgument>
+					<showWarnings>true</showWarnings>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<!-- Need combination of test and excludes, otherwise
+							 */Abstract*Test.java will be ignored -->
+					<test>*Test</test>
+					<excludes/>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+		
+	<dependencies>
+
+		<dependency>
+			<groupId>org.freecompany.util</groupId>
+			<artifactId>util-xml-editor</artifactId>
+			<version>0.0.6</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.freecompany.util</groupId>
+			<artifactId>util-text</artifactId>
+			<version>0.3.5</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>1.6.5</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.3</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies> 
+
+</project>
