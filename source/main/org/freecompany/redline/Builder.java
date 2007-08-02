@@ -1,12 +1,5 @@
 package org.freecompany.redline;
 
-import org.freecompany.redline.header.Architecture;
-import org.freecompany.redline.header.Format;
-import org.freecompany.redline.header.Os;
-import org.freecompany.redline.header.RpmType;
-import org.freecompany.redline.payload.Contents;
-import org.freecompany.redline.payload.CpioHeader;
-import org.freecompany.redline.payload.Directive;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -22,6 +15,13 @@ import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import org.freecompany.redline.header.Architecture;
+import org.freecompany.redline.header.Format;
+import org.freecompany.redline.header.Os;
+import org.freecompany.redline.header.RpmType;
+import org.freecompany.redline.payload.Contents;
+import org.freecompany.redline.payload.CpioHeader;
+import org.freecompany.redline.payload.Directive;
 
 import static org.freecompany.redline.ChannelWrapper.*;
 import static org.freecompany.redline.header.AbstractHeader.*;
@@ -259,10 +259,10 @@ public class Builder {
 	}
 	
 	/**
-	* Adds a source rpm.
-	*
-	* @param rpm name of rpm source file
-	*/
+	 * Adds a source rpm.
+	 *
+	 * @param rpm name of rpm source file
+	 */
 	public void setSourceRpm(final String rpm) {
 		if (rpm != null) format.getHeader().createEntry(SOURCERPM, rpm);
 	}
@@ -376,7 +376,7 @@ public class Builder {
 	 * @param mode the mode of the target file in standard three octet notation
 	 */
 	public void addFile( final String path, final File source, final int mode) throws NoSuchAlgorithmException, IOException {
-		contents.addFile( path, source, mode, null);
+		contents.addFile( path, source, mode);
 	}
 	
 	/**
@@ -385,17 +385,34 @@ public class Builder {
 	 * to record the directory names and file names, as well as their
 	 * digests.
 	 *
-	 * @param target the absolute path at which this file will be installed.
-	 * @param file the file content to include in this rpm.
+	 * @param path the absolute path at which this file will be installed.
+	 * @param source the file content to include in this rpm.
+	 * @param mode the mode of the target file in standard three octet notation
+	 * @param directive directive indicating special handling for this file.
+	 * @param uname user owner for the given file
+	 * @param gname group owner for the given file
+	 */
+	public void addFile( final String path, final File source, final int mode, final Directive directive, final String uname, final String gname) throws NoSuchAlgorithmException, IOException {
+		contents.addFile( path, source, mode, directive, uname, gname);
+	}
+	
+	/**
+	 * Add the specified file to the repository payload in order.
+	 * The required header entries will automatically be generated
+	 * to record the directory names and file names, as well as their
+	 * digests.
+	 *
+	 * @param path the absolute path at which this file will be installed.
+	 * @param source the file content to include in this rpm.
 	 * @param mode the mode of the target file in standard three octet notation
 	 * @param directive directive indicating special handling for this file.
 	 */
 	public void addFile( final String path, final File source, final int mode, final Directive directive) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source, mode, directive);
 	}
-
+	
 	/**
-	 * Addes the file to the repository with the default mode of <code>644</code>.
+	 * Adds the file to the repository with the default mode of <code>644</code>.
 	 *
 	 * @param path the absolute path at which this file will be installed.
 	 * @param file the file content to include in this rpm.
@@ -405,7 +422,7 @@ public class Builder {
 	}
 	
 	/**
-	 * Addes the directory to the repository with the default mode of <code>644</code>.
+	 * Adds the directory to the repository with the default mode of <code>644</code>.
 	 *
 	 * @param path the absolute path at which this file will be installed.
 	 * @param file the file content to include in this rpm.
@@ -413,12 +430,38 @@ public class Builder {
 	public void addDirectory( final String path) throws NoSuchAlgorithmException, IOException {
 		contents.addDirectory( path);
 	}
+
+	/**
+	 * Adds the directory to the repository.
+	 *
+	 * @param path the absolute path to add as a directory.
+	 * @param permissions the mode of the directory in standard three octet notation.
+	 * @param directive directive indicating special handling for this file.
+	 * @param uname user owner of the directory
+	 * @param gname group owner of the directory
+	 */
+	public void addDirectory( final String path, final int permissions, final Directive directive, final String uname, final String gname) throws NoSuchAlgorithmException, IOException {
+		contents.addDirectory( path, permissions, directive, uname, gname);
+	}
 	
 	/**
-	 * Addes the directory to the repository with the default mode of <code>644</code>.
+	 * Adds the directory to the repository.
 	 *
-	 * @param path the absolute path at which this file will be installed.
-	 * @param file the file content to include in this rpm.
+	 * @param path the absolute path to add as a directory.
+	 * @param permissions the mode of the directory in standard three octet notation.
+	 * @param directive directive indicating special handling for this file.
+	 * @param uname user owner of the directory
+	 * @param gname group owner of the directory
+	 * @param addParents whether to add parent directories to the rpm 
+	 */
+	public void addDirectory( final String path, final int permissions, final Directive directive, final String uname, final String gname, final boolean addParents) throws NoSuchAlgorithmException, IOException {
+		contents.addDirectory( path, permissions, directive, uname, gname, addParents);
+	}
+	
+	/**
+	 * Adds the directory to the repository with the default mode of <code>644</code>.
+	 *
+	 * @param path the absolute path to add as a directory.
 	 * @param directive directive indicating special handling for this file.
 	 */
 	public void addDirectory( final String path, final Directive directive) throws NoSuchAlgorithmException, IOException {
@@ -426,7 +469,7 @@ public class Builder {
 	}
 
 	/**
-	 * Addes a symbolic link to the repository.
+	 * Adds a symbolic link to the repository.
 	 *
 	 * @param path the absolute path at which this link will be installed.
 	 * @param target the path of the file this link will point to.
@@ -436,7 +479,7 @@ public class Builder {
 	}
 
 	/**
-	 * Addes a symbolic link to the repository.
+	 * Adds a symbolic link to the repository.
 	 *
 	 * @param path the absolute path at which this link will be installed.
 	 * @param target the path of the file this link will point to.
@@ -487,7 +530,7 @@ public class Builder {
 			else if ( "SHA1withDSA".equals( key.getAlgorithm())) map.put( key, ( Entry< byte[]>) format.getSignature().addEntry( DSAHEADER, DSASIZE));
 			else throw new IOException( "Unknown key type '" + key.getAlgorithm() + "'.");
 		}
-		*/
+		 */
 
 		format.getHeader().createEntry( EPOCH, 0);
 		format.getHeader().createEntry( REQUIRENAME, dependencies.keySet().toArray( new String[ dependencies.size()]));
@@ -536,8 +579,8 @@ public class Builder {
 				public void sign( final byte[] signature) { entry.setValues( signature); }
 			};
 		}
-		*/
-		
+		 */
+
 		final Key< Integer> sigsizekey = output.start();
 		final Key< byte[]> shakey = output.start( "SHA");
 		final Key< byte[]> md5key = output.start( "MD5");

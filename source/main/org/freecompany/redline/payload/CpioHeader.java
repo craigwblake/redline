@@ -1,7 +1,5 @@
 package org.freecompany.redline.payload;
 
-import org.freecompany.redline.Util;
-import org.freecompany.util.text.Comparison;
 import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -10,6 +8,8 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.util.Date;
+import org.freecompany.redline.Util;
+import org.freecompany.util.text.Comparison;
 
 import static org.freecompany.redline.Util.normalizePath;
 
@@ -42,7 +42,9 @@ public class CpioHeader {
 	protected int type;
 	protected int permissions = DEFAULT_FILE_PERMISSION;
 	protected int uid;
+	protected String uname;
 	protected int gid;
+	protected String gname;
 	protected int nlink = 1;
 	protected long mtime;
 	protected int filesize;
@@ -93,6 +95,11 @@ public class CpioHeader {
 	public void setInode( int inode) { this.inode = inode; }
 	public void setFlags( int flags) { this.flags = flags; }
 
+	public String getUname() { return this.uname; };
+	public String getGname() { return this.gname; };
+	public void setUname( String uname) { this.uname = uname; }
+	public void setGname( String gname) { this.gname = gname; }
+
 	/**
 	 * Test to see if this is the last header, and is therefore the end of the
 	 * archive. Uses the CPIO magic trailer value to denote the last header of
@@ -101,7 +108,7 @@ public class CpioHeader {
 	public boolean isLast() {
 		return Comparison.equals( TRAILER, name);
 	}
-
+	
 	public void setLast() {
 		name = TRAILER;
 	}
@@ -109,7 +116,7 @@ public class CpioHeader {
 	public void setName( String name) {
 		this.name = name;
 	}
-	
+
 	public int getFileSize() {
 		return filesize;
 	}
@@ -228,6 +235,8 @@ public class CpioHeader {
 		builder.append( "Type: ").append( type).append( "\n");
 		builder.append( "UID: ").append( uid).append( "\n");
 		builder.append( "GID: ").append( gid).append( "\n");
+		builder.append( "UserName: ").append( uname).append( "\n");
+		builder.append( "GroupName: ").append( gname).append( "\n");
 		builder.append( "Nlink: ").append( nlink).append( "\n");
 		builder.append( "MTime: ").append( new Date( mtime)).append( "\n");
 		builder.append( "FileSize: ").append( filesize).append( "\n");

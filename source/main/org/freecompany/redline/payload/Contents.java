@@ -1,18 +1,12 @@
 package org.freecompany.redline.payload;
 
-import org.freecompany.redline.ChannelWrapper.Key;
-import org.freecompany.redline.header.Flags;
-import org.freecompany.redline.ReadableChannelWrapper;
-import org.freecompany.redline.Util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,17 +15,18 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
+import org.freecompany.redline.ChannelWrapper.Key;
+import org.freecompany.redline.ReadableChannelWrapper;
+import org.freecompany.redline.Util;
 
-import static java.util.Collections.unmodifiableSet;
 import static java.util.Arrays.asList;
 import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.INFO;
 import static java.util.logging.Logger.getLogger;
+import static org.freecompany.redline.Util.normalizePath;
 import static org.freecompany.redline.payload.CpioHeader.DEFAULT_DIRECTORY_PERMISSION;
-import static org.freecompany.redline.payload.CpioHeader.SYMLINK;
 import static org.freecompany.redline.payload.CpioHeader.DIR;
 import static org.freecompany.redline.payload.CpioHeader.FILE;
-import static org.freecompany.redline.Util.normalizePath;
+import static org.freecompany.redline.payload.CpioHeader.SYMLINK;
 
 /**
  * The contents of an RPM archive. These entries define the files and links that
@@ -41,6 +36,7 @@ import static org.freecompany.redline.Util.normalizePath;
 public class Contents {
 
 	private static final Set< String> builtin = new HashSet< String>();
+	private static final Set< String> docDirs = new HashSet< String>();
 	static {
 		builtin.add( "/");
 		builtin.add( "/bin");
@@ -59,6 +55,12 @@ public class Contents {
 		builtin.add( "/tmp");
 		builtin.add( "/var");
 		builtin.add( "/var/log");
+		docDirs.add( "/usr/doc");
+		docDirs.add( "/usr/man");
+		docDirs.add( "/usr/X11R6/man");
+		docDirs.add( "/usr/share/doc");
+		docDirs.add( "/usr/share/man");
+		docDirs.add( "/usr/share/info");
 	}
 
 	private Logger logger = getLogger( Contents.class.getName());
@@ -112,9 +114,9 @@ public class Contents {
 	 * @param directive directive indicating special handling for this directory.
 	 */
 	public synchronized void addDirectory( final String path, final Directive directive) {
-		addDirectory( path, -1, directive);
+		addDirectory( path, -1, directive, null, null);
 	}
-
+	
 	/**
 	 * Adds a directory entry to the archive with the specified permissions.
 	 *
@@ -122,7 +124,7 @@ public class Contents {
 	 * @param permissions the permissions flags.
 	 */
 	public synchronized void addDirectory( final String path, final int permissions) {
-		addDirectory(path, permissions, null);
+		addDirectory(path, permissions, null, null, null);
 	}
 
 	/**
@@ -131,16 +133,34 @@ public class Contents {
 	 * @param path the destination path for the installed file.
 	 * @param permissions the permissions flags.
 	 * @param directive directive indicating special handling for this directory.
+	 * @param uname user owner for the given file
+	 * @param gname group owner for the given file
 	 */
-	public synchronized void addDirectory( final String path, final int permissions, final Directive directive) {
+	public synchronized void addDirectory( final String path, final int permissions, final Directive directive, final String uname, final String gname) {
+		addDirectory(path, permissions, directive, uname, gname, true);
+	}
+	
+	/**
+	 * Adds a directory entry to the archive with the specified permissions.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param permissions the permissions flags.
+	 * @param directive directive indicating special handling for this directory.
+	 * @param uname user owner for the given file
+	 * @param gname group owner for the given file
+	 * @param addParents whether to add parent directories to the rpm
+	 */
+	public synchronized void addDirectory( final String path, final int permissions, final Directive directive, final String uname, final String gname, boolean addParents) {
 		if ( files.contains( path)) return;
 
-		addParents( new File( path));
+		if ( addParents) addParents( new File( path), permissions, uname, gname);
 		files.add( path);
 		logger.log( FINE, "Adding directory ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path);
 		header.setType( DIR);
 		header.setInode( inode++);
+		if (uname != null) header.setUname(uname);
+		if (gname != null) header.setGname(gname);
 		header.setMtime( System.currentTimeMillis());
 		if ( permissions != -1) header.setPermissions( permissions);
 		else header.setPermissions( DEFAULT_DIRECTORY_PERMISSION);
@@ -156,7 +176,7 @@ public class Contents {
 	 * @param source the local file to be included in the package.
 	 */
 	public synchronized void addFile( final String path, final File source) throws FileNotFoundException {
-		addFile( path, source, -1, null);
+		addFile( path, source, -1);
 	}
 
 	/**
@@ -166,8 +186,20 @@ public class Contents {
 	 * @param source the local file to be included in the package.
 	 * @param permissions the permissions flags.
 	 */
-	public synchronized void addFile( final String path, final File source, final int permissions) throws FileNotFoundException {
-		addFile(path, source, permissions, null);
+	public synchronized void addFile( final String path, final File source, int permissions) throws FileNotFoundException {
+		addFile(path, source, permissions, null, null, null);
+	}
+	
+	/**
+	 * Adds a file entry to the archive with the specified permissions.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param source the local file to be included in the package.
+	 * @param permissions the permissions flags.
+	 * @param directive directive indicating special handling for this file.
+	 */
+	public synchronized void addFile( final String path, final File source, int permissions, final Directive directive) throws FileNotFoundException {
+		addFile(path, source, permissions, null, null, null);
 	}
 
 	/**
@@ -177,19 +209,24 @@ public class Contents {
 	 * @param source the local file to be included in the package.
 	 * @param permissions the permissions flags.
 	 * @param directive directive indicating special handling for this file.
+	 * @param uname user owner for the given file
+	 * @param gname group owner for the given file
 	 */
-	public synchronized void addFile( final String path, final File source, final int permissions, final Directive directive) throws FileNotFoundException {
+	public synchronized void addFile( final String path, final File source, final int permissions, final Directive directive, final String uname, final String gname) throws FileNotFoundException {
 		if ( files.contains( path)) return;
 
-		addParents( new File( path));
+		addParents( new File( path), permissions, uname, gname);
 		files.add( path);
 		logger.log( FINE, "Adding file ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path, source);
 		header.setType( FILE);
 		header.setInode( inode++);
+		if (uname != null) header.setUname(uname);
+		if (gname != null) header.setGname(gname);
 		if ( permissions != -1) header.setPermissions( permissions);
 		headers.add( header);
 		sources.put( header, source);
+		
 		if ( directive != null) header.setFlags( directive.flag());
 	}
 
@@ -197,13 +234,13 @@ public class Contents {
 	 * Adds entries for parent directories of this file, so that they may be cleaned up when 
 	 * removing the package.
 	 */
-	protected synchronized void addParents( final File file) {
+	protected synchronized void addParents( final File file, final int permissions, final String uname, final String gname ) {
 		final File parent = file.getParentFile();
 		if ( parent == null) return;
 
 		final String path = parent.getAbsolutePath();
 		if ( builtin.contains( path)) return;
-		addDirectory( path);
+		addDirectory( path, permissions, null, uname, gname);
 	}
 
 	/**
@@ -352,13 +389,19 @@ public class Contents {
 
 	public String[] getUsers() {
 		String[] array = new String[ headers.size()];
-		Arrays.fill( array, "root");
+		int x = 0;
+		for (CpioHeader header : headers) {
+			array[ x++] = header.getUname() == null ? "root" : header.getUname();
+		}
 		return array;
 	}
 
 	public String[] getGroups() {
 		String[] array = new String[ headers.size()];
-		Arrays.fill( array, "root");
+		int x = 0;
+		for (CpioHeader header : headers) {
+			array[ x++] = header.getGname() == null ? "root" : header.getGname();
+		}
 		return array;
 	}
 
