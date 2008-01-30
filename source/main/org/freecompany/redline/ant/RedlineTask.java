@@ -82,7 +82,7 @@ public class RedlineTask extends Task {
 				
 				for ( String entry : scanner.getIncludedFiles()) {
 					File file = new File( scanner.getBasedir(), entry);
-					builder.addFile( prefix + file.getName(), file, fileset.getFileMode( getProject()));
+					builder.addFile( prefix + entry, file, fileset.getFileMode( getProject()));
 				}
 
 			}
