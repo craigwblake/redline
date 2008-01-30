@@ -36,7 +36,7 @@ public class CpioHeader {
 	protected static final CharSequence MAGIC = "070701";
 	protected static final String TRAILER = "TRAILER!!!";
 
-	protected Charset charset = Charset.forName( "US-ASCII");
+	protected Charset charset = Charset.forName( "UTF-8");
 
 	protected int inode;
 	protected int type;
