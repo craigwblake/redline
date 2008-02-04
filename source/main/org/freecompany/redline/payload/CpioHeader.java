@@ -203,7 +203,8 @@ public class CpioHeader {
 	 * to the nearest 2 byte boundary as CPIO requires by appending a null when needed.
 	 */
 	public int write( final WritableByteChannel channel, int total) throws IOException {
-		int length = name.length() + 1;
+		final ByteBuffer buffer = charset.encode( CharBuffer.wrap( name));
+		int length = buffer.remaining() + 1;
 		ByteBuffer descriptor = ByteBuffer.allocate( CPIO_HEADER);
 		descriptor.put( writeSix( MAGIC));
 		descriptor.put( writeEight( inode));
@@ -223,7 +224,7 @@ public class CpioHeader {
 
 		total += CPIO_HEADER + length;
 		Util.empty( channel, descriptor);
-		Util.empty( channel, charset.encode( CharBuffer.wrap( name)));
+		Util.empty( channel, buffer);
 		Util.empty( channel, ByteBuffer.allocate( 1));
 		return total + skip( channel, total);
 	}
