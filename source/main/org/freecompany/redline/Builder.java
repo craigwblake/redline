@@ -597,7 +597,7 @@ public class Builder {
 		int total = 0;
 		final ByteBuffer buffer = ByteBuffer.allocate( 4096);
 		for ( CpioHeader header : contents.headers()) {
-			final String path = header.getName().toString();
+			final String path = header.getName();
 			if ( path.startsWith( "/")) header.setName( "." + path);
 			total = header.write( compressor, total);
 			

@@ -274,7 +274,7 @@ public class Contents {
 	public String[] getDirNames() {
 		final Set< String> set = new LinkedHashSet< String>();
 		for ( CpioHeader header : headers) {
-			String path = new File( header.getName().toString()).getParent();
+			String path = new File( header.getName()).getParent();
 			if ( path == null) continue;
 
 			String parent = normalizePath( path);
@@ -290,7 +290,7 @@ public class Contents {
 		int[] array = new int[ headers.size()];
 		int x = 0;
 		for ( CpioHeader header : headers) {
-			String path = new File( header.getName().toString()).getParent();
+			String path = new File( header.getName()).getParent();
 			if ( path == null) continue;
 
 			String parent = normalizePath( path);
@@ -303,7 +303,7 @@ public class Contents {
 	public String[] getBaseNames() {
 		String[] array = new String[ headers.size()];
 		int x = 0;
-		for ( CpioHeader header : headers) array[ x++] = normalizePath( new File( header.getName().toString()).getName());
+		for ( CpioHeader header : headers) array[ x++] = normalizePath( new File( header.getName()).getName());
 		return array;
 	}
 

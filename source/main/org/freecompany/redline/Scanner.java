@@ -28,7 +28,8 @@ public class Scanner {
 			header = new CpioHeader();
 			total = header.read( in, total);
 			System.out.println( header);
-			uncompressed.skip( header.getFileSize());
+			final int skip = header.getFileSize();
+			if ( uncompressed.skip( skip) != skip) throw new RuntimeException( "Skip failed.");
 			total += header.getFileSize();
 		} while ( !header.isLast());
 	}
