@@ -263,8 +263,8 @@ public class Builder {
 	 *
 	 * @param rpm name of rpm source file
 	 */
-	public void setSourceRpm(final String rpm) {
-		if (rpm != null) format.getHeader().createEntry(SOURCERPM, rpm);
+	public void setSourceRpm( final String rpm) {
+		if ( rpm != null) format.getHeader().createEntry( SOURCERPM, rpm);
 	}
 	
 	/**
@@ -273,8 +273,8 @@ public class Builder {
 	 *
 	 * @param prefixes Path prefixes which may be relocated
 	 */
-	public void setPrefixes(final String... prefixes) {
-		if (prefixes != null) format.getHeader().createEntry(PREFIXES, prefixes);
+	public void setPrefixes( final String... prefixes) {
+		if ( prefixes != null) format.getHeader().createEntry( PREFIXES, prefixes);
 	}
 
 	/**
@@ -283,9 +283,9 @@ public class Builder {
 	 * {@link #setPreInstallProgram(String)} method.
 	 *
 	 * @param script Script contents to run (i.e. shell commands)
-	 */
-	public void setPreInstallScript(final String script) {
-		if (script != null) format.getHeader().createEntry(PREINSCRIPT, script);
+	 */ 
+	public void setPreInstallScript( final String script) {
+		if ( script != null) format.getHeader().createEntry( PREINSCRIPT, script);
 	}
 	
 	/**
@@ -295,8 +295,8 @@ public class Builder {
 	 *
 	 * @param program Path to the interpretter
 	 */
-	public void setPreInstallProgram(final String program) {
-		if (program != null) format.getHeader().createEntry(PREINPROG, program);
+	public void setPreInstallProgram( final String program) {
+		if ( program != null) format.getHeader().createEntry( PREINPROG, program);
 	}
 	
 	/**
@@ -306,8 +306,8 @@ public class Builder {
 	 *
 	 * @param script Script contents to run (i.e. shell commands)
 	 */
-	public void setPostInstallScript(final String script) {
-		if (script != null) format.getHeader().createEntry(POSTINSCRIPT, script);
+	public void setPostInstallScript( final String script) {
+		if ( script != null) format.getHeader().createEntry( POSTINSCRIPT, script);
 	}
 	
 	/**
@@ -317,8 +317,8 @@ public class Builder {
 	 *
 	 * @param program Path to the interpretter
 	 */
-	public void setPostInstallProgram(final String program) {
-		if (program != null) format.getHeader().createEntry(POSTINPROG, program);
+	public void setPostInstallProgram( final String program) {
+		if ( program != null) format.getHeader().createEntry( POSTINPROG, program);
 	}
 
 	/**
@@ -328,8 +328,8 @@ public class Builder {
 	 *
 	 * @param script Script contents to run (i.e. shell commands)
 	 */
-	public void setPreUninstallScript(final String script) {
-		if (script != null) format.getHeader().createEntry(PREUNSCRIPT, script);
+	public void setPreUninstallScript( final String script) {
+		if ( script != null) format.getHeader().createEntry( PREUNSCRIPT, script);
 	}
 
 	/**
@@ -339,8 +339,8 @@ public class Builder {
 	 *
 	 * @param program Path to the interpretter
 	 */
-	public void setPreUninstallProgram(final String program) {
-		if (program != null) format.getHeader().createEntry(PREUNPROG, program);
+	public void setPreUninstallProgram( final String program) {
+		if ( program != null) format.getHeader().createEntry( PREUNPROG, program);
 	}
 	
 	/**
@@ -350,8 +350,8 @@ public class Builder {
 	 *
 	 * @param script Script contents to run (i.e. shell commands)
 	 */
-	public void setPostUninstallScript(final String script) {
-		if (script != null) format.getHeader().createEntry(POSTUNSCRIPT, script);
+	public void setPostUninstallScript( final String script) {
+		if ( script != null) format.getHeader().createEntry( POSTUNSCRIPT, script);
 	}
 	
 	/**
@@ -361,8 +361,8 @@ public class Builder {
 	 *
 	 * @param program Path to the interpretter
 	 */
-	public void setPostUninstallProgram(final String program) {
-		if (program != null) format.getHeader().createEntry(POSTUNPROG, program);
+	public void setPostUninstallProgram( final String program) {
+		if ( program != null) format.getHeader().createEntry( POSTUNPROG, program);
 	}
 	
 	/**
