@@ -6,6 +6,16 @@ import junit.framework.TestCase;
 
 public class ContentsTest extends TestCase {
 
+	public void testListParents() throws Exception {
+		ArrayList< String> list = new ArrayList< String>();
+		Contents.listParents( list, new File( "/one/two/three/four"));
+
+		assertEquals( 3, list.size());
+		assertEquals( "/one/two/three", list.get( 0));
+		assertEquals( "/one/two", list.get( 1));
+		assertEquals( "/one", list.get( 2));
+	}
+
 	public void testListParentsBuiltin() throws Exception {
 		ArrayList< String> list = new ArrayList< String>();
 		Contents.listParents( list, new File( "/bin/one/two/three/four"));
