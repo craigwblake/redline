@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -52,6 +53,7 @@ public class Contents {
 		builtin.add( "/usr/sbin");
 		builtin.add( "/usr/share");
 		builtin.add( "/sbin");
+		builtin.add( "/opt");
 		builtin.add( "/tmp");
 		builtin.add( "/var");
 		builtin.add( "/var/log");
@@ -235,12 +237,9 @@ public class Contents {
 	 * removing the package.
 	 */
 	protected synchronized void addParents( final File file, final int permissions, final String uname, final String gname ) {
-		final File parent = file.getParentFile();
-		if ( parent == null) return;
-
-		final String path = parent.getAbsolutePath();
-		if ( builtin.contains( path)) return;
-		addDirectory( path, permissions, null, uname, gname);
+		final ArrayList< String> parents = new ArrayList< String>();
+		listParents( parents, file);
+		for ( String parent : parents) addDirectory( parent, permissions, null, uname, gname);
 	}
 
 	/**
@@ -453,6 +452,20 @@ public class Contents {
 		String[] array = new String[ headers.size()];
 		Arrays.fill( array, "<<none>>");
 		return array;
+	}
+
+	/**
+	 * Generates a list of parent paths given a starting path.
+	 */
+	protected static void listParents( final List< String> parents, final File file) {
+		final File parent = file.getParentFile();
+		if ( parent == null) return;
+		
+		final String path = parent.getAbsolutePath();
+		if ( builtin.contains( path)) return;
+
+		parents.add( path);
+		listParents( parents, parent);
 	}
 
 	/**
