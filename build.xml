@@ -9,9 +9,10 @@
 	<property name='imp.junit.fork' value='true'/>
 	<property name='imp.junit.usefile' value='false'/>
 
-	<!--<imp:index group='org/freecompany/redline' types='jar,module,rpm,bundle,source,site'>-->
-	<imp:index group='org/freecompany/redline' types='jar,module,rpm,source,site'>
-		<imp:dependency types='compile' uri='urn:brimstone:ant/ant-1.6.5.jar'/>
+	<imp:index group='org/freecompany/redline' types='jar,module,rpm,bundle,source,site'>
+		<imp:dependency types='compile,test' uri='urn:brimstone:ant/ant-1.6.5.jar'/>
+		<imp:dependency types='compile,test' uri='urn:brimstone:ant/ant-junit-1.6.5.jar'/>
+		<imp:dependency types='compile,test' uri='urn:brimstone:junit/junit-3.8.1.jar'/>
 		<imp:dependency types='compile,test,run' uri='urn:brimstone:org/freecompany/util/util-text-0.3.5.jar'/>
 		<imp:dependency types='compile,test,run' uri='urn:brimstone:org/freecompany/util/util-xml-editor-0.0.6.module'/>
 	</imp:index>
