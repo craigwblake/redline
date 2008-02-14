@@ -461,7 +461,7 @@ public class Contents {
 		final File parent = file.getParentFile();
 		if ( parent == null) return;
 		
-		final String path = parent.getPath();
+		final String path = normalizePath( parent.getPath());
 		if ( builtin.contains( path)) return;
 
 		parents.add( path);
