@@ -6,6 +6,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import org.freecompany.redline.Builder;
 import org.freecompany.redline.header.Architecture;
@@ -98,9 +99,9 @@ public class RedlineTask extends Task {
 	}
 
 	public void restrict( String name) {
-		for ( Depends dependency : depends) {
-			if ( dependency.getName().equals( name)) depends.remove( dependency);
-			break;
+		for ( Iterator< Depends> i = depends.iterator(); i.hasNext();) {
+			final Depends dependency = i.next();
+			if ( dependency.getName().equals( name)) i.remove();
 		}
 	}
 
