@@ -97,6 +97,13 @@ public class RedlineTask extends Task {
 		}
 	}
 
+	public void restrict( String name) {
+		for ( Depends dependency : depends) {
+			if ( dependency.getName().equals( name)) depends.remove( dependency);
+			break;
+		}
+	}
+
 	public void setName( String name) { this.name = name; }
 	public void setType( String type) { this.type = RpmType.valueOf( type); }
 	public void setArchitecture( String architecture) { this.architecture = Architecture.valueOf( architecture); }
