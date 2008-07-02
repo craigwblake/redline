@@ -30,10 +30,14 @@ import static org.freecompany.redline.header.Signature.SignatureTag.*;
 import static org.freecompany.redline.header.Header.HeaderTag.*;
 
 /**
- * The normal entry point to the API used for building and RPM. The API provides methods to
- * configure and add contents to a new RPM. The current version of the RPM format (3.0) requires
- * numerous headers to be set for an RPM to be valid. All of the required fields are either
- * set automatically or exposed through setters in this builder class. Any required fields are
+ * The normal entry point to the API used for
+ * building and RPM. The API provides methods to
+ * configure and add contents to a new RPM. The
+ * current version of the RPM format (3.0) requires
+ * numerous headers to be set for an RPM to be
+ * valid. All of the required fields are either
+ * set automatically or exposed through setters in
+ * this builder class. Any required fields are
  * marked in their respective method API documentation.
  */
 public class Builder {
@@ -644,6 +648,10 @@ public class Builder {
 		return getSpecial( 0x0000003F, count);
 	}
 
+	/**
+	 * Returns the special header expected by RPM for
+	 * a particular header.
+	 */
 	protected byte[] getSpecial( final int tag, final int count) {
 		final ByteBuffer buffer = ByteBuffer.allocate( 16);
 		buffer.putInt( tag);
@@ -653,6 +661,10 @@ public class Builder {
 		return buffer.array();
 	}
 
+	/**
+	 * Converts an array of Integer objects into an equivalent
+	 * array of int primitives.
+	 */
 	protected int[] convert( final Integer[] ints) {
 		int[] array = new int[ ints.length];
 		int count = 0;

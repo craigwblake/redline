@@ -22,6 +22,9 @@ import static org.freecompany.redline.header.Architecture.NOARCH;
 import static org.freecompany.redline.header.Os.LINUX;
 import static org.freecompany.redline.header.RpmType.BINARY;
 
+/**
+ * Ant task for creating an RPM file.
+ */
 public class RedlineTask extends Task {
 
 	public static final String NAMESPACE = "http://freecompany.org/namespace/redline";

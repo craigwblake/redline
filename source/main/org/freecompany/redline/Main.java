@@ -19,6 +19,12 @@ import static org.freecompany.redline.header.Architecture.NOARCH;
 import static org.freecompany.redline.header.Os.LINUX;
 import static org.freecompany.redline.payload.CpioHeader.DEFAULT_FILE_PERMISSION;
 
+/**
+ * Main entry point for the Redline command line tool. The command line tool
+ * uses a provided configuration file to generate an RPM file. Execution of this
+ * tool may be scripted or called from third party software as needed to create
+ * an RPM file.
+ */
 public class Main {
 
 	public static void main( String[] args) throws SAXException, NoSuchAlgorithmException, IOException {
@@ -26,12 +32,33 @@ public class Main {
 		else new Main().run( new File( args[ 0]));
 	}
 
+	/**
+	 * Runs the tool using a configuration provided in the given file parameter. The configuration file
+	 * is expected to be well formed XML conforming to the Redline configuration syntax.
+	 *
+	 * @param file the configuration file to use
+	 * @throws SAXException if the provided file is not well formed XML
+	 * @throws NoSuchAlgorithmException if an operation attempted during RPM creation fails due
+	 * to a missing encryption algorithm
+	 * @throws IOException if an IO error occurs either in reading the configuration file, reading
+	 * an input file to the RPM, or during RPM creation
+	 */
 	public void run( File file) throws SAXException, NoSuchAlgorithmException, IOException {
 		XmlEditor editor = new XmlEditor();
 		editor.read( file);
 		run( editor, new File( "."));
 	}
 
+	/**
+	 * Runs the tool using a configuration provided in the given configuration and output file.
+	 *
+	 * @param editor the XML configuration file, parsed by the XmlEditor utility
+	 * @param file the destination file to use in creating the RPM
+	 * @throws NoSuchAlgorithmException if an operation attempted during RPM creation fails due
+	 * to a missing encryption algorithm
+	 * @throws IOException if an IO error occurs either in reading the configuration file, reading
+	 * an input file to the RPM, or during RPM creation
+	 */
 	public void run( XmlEditor editor, File destination) throws NoSuchAlgorithmException, IOException {
 		editor.startPrefixMapping( "http://www.freecompany.org/namespace/redline", "rpm");
 		Contents include = new Contents();
@@ -59,6 +86,20 @@ public class Main {
 		run( editor, editor.getValue( "rpm:name/text()"), editor.getValue( "rpm:version/text()"), editor.getValue( "rpm:release/text()", "1"), include, destination);
 	}
 
+	/**
+	 * Runs the tool using the provided settings. 
+	 *
+	 * @param editor the XML configuration file, parsed by the XmlEditor utility
+	 * @param name the name of the RPM file to create
+	 * @param version the version of the created RPM
+	 * @param release the release version of the created RPM
+	 * @param include the contents to include in the generated RPM file
+	 * @param file the destination file to use in creating the RPM
+	 * @throws NoSuchAlgorithmException if an operation attempted during RPM creation fails due
+	 * to a missing encryption algorithm
+	 * @throws IOException if an IO error occurs either in reading the configuration file, reading
+	 * an input file to the RPM, or during RPM creation
+	 */
 	public void run( XmlEditor editor, String name, String version, String release, Contents include, File destination) throws NoSuchAlgorithmException, IOException {
 		Builder builder = new Builder();
 		builder.setPackage( name, version, release);

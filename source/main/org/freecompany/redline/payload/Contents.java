@@ -270,6 +270,9 @@ public class Contents {
 		return total;
 	}
 
+	/**
+	 * Gets the dirnames headers values.
+	 */
 	public String[] getDirNames() {
 		final Set< String> set = new LinkedHashSet< String>();
 		for ( CpioHeader header : headers) {
@@ -283,6 +286,9 @@ public class Contents {
 		return set.toArray( new String[ set.size()]);
 	}
 
+	/**
+	 * Gets the dirindexes headers values.
+	 */
 	// TODO: Fix this (as part of general refactoring) to be much better.
 	public int[] getDirIndexes() {
 		final List< String> dirs = asList( getDirNames());
@@ -299,6 +305,9 @@ public class Contents {
 		return array;
 	}
 
+	/**
+	 * Gets the basenames header values.
+	 */
 	public String[] getBaseNames() {
 		String[] array = new String[ headers.size()];
 		int x = 0;
@@ -306,6 +315,9 @@ public class Contents {
 		return array;
 	}
 
+	/**
+	 * Gets the sizes header values.
+	 */
 	public int[] getSizes() {
 		int[] array = new int[ headers.size()];
 		int x = 0;
@@ -317,6 +329,9 @@ public class Contents {
 		return array;
 	}
 
+	/**
+	 * Gets the modes header values.
+	 */
 	public short[] getModes() {
 		short[] array = new short[ headers.size()];
 		int x = 0;
@@ -324,6 +339,9 @@ public class Contents {
 		return array;
 	}
 
+	/**
+	 * Gets the rdevs header values.
+	 */
 	public short[] getRdevs() {
 		short[] array = new short[ headers.size()];
 		int x = 0;
@@ -331,6 +349,9 @@ public class Contents {
 		return array;
 	}
 
+	/**
+	 * Gets the mtimes header values.
+	 */
 	public int[] getMtimes() {
 		int[] array = new int[ headers.size()];
 		int x = 0;
@@ -367,6 +388,9 @@ public class Contents {
 		return array;
 	}
 
+	/**
+	 * Gets the linktos header values.
+	 */
 	public String[] getLinkTos() {
 		String[] array = new String[ headers.size()];
 		int x = 0;
@@ -379,6 +403,9 @@ public class Contents {
 		return array;
 	}
 
+	/**
+	 * Gets the flags header values.
+	 */
 	public int[] getFlags() {
 		int[] array = new int[ headers.size()];
 		int x = 0;
@@ -386,6 +413,9 @@ public class Contents {
 		return array;
 	}
 
+	/**
+	 * Gets the users header values.
+	 */
 	public String[] getUsers() {
 		String[] array = new String[ headers.size()];
 		int x = 0;
@@ -395,6 +425,9 @@ public class Contents {
 		return array;
 	}
 
+	/**
+	 * Gets the groups header values.
+	 */
 	public String[] getGroups() {
 		String[] array = new String[ headers.size()];
 		int x = 0;
@@ -404,22 +437,34 @@ public class Contents {
 		return array;
 	}
 
+	/**
+	 * Gets the colors header values.
+	 */
 	public int[] getColors() {
 		return new int[ headers.size()];
 	}
 
+	/**
+	 * Gets the verifyflags header values.
+	 */
 	public int[] getVerifyFlags() {
 		int[] array = new int[ headers.size()];
 		Arrays.fill( array, -1);
 		return array;
 	}
 
+	/**
+	 * Gets the classes header values.
+	 */
 	public int[] getClasses() {
 		int[] array = new int[ headers.size()];
 		Arrays.fill( array, 1);
 		return array;
 	}
 
+	/**
+	 * Gets the devices header values.
+	 */
 	public int[] getDevices() {
 		int[] array = new int[ headers.size()];
 		int x = 0;
@@ -427,6 +472,9 @@ public class Contents {
 		return array;
 	}
 
+	/**
+	 * Gets the inodes header values.
+	 */
 	public int[] getInodes() {
 		int[] array = new int[ headers.size()];
 		int x = 0;
@@ -434,20 +482,32 @@ public class Contents {
 		return array;
 	}
 
+	/**
+	 * Gets the langs header values.
+	 */
 	public String[] getLangs() {
 		String[] array = new String[ headers.size()];
 		Arrays.fill( array, "");
 		return array;
 	}
 
+	/**
+	 * Gets the dependsx header values.
+	 */
 	public int[] getDependsX() {
 		return new int[ headers.size()];
 	}
 
+	/**
+	 * Gets the dependsn header values.
+	 */
 	public int[] getDependsN() {
 		return new int[ headers.size()];
 	}
 
+	/**
+	 * Gets the contexts header values.
+	 */
 	public String[] getContexts() {
 		String[] array = new String[ headers.size()];
 		Arrays.fill( array, "<<none>>");

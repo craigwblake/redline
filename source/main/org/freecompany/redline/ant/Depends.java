@@ -1,5 +1,9 @@
 package org.freecompany.redline.ant;
 
+/**
+ * Object describing a dependency on a
+ * particular version of an RPM package.
+ */
 public class Depends {
 
 	protected String name;

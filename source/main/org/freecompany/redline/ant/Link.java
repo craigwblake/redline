@@ -1,5 +1,10 @@
 package org.freecompany.redline.ant;
 
+/**
+ * Object describing a symbolic link
+ * to be generated on the target machine
+ * during installation of the RPM file.
+ */
 public class Link {
 
 	protected String path;

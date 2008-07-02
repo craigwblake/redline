@@ -6,8 +6,23 @@ import static org.freecompany.redline.header.RpmType.BINARY;
 import static org.freecompany.redline.header.Architecture.NOARCH;
 import static org.freecompany.redline.header.Os.LINUX;
 
+/**
+ * Simple test class to validate that a basic
+ * RPM file can be correctly generated. The
+ * results of this test class can be read in
+ * by the scanner to validate it's format.
+ */
 public class Test {
 
+	/**
+	 * Builds a test RPM file using the provided optional arguments.
+	 * The first argument is the target path of a file to add to the
+	 * RPM, and the second argument is the path to the actual file
+	 * content.
+	 *
+	 * @throws Exception if an error occurrs generating the test
+	 * RPM file
+	 */
 	public static void main( String[] args) throws Exception {
 
 		// Set required fields for the RPM package.

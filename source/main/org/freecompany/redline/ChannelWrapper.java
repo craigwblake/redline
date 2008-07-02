@@ -11,12 +11,33 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Signature;
 
+/**
+ * Wraps an IO channel so that bytes may be observed
+ * during transmission. Wrappers around IO channels are
+ * used for a variety of purposes, including counting
+ * byte output for use in generating headers, calculating
+ * a signature across output bytes, and digesting output
+ * bytes using a one-way secure hash.
+ */
 public abstract class ChannelWrapper {
 
 	public static class Key< T> {}
 
+	/**
+	 * Interface describing an object that consumes
+	 * data from a NIO buffer.
+	 */
 	protected interface Consumer< T> {
+
+		/**
+		 * Consume some input from the given buffer.
+		 */
 		void consume( ByteBuffer buffer);
+
+		/**
+		 * Complete operationds and optionally return
+		 * a value to the holder of the key.
+		 */
 		T finish();
 	}
 
@@ -53,6 +74,10 @@ public abstract class ChannelWrapper {
 
 	/**
 	 * Initialize a signature on this channel.
+	 *
+	 * @param key the private key to use in signing this data stream.
+	 * @throws NoSuchAlgorithmException if the key algorithm is not supported
+	 * @throws InvalidKeyException if the key provided is invalid for signing
 	 */
 	public Key< byte[]> start( final PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException {
 		final Signature signature = Signature.getInstance( key.getAlgorithm());
@@ -79,6 +104,9 @@ public abstract class ChannelWrapper {
 
 	/**
 	 * Initialize a digest on this channel.
+	 *
+	 * @param algorithm the digest algorithm to use in computing the hash
+	 * @throws NoSuchAlgorithmException if the given algorithm does not exist
 	 */
 	public Key< byte[]> start( final String algorithm) throws NoSuchAlgorithmException {
 		final MessageDigest digest = MessageDigest.getInstance( algorithm);
