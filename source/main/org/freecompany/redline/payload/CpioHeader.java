@@ -36,7 +36,7 @@ public class CpioHeader {
 	protected static final CharSequence MAGIC = "070701";
 	protected static final String TRAILER = "TRAILER!!!";
 
-	protected Charset charset = Charset.forName( "UTF-8");
+	protected Charset charset = Charset.forName( "ASCII");
 
 	protected int inode;
 	protected int type;
@@ -86,7 +86,7 @@ public class CpioHeader {
 	public String getName() { return name; }
 	public int getFlags() { return flags; }
 
-	public int getMode() { return ( type << 12) | permissions; }
+	public int getMode() { return ( type << 12) | ( permissions & 07777); }
 
 	public void setPermissions( int permissions) { this.permissions = permissions; }
 	public void setType( int type) { this.type = type; }
@@ -108,7 +108,7 @@ public class CpioHeader {
 	public boolean isLast() {
 		return Comparison.equals( TRAILER, name);
 	}
-	
+
 	public void setLast() {
 		name = TRAILER;
 	}
