@@ -177,7 +177,7 @@ public class Contents {
 	 * @param path the destination path for the installed file.
 	 * @param source the local file to be included in the package.
 	 */
-	public synchronized void addFile( final String path, final File source) throws FileNotFoundException {
+	public void addFile( final String path, final File source) throws FileNotFoundException {
 		addFile( path, source, -1);
 	}
 
@@ -188,8 +188,19 @@ public class Contents {
 	 * @param source the local file to be included in the package.
 	 * @param permissions the permissions flags.
 	 */
-	public synchronized void addFile( final String path, final File source, int permissions) throws FileNotFoundException {
+	public void addFile( final String path, final File source, int permissions) throws FileNotFoundException {
 		addFile(path, source, permissions, null, null, null);
+	}
+
+	/**
+	 * Adds a file entry to the archive with the specified permissions.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param source the local file to be included in the package.
+	 * @param permissions the permissions flags.
+	 */
+	public void addFile( final String path, final File source, int permissions, int dirmode) throws FileNotFoundException {
+		addFile(path, source, permissions, null, null, null, dirmode);
 	}
 	
 	/**
@@ -200,7 +211,7 @@ public class Contents {
 	 * @param permissions the permissions flags.
 	 * @param directive directive indicating special handling for this file.
 	 */
-	public synchronized void addFile( final String path, final File source, int permissions, final Directive directive) throws FileNotFoundException {
+	public void addFile( final String path, final File source, int permissions, final Directive directive) throws FileNotFoundException {
 		addFile(path, source, permissions, null, null, null);
 	}
 
@@ -214,10 +225,24 @@ public class Contents {
 	 * @param uname user owner for the given file
 	 * @param gname group owner for the given file
 	 */
-	public synchronized void addFile( final String path, final File source, final int permissions, final Directive directive, final String uname, final String gname) throws FileNotFoundException {
+	public void addFile( final String path, final File source, final int permissions, final Directive directive, final String uname, final String gname) throws FileNotFoundException {
+		addFile( path, source, permissions, directive, uname, gname, -1);
+	}
+
+	/**
+	 * Adds a file entry to the archive with the specified permissions.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param source the local file to be included in the package.
+	 * @param permissions the permissions flags.
+	 * @param directive directive indicating special handling for this file.
+	 * @param uname user owner for the given file
+	 * @param gname group owner for the given file
+	 */
+	public synchronized void addFile( final String path, final File source, final int permissions, final Directive directive, final String uname, final String gname, final int dirmode) throws FileNotFoundException {
 		if ( files.contains( path)) return;
 
-		addParents( new File( path), permissions, uname, gname);
+		addParents( new File( path), dirmode, uname, gname);
 		files.add( path);
 		logger.log( FINE, "Adding file ''{0}''.", path);
 		CpioHeader header = new CpioHeader( path, source);

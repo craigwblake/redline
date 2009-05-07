@@ -430,7 +430,7 @@ public class Builder {
 	public void setPreUninstallProgram( final String program) {
 		if ( program != null) format.getHeader().createEntry( PREUNPROG, program);
 	}
-	
+
 	/**
 	 * Declares a script to be run as part of the RPM post-uninstallation. The
 	 * script will be run using the interpretter declared with the
@@ -442,7 +442,7 @@ public class Builder {
         setPostUninstallProgram(readProgram(script));
         if ( script != null) format.getHeader().createEntry( POSTUNSCRIPT, script);
 	}
-	
+
 	/**
 	 * Declares a script file to be run as part of the RPM post-uninstallation. The
 	 * script will be run using the interpretter declared with the
@@ -464,7 +464,7 @@ public class Builder {
 	public void setPostUninstallProgram( final String program) {
 		if ( program != null) format.getHeader().createEntry( POSTUNPROG, program);
 	}
-	
+
 	/**
 	 * Add the specified file to the repository payload in order.
 	 * The required header entries will automatically be generated
@@ -478,7 +478,21 @@ public class Builder {
 	public void addFile( final String path, final File source, final int mode) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source, mode);
 	}
-	
+
+	/**
+	 * Add the specified file to the repository payload in order.
+	 * The required header entries will automatically be generated
+	 * to record the directory names and file names, as well as their
+	 * digests.
+	 *
+	 * @param target the absolute path at which this file will be installed.
+	 * @param file the file content to include in this rpm.
+	 * @param mode the mode of the target file in standard three octet notation
+	 */
+	public void addFile( final String path, final File source, final int mode, final int dirmode) throws NoSuchAlgorithmException, IOException {
+		contents.addFile( path, source, mode, dirmode);
+	}
+
 	/**
 	 * Add the specified file to the repository payload in order.
 	 * The required header entries will automatically be generated

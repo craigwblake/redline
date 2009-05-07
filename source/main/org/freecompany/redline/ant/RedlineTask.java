@@ -92,10 +92,12 @@ public class RedlineTask extends Task {
 				String prefix = normalizePath( fileset.getPrefix( getProject()));
 				if ( !prefix.endsWith( "/")) prefix += "/";
 				DirectoryScanner scanner = fileset.getDirectoryScanner( getProject());
+
+				int dirmode = fileset.getDirMode( getProject()) & 07777;
 				
 				for ( String entry : scanner.getIncludedFiles()) {
 					File file = new File( scanner.getBasedir(), entry);
-					builder.addFile( prefix + entry, file, fileset.getFileMode( getProject()) & 07777);
+					builder.addFile( prefix + entry, file, fileset.getFileMode( getProject()) & 07777, dirmode);
 				}
 
 			}
