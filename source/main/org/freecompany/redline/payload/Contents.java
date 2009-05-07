@@ -141,7 +141,7 @@ public class Contents {
 	public synchronized void addDirectory( final String path, final int permissions, final Directive directive, final String uname, final String gname) {
 		addDirectory(path, permissions, directive, uname, gname, true);
 	}
-	
+
 	/**
 	 * Adds a directory entry to the archive with the specified permissions.
 	 *
@@ -324,6 +324,7 @@ public class Contents {
 		for ( CpioHeader header : headers) {
 			Object object = sources.get( header);
 			if ( object instanceof File) array[ x] = ( int) (( File) object).length();
+			else if ( header.getType() == DIR) array[ x] = 4096;
 			++x;
 		}
 		return array;
