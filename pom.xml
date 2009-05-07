@@ -46,6 +46,14 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<directory>source/main</directory>
+				<includes>
+					<include>**/antlib.xml</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 		
 	<dependencies>
