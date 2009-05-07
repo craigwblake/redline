@@ -49,6 +49,10 @@ public class RedlineTask extends Task {
 	protected List< ZipFileSet> filesets = new ArrayList< ZipFileSet>();
 	protected List< Link> links = new ArrayList< Link>();
 	protected List< Depends> depends = new ArrayList< Depends>();
+	protected File preInstallScript;
+	protected File postInstallScript;
+	protected File preUninstallScript;
+	protected File postUninstallScript;
 
 	public RedlineTask() {
 		try {
@@ -78,7 +82,12 @@ public class RedlineTask extends Task {
 		builder.setUrl( url);
 		builder.setProvides( provides == null ? name : provides);
 
-		try {
+        try {
+			builder.setPreInstallScript( preInstallScript);
+			builder.setPostInstallScript( postInstallScript);
+			builder.setPreUninstallScript( preUninstallScript);
+			builder.setPostUninstallScript( postUninstallScript);
+			
 			for ( ZipFileSet fileset : filesets) {
 				String prefix = normalizePath( fileset.getPrefix( getProject()));
 				if ( !prefix.endsWith( "/")) prefix += "/";
@@ -128,4 +137,8 @@ public class RedlineTask extends Task {
 	public void addZipfileset( ZipFileSet fileset) { filesets.add( fileset); }
 	public void addLink( Link link) { links.add( link); }
 	public void addDepends( Depends dependency) { depends.add( dependency); }
+	public void setPreInstallScript( File preInstallScript) { this.preInstallScript = preInstallScript; }
+	public void setPostInstallScript( File postInstallScript) { this.postInstallScript = postInstallScript; }
+	public void setPreUninstallScript( File preUninstallScript) { this.preUninstallScript = preUninstallScript; }
+	public void setPostUninstallScript( File postUninstallScript) { this.postUninstallScript = postUninstallScript; }
 }

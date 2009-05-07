@@ -1,7 +1,9 @@
 package org.freecompany.redline;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
@@ -12,6 +14,8 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -281,7 +285,51 @@ public class Builder {
 		if ( prefixes != null) format.getHeader().createEntry( PREFIXES, prefixes);
 	}
 
-	/**
+    /**
+     * Return the content of the specified script file as a String.
+     *
+     * @param file the script file to be read
+     */
+    private String readScript( File file) throws IOException {
+        if ( file == null) return null;
+
+        StringBuilder script = new StringBuilder();
+        BufferedReader in = new BufferedReader( new FileReader(file));
+
+        try {
+            String line;
+            while (( line = in.readLine()) != null) {
+                script.append( line);
+                script.append( "\n");
+            }
+        } finally {
+            in.close();
+        }
+
+        return script.toString();
+    }
+
+    /**
+     * Returns the program use to run the specified script (guessed by parsing 
+     * the shebang at the beginning of the script)
+     * 
+     * @param script
+     */
+    private String readProgram( String script) {
+        String program = null;
+        
+        if ( script != null) {
+            Pattern pattern = Pattern.compile( "^#!(/.*)");
+            Matcher matcher = pattern.matcher( script);
+            if ( matcher.find()) {
+                program = matcher.group( 1);
+            }            
+        }
+                
+        return program;
+    }
+
+    /**
 	 * Declares a script to be run as part of the RPM pre-installation. The
 	 * script will be run using the interpretter declared with the
 	 * {@link #setPreInstallProgram(String)} method.
@@ -289,10 +337,22 @@ public class Builder {
 	 * @param script Script contents to run (i.e. shell commands)
 	 */ 
 	public void setPreInstallScript( final String script) {
-		if ( script != null) format.getHeader().createEntry( PREINSCRIPT, script);
+        setPreInstallProgram(readProgram(script));
+        if ( script != null) format.getHeader().createEntry( PREINSCRIPT, script);
 	}
 	
 	/**
+	 * Declares a script file to be run as part of the RPM pre-installation. The
+	 * script will be run using the interpretter declared with the
+	 * {@link #setPreInstallProgram(String)} method.
+	 *
+	 * @param file Script to run (i.e. shell commands)
+	 */
+	public void setPreInstallScript( final File file) throws IOException {
+		setPreInstallScript(readScript(file));
+	}
+
+    /**
 	 * Declares the interpretter to be used when invoking the RPM
 	 * pre-installation script that can be set with the
 	 * {@link #setPreInstallScript(String)} method.
@@ -311,10 +371,22 @@ public class Builder {
 	 * @param script Script contents to run (i.e. shell commands)
 	 */
 	public void setPostInstallScript( final String script) {
-		if ( script != null) format.getHeader().createEntry( POSTINSCRIPT, script);
+        setPostInstallProgram(readProgram(script));
+        if ( script != null) format.getHeader().createEntry( POSTINSCRIPT, script);
 	}
 	
 	/**
+	 * Declares a script file to be run as part of the RPM post-installation. The
+	 * script will be run using the interpretter declared with the
+	 * {@link #setPostInstallProgram(String)} method.
+	 *
+	 * @param file Script to run (i.e. shell commands)
+	 */
+	public void setPostInstallScript( final File file) throws IOException {
+        setPostInstallScript(readScript(file));
+	}
+
+    /**
 	 * Declares the interpretter to be used when invoking the RPM
 	 * post-installation script that can be set with the
 	 * {@link #setPreInstallScript(String)} method.
@@ -333,10 +405,22 @@ public class Builder {
 	 * @param script Script contents to run (i.e. shell commands)
 	 */
 	public void setPreUninstallScript( final String script) {
-		if ( script != null) format.getHeader().createEntry( PREUNSCRIPT, script);
+        setPreUninstallProgram(readProgram(script));
+        if ( script != null) format.getHeader().createEntry( PREUNSCRIPT, script);
 	}
 
 	/**
+	 * Declares a script file to be run as part of the RPM pre-uninstallation. The
+	 * script will be run using the interpretter declared with the
+	 * {@link #setPreUninstallProgram(String)} method.
+	 *
+	 * @param file Script to run (i.e. shell commands)
+	 */
+	public void setPreUninstallScript( final File file) throws IOException {
+        setPreUninstallScript(readScript(file));
+	}
+
+    /**
 	 * Declares the interpretter to be used when invoking the RPM
 	 * pre-uninstallation script that can be set with the
 	 * {@link #setPreUninstallScript(String)} method.
@@ -355,10 +439,22 @@ public class Builder {
 	 * @param script Script contents to run (i.e. shell commands)
 	 */
 	public void setPostUninstallScript( final String script) {
-		if ( script != null) format.getHeader().createEntry( POSTUNSCRIPT, script);
+        setPostUninstallProgram(readProgram(script));
+        if ( script != null) format.getHeader().createEntry( POSTUNSCRIPT, script);
 	}
 	
 	/**
+	 * Declares a script file to be run as part of the RPM post-uninstallation. The
+	 * script will be run using the interpretter declared with the
+	 * {@link #setPostUninstallProgram(String)} method.
+	 *
+	 * @param file Script contents to run (i.e. shell commands)
+	 */
+	public void setPostUninstallScript( final File file) throws IOException {
+        setPostUninstallScript(readScript(file));
+	}
+
+    /**
 	 * Declares the interpretter to be used when invoking the RPM
 	 * post-uninstallation script that can be set with the
 	 * {@link #setPostUninstallScript(String)} method.
