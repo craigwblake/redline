@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
@@ -43,6 +44,14 @@ public class Contents {
 		builtin.add( "/bin");
 		builtin.add( "/dev");
 		builtin.add( "/etc");
+		builtin.add( "/etc/cron.d");
+		builtin.add( "/etc/cron.daily");
+		builtin.add( "/etc/cron.hourly");
+		builtin.add( "/etc/cron.monthly");
+		builtin.add( "/etc/cron.weekly");
+		builtin.add( "/etc/default");
+		builtin.add( "/etc/init.d");
+		builtin.add( "/etc/logrotate.d");
 		builtin.add( "/lib");
 		builtin.add( "/usr");
 		builtin.add( "/usr/bin");
@@ -52,6 +61,7 @@ public class Contents {
 		builtin.add( "/usr/local/lib");
 		builtin.add( "/usr/sbin");
 		builtin.add( "/usr/share");
+		builtin.add( "/usr/share/applications");
 		builtin.add( "/sbin");
 		builtin.add( "/opt");
 		builtin.add( "/tmp");
@@ -68,9 +78,9 @@ public class Contents {
 	private Logger logger = getLogger( Contents.class.getName());
 	private int inode = 1;
 
-	protected final TreeSet< CpioHeader> headers = new TreeSet< CpioHeader>( new HeaderComparator());
-	protected final HashSet< String> files = new HashSet< String>();
-	protected final HashMap< CpioHeader, Object> sources = new HashMap< CpioHeader, Object>();
+	protected final Set< CpioHeader> headers = new TreeSet< CpioHeader>( new HeaderComparator());
+	protected final Set< String> files = new HashSet< String>();
+	protected final Map< CpioHeader, Object> sources = new HashMap< CpioHeader, Object>();
 
 	/**
 	 * Adds a directory entry to the archive with the default permissions of 644.
@@ -565,5 +575,5 @@ public class Contents {
 		public boolean equals( final CpioHeader one, final CpioHeader two) {
 			return one.getName().equals( two.getName());
 		}
-	};
+	}
 }
