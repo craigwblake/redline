@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -524,7 +525,7 @@ public class Builder {
 	public void addFile( final String path, final File source, final int mode, final Directive directive) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source, mode, directive);
 	}
-	
+
 	/**
 	 * Adds the file to the repository with the default mode of <code>644</code>.
 	 *
@@ -534,7 +535,21 @@ public class Builder {
 	public void addFile( final String path, final File source) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source);
 	}
-	
+
+	/**
+	 * Add the specified file to the repository payload in order by URL.
+	 * The required header entries will automatically be generated
+	 * to record the directory names and file names, as well as their
+	 * digests.
+	 *
+	 * @param target the absolute path at which this file will be installed.
+	 * @param file the file content to include in this rpm.
+	 * @param mode the mode of the target file in standard three octet notation
+	 */
+	public void addURL( final String path, final URL source, final int mode, final int dirmode) throws NoSuchAlgorithmException, IOException {
+		contents.addURL( path, source, mode, null, null, null, dirmode);
+	}
+
 	/**
 	 * Adds the directory to the repository with the default mode of <code>644</code>.
 	 *
@@ -718,6 +733,14 @@ public class Builder {
 			final Object object = contents.getSource( header);
 			if ( object instanceof File) {
 				final FileChannel in = new FileInputStream(( File) object).getChannel();
+				while ( in.read(( ByteBuffer) buffer.rewind()) > 0) {
+					total += compressor.write(( ByteBuffer) buffer.flip());
+					buffer.compact();
+				}
+				total += header.skip( compressor, total);
+				in.close();
+			} else if ( object instanceof URL) {
+				final ReadableByteChannel in = Channels.newChannel((( URL) object).openConnection().getInputStream());
 				while ( in.read(( ByteBuffer) buffer.rewind()) > 0) {
 					total += compressor.write(( ByteBuffer) buffer.flip());
 					buffer.compact();

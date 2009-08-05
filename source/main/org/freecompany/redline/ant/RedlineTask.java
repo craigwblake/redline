@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.net.URL;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -89,6 +90,7 @@ public class RedlineTask extends Task {
 			builder.setPostUninstallScript( postUninstallScript);
 			
 			for ( ZipFileSet fileset : filesets) {
+				File zip = fileset.getSrc( getProject());
 				String prefix = normalizePath( fileset.getPrefix( getProject()));
 				if ( !prefix.endsWith( "/")) prefix += "/";
 				DirectoryScanner scanner = fileset.getDirectoryScanner( getProject());
@@ -96,8 +98,14 @@ public class RedlineTask extends Task {
 				int dirmode = fileset.getDirMode( getProject()) & 07777;
 				
 				for ( String entry : scanner.getIncludedFiles()) {
-					File file = new File( scanner.getBasedir(), entry);
-					builder.addFile( prefix + entry, file, fileset.getFileMode( getProject()) & 07777, dirmode);
+					if ( zip != null) {
+						URL url = new URL( "jar:" + zip.toURL() + "!/" + entry);
+						System.out.println( "File " + url + " size is " + url.openConnection().getContentLength());
+						builder.addURL( prefix + entry, url, fileset.getFileMode( getProject()) & 07777, dirmode);
+					} else {
+						File file = new File( scanner.getBasedir(), entry);
+						builder.addFile( prefix + entry, file, fileset.getFileMode( getProject()) & 07777, dirmode);
+					}
 				}
 
 			}
