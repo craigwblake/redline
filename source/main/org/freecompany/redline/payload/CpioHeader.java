@@ -2,6 +2,8 @@ package org.freecompany.redline.payload;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.ReadableByteChannel;
@@ -65,6 +67,18 @@ public class CpioHeader {
 
 	public CpioHeader( final File file) {
 		this( file.getAbsolutePath(), file);
+	}
+
+	public CpioHeader( final String name, final URL url) {
+		try {
+			URLConnection connection = url.openConnection();
+			mtime = connection.getLastModified();
+			filesize = connection.getContentLength();
+			this.name = normalizePath( name);
+			setType( FILE);
+		} catch ( IOException e) {
+			throw new RuntimeException( e);
+		}
 	}
 
 	public CpioHeader( final String name, final File file) {

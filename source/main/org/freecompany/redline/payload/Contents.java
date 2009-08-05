@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -268,6 +270,34 @@ public class Contents {
 	}
 
 	/**
+	 * Adds a URL entry to the archive with the specified permissions.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param source the URL with the data to be added
+	 * @param permissions the permissions flags.
+	 * @param directive directive indicating special handling for this file.
+	 * @param uname user owner for the given file
+	 * @param gname group owner for the given file
+	 */
+	public synchronized void addURL( final String path, final URL source, final int permissions, final Directive directive, final String uname, final String gname, final int dirmode) throws FileNotFoundException {
+		if ( files.contains( path)) return;
+
+		addParents( new File( path), dirmode, uname, gname);
+		files.add( path);
+		logger.log( FINE, "Adding file ''{0}''.", path);
+		CpioHeader header = new CpioHeader( path, source);
+		header.setType( FILE);
+		header.setInode( inode++);
+		if (uname != null) header.setUname(uname);
+		if (gname != null) header.setGname(gname);
+		if ( permissions != -1) header.setPermissions( permissions);
+		headers.add( header);
+		sources.put( header, source);
+		
+		if ( directive != null) header.setFlags( directive.flag());
+	}
+
+	/**
 	 * Adds entries for parent directories of this file, so that they may be cleaned up when 
 	 * removing the package.
 	 */
@@ -301,7 +331,14 @@ public class Contents {
 	 */
 	public int getTotalSize() {
 		int total = 0;
-		for ( Object object : sources.values()) if ( object instanceof File) total += (( File) object).length();
+		try {
+			for ( Object object : sources.values()) {
+				if ( object instanceof File) total += (( File) object).length();
+				else if ( object instanceof URL) total += (( URL) object).openConnection().getContentLength();
+			}
+		} catch ( IOException e) {
+			throw new RuntimeException( e);
+		}
 		return total;
 	}
 
@@ -356,11 +393,16 @@ public class Contents {
 	public int[] getSizes() {
 		int[] array = new int[ headers.size()];
 		int x = 0;
-		for ( CpioHeader header : headers) {
-			Object object = sources.get( header);
-			if ( object instanceof File) array[ x] = ( int) (( File) object).length();
-			else if ( header.getType() == DIR) array[ x] = 4096;
-			++x;
+		try {
+			for ( CpioHeader header : headers) {
+				Object object = sources.get( header);
+				if ( object instanceof File) array[ x] = ( int) (( File) object).length();
+				else if ( object instanceof URL) array[ x] = (( URL) object).openConnection().getContentLength();
+				else if ( header.getType() == DIR) array[ x] = 4096;
+				++x;
+			}
+		} catch ( IOException e) {
+			throw new RuntimeException( e);
 		}
 		return array;
 	}
@@ -392,7 +434,7 @@ public class Contents {
 		int[] array = new int[ headers.size()];
 		int x = 0;
 		for ( CpioHeader header : headers) {
-			array[ x++] = ( int) header.getMtime();
+			array[ x++] = header.getMtime();
 		}
 		return array;
 	}
@@ -411,9 +453,16 @@ public class Contents {
 		int x = 0;
 		for ( CpioHeader header : headers) {
 			Object object = sources.get( header);
+			System.out.println( "Calculating MD5 for item: " + object + " of type " + ( object == null ? null : object.getClass()));
 			String value = "";
 			if ( object instanceof File) {
 				final ReadableChannelWrapper input = new ReadableChannelWrapper( new FileInputStream(( File) object).getChannel());
+				final Key< byte[]> key = input.start( "MD5");
+				while ( input.read( buffer) != -1) buffer.rewind();
+				value = new String( Util.hex( input.finish( key)));
+				input.close();
+			} else if ( object instanceof URL) {
+				final ReadableChannelWrapper input = new ReadableChannelWrapper( Channels.newChannel((( URL) object).openConnection().getInputStream()));
 				final Key< byte[]> key = input.start( "MD5");
 				while ( input.read( buffer) != -1) buffer.rewind();
 				value = new String( Util.hex( input.finish( key)));
@@ -514,7 +563,7 @@ public class Contents {
 	public int[] getInodes() {
 		int[] array = new int[ headers.size()];
 		int x = 0;
-		for ( CpioHeader header : headers) array[ x++] = ( int) header.getInode();
+		for ( CpioHeader header : headers) array[ x++] = header.getInode();
 		return array;
 	}
 
