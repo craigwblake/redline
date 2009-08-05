@@ -100,7 +100,6 @@ public class RedlineTask extends Task {
 				for ( String entry : scanner.getIncludedFiles()) {
 					if ( zip != null) {
 						URL url = new URL( "jar:" + zip.toURL() + "!/" + entry);
-						System.out.println( "File " + url + " size is " + url.openConnection().getContentLength());
 						builder.addURL( prefix + entry, url, fileset.getFileMode( getProject()) & 07777, dirmode);
 					} else {
 						File file = new File( scanner.getBasedir(), entry);

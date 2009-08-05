@@ -453,7 +453,6 @@ public class Contents {
 		int x = 0;
 		for ( CpioHeader header : headers) {
 			Object object = sources.get( header);
-			System.out.println( "Calculating MD5 for item: " + object + " of type " + ( object == null ? null : object.getClass()));
 			String value = "";
 			if ( object instanceof File) {
 				final ReadableChannelWrapper input = new ReadableChannelWrapper( new FileInputStream(( File) object).getChannel());
