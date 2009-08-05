@@ -381,11 +381,11 @@ public abstract class AbstractHeader {
 		public int size() { return count * ( Byte.SIZE / 8); }
 		public void read( final ByteBuffer buffer) {
 			byte[] values = new byte[ count];
-			for ( int x = 0; x < count; x++) values[ x] = ( byte) buffer.get();
+			for ( int x = 0; x < count; x++) values[ x] = buffer.get();
 			setValues( values);
 		}
 		public void write( final ByteBuffer data) {
-			for ( byte c : values) data.put(( byte) c);
+			for ( byte c : values) data.put( c);
 		}
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
