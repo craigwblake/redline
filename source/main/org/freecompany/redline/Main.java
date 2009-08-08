@@ -6,7 +6,6 @@ import org.freecompany.redline.header.Os;
 import org.freecompany.redline.header.RpmType;
 import org.freecompany.redline.payload.Contents;
 import org.freecompany.redline.payload.CpioHeader;
-import org.freecompany.util.xml.editor.XmlEditor;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
