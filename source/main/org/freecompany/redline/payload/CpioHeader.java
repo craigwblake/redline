@@ -11,7 +11,7 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.util.Date;
 import org.freecompany.redline.Util;
-import org.freecompany.util.text.Comparison;
+import org.freecompany.redline.Comparison;
 
 import static org.freecompany.redline.Util.normalizePath;
 

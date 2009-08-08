@@ -63,11 +63,6 @@
 			<version>0.0.6</version>
 		</dependency>
 		<dependency>
-			<groupId>org.freecompany.util</groupId>
-			<artifactId>util-text</artifactId>
-			<version>0.3.5</version>
-		</dependency>
-		<dependency>
 			<groupId>ant</groupId>
 			<artifactId>ant</artifactId>
 			<version>1.6.5</version>

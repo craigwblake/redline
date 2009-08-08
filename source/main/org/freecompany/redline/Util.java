@@ -1,11 +1,16 @@
 package org.freecompany.redline;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
+import java.util.Formatter;
 
 /**
  * General utilities needed to read and write
@@ -13,7 +18,7 @@ import java.nio.channels.WritableByteChannel;
  * elsewhere but reproduced here to minimize runtime
  * dependencies.
  */
-public class Util extends org.freecompany.util.text.Util {
+public class Util {
 
 	private Util() {}
 
@@ -117,5 +122,59 @@ public class Util extends org.freecompany.util.text.Util {
 	 */
 	public static void pad( ByteBuffer buffer, int boundary) {
 		buffer.position( round( buffer.position(), boundary));
+	}
+
+	public static void dump( byte[] data) {
+		dump( data, System.out);
+	}
+
+	public static void dump( byte[] data, Appendable out) {
+		dump( ByteBuffer.wrap( data), out);
+	}
+
+	public static void dump( char[] data) {
+		dump( data, System.out);
+	}
+
+	public static void dump( CharSequence data) {
+		dump( Charset.forName( "US-ASCII").encode( CharBuffer.wrap( data)), System.out);
+	}
+
+	public static void dump( char[] data, Appendable out) {
+		dump( Charset.forName( "US-ASCII").encode( CharBuffer.wrap( data)), out);
+	}
+
+	public static void dump( ByteBuffer buf, Appendable out) {
+		Formatter fmt = new Formatter( out);
+
+		int pos = buf.position();
+		fmt.format( "%8x:", pos & ~0xf);
+		StringBuilder builder = new StringBuilder();
+		for ( int i = 0; i < ( pos & 0xf); i++) {
+			fmt.format( "   ");
+			builder.append( ' ');
+		}
+		while ( buf.hasRemaining()) {
+			byte b = buf.get();
+			fmt.format( " %2x", b);
+			if ( ' ' <= b && b < 0x7f) {
+				builder.append(( char) b);
+			} else {
+				builder.append( ' ');
+			}
+			if ( buf.hasRemaining() && ( buf.position() & 0xf) == 0) {
+				fmt.format( " %s\n%8x:", builder, buf.position());
+				builder.setLength( 0);
+			}
+		}
+		buf.position( pos);
+	}
+
+	public static String hex( byte[] data) {
+		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		final PrintStream printer = new PrintStream( baos);
+		for ( byte b : data) printer.format( "%02x", b);
+		printer.flush();
+		return baos.toString();
 	}
 }
