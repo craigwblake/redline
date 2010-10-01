@@ -3,15 +3,11 @@
 	
 	<groupId>org.freecompany.redline</groupId>
 	<artifactId>redline</artifactId>
-	<version>1.1.2</version>
+	<version>1.1.3</version>
 	<packaging>jar</packaging>
 	<name>Redline</name> 
 	<description>Redline is a pure Java library for manipulating RPM Package Manager packages.</description>
-	<organization>
-		<name>FreeCompany</name>
-		<url>http://www.freecompany.org/index.html</url>
-	</organization>
-	<url>http://www.freecompany.org/redline/index.html</url>	
+	<url>http://github.com/craigwblake/redline</url>
 	<licenses>
 		<license>
 			<name>MIT</name>
@@ -19,9 +15,6 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	<scm>
-		<url>scm:svn:https://www.freecompany.org/svn/public/redline/trunk</url>
-	</scm>
 
 	<build>
 		<defaultGoal>install</defaultGoal>
@@ -44,6 +37,13 @@
 					<test>*Test</test>
 					<excludes/>
 				</configuration>
+			</plugin>
+			<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-resources-plugin</artifactId>
+			<configuration>
+				<encoding>UTF-8</encoding>
+			</configuration>
 			</plugin>
 		</plugins>
 		<resources>
@@ -69,12 +69,5 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies> 
-
-	<distributionManagement>
-		<repository>
-			<id>ssh-repository</id>
-			<url>scpexe://maven.freecompany.org/external/repositories/maven</url>
-		</repository>
-	</distributionManagement>
 
 </project>
