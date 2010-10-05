@@ -119,6 +119,16 @@ public class Builder {
 	}
 	
 	/**
+     * Adds a header entry value to the header. For example use this to set the source RPM package
+     * name on your RPM
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+     */
+	public void addHeaderEntry( final Tag tag, final String value) {
+	    format.getHeader().createEntry(tag, value);
+	}
+
+	/**
 	 * <b>Required Field</b>. Sets the package information, such as the rpm name, the version, and the release number.
 	 * 
 	 * @param name the name of the RPM package.
@@ -495,6 +505,23 @@ public class Builder {
 	}
 
 	/**
+     * Add the specified file to the repository payload in order.
+     * The required header entries will automatically be generated
+     * to record the directory names and file names, as well as their
+     * digests.
+     *
+     * @param target the absolute path at which this file will be installed.
+     * @param file the file content to include in this rpm.
+     * @param mode the mode of the target file in standard three octet notation
+     * @param uname user owner for the given file
+     * @param gname group owner for the given file
+
+     */
+    public void addFile( final String path, final File source, final int mode, final int dirmode, final String uname, final String gname) throws NoSuchAlgorithmException, IOException {
+        contents.addFile( path, source, mode, null, uname, gname, dirmode);
+    }
+
+	/**
 	 * Add the specified file to the repository payload in order.
 	 * The required header entries will automatically be generated
 	 * to record the directory names and file names, as well as their
@@ -549,6 +576,22 @@ public class Builder {
 	public void addURL( final String path, final URL source, final int mode, final int dirmode) throws NoSuchAlgorithmException, IOException {
 		contents.addURL( path, source, mode, null, null, null, dirmode);
 	}
+
+	/**
+     * Add the specified file to the repository payload in order by URL.
+     * The required header entries will automatically be generated
+     * to record the directory names and file names, as well as their
+     * digests.
+     *
+     * @param target the absolute path at which this file will be installed.
+     * @param file the file content to include in this rpm.
+     * @param mode the mode of the target file in standard three octet notation
+     * @param username ownership of added file
+     * @param group ownership of added file
+     */
+    public void addURL( final String path, final URL source, final int mode, final int dirmode, final String username, final String group) throws NoSuchAlgorithmException, IOException {
+        contents.addURL( path, source, mode, null, username, group, dirmode);
+    }
 
 	/**
 	 * Adds the directory to the repository with the default mode of <code>644</code>.

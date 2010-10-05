@@ -179,7 +179,7 @@ public class Contents {
 		if ( permissions != -1) header.setPermissions( permissions);
 		else header.setPermissions( DEFAULT_DIRECTORY_PERMISSION);
 		headers.add( header);
-		sources.put( header, null);
+		sources.put( header, "");
 		if ( directive != null) header.setFlags( directive.flag());
 	}
 

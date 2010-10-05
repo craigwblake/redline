@@ -11,11 +11,14 @@ import java.util.Iterator;
 import java.util.List;
 import org.freecompany.redline.Builder;
 import org.freecompany.redline.header.Architecture;
+import org.freecompany.redline.header.Header;
 import org.freecompany.redline.header.Os;
 import org.freecompany.redline.header.RpmType;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.ArchiveFileSet;
+import org.apache.tools.ant.types.TarFileSet;
 import org.apache.tools.ant.types.ZipFileSet;
 
 import static org.freecompany.redline.Util.normalizePath;
@@ -27,7 +30,6 @@ import static org.freecompany.redline.header.RpmType.BINARY;
  * Ant task for creating an RPM file.
  */
 public class RedlineTask extends Task {
-
 	public static final String NAMESPACE = "http://freecompany.org/namespace/redline";
 
 	protected String name;
@@ -42,12 +44,13 @@ public class RedlineTask extends Task {
 	protected String distribution = "";
 	protected String vendor = "";
 	protected String url = "";
+	protected String sourcePackage = "";
 	protected String provides;
 	protected RpmType type = BINARY;
 	protected Architecture architecture = NOARCH;
 	protected Os os = LINUX;
 	protected File destination;
-	protected List< ZipFileSet> filesets = new ArrayList< ZipFileSet>();
+	protected List< ArchiveFileSet> filesets = new ArrayList< ArchiveFileSet>();
 	protected List< Link> links = new ArrayList< Link>();
 	protected List< Depends> depends = new ArrayList< Depends>();
 	protected File preInstallScript;
@@ -63,6 +66,7 @@ public class RedlineTask extends Task {
 		}
 	}
 
+	@Override
 	public void execute() throws BuildException {
 		if ( name == null) throw new BuildException( "Attribute 'name' is required.");
 		if ( version == null) throw new BuildException( "Attribute 'version' is required.");
@@ -82,35 +86,51 @@ public class RedlineTask extends Task {
 		builder.setVendor( vendor);
 		builder.setUrl( url);
 		builder.setProvides( provides == null ? name : provides);
+		if (sourcePackage != null) {
+			builder.addHeaderEntry(Header.HeaderTag.SOURCERPM, sourcePackage);
+		}
 
-        try {
+		try {
 			builder.setPreInstallScript( preInstallScript);
 			builder.setPostInstallScript( postInstallScript);
 			builder.setPreUninstallScript( preUninstallScript);
 			builder.setPostUninstallScript( postUninstallScript);
-			
-			for ( ZipFileSet fileset : filesets) {
-				File zip = fileset.getSrc( getProject());
+
+			for ( ArchiveFileSet fileset : filesets) {
+				File archive = fileset.getSrc( getProject());
 				String prefix = normalizePath( fileset.getPrefix( getProject()));
 				if ( !prefix.endsWith( "/")) prefix += "/";
 				DirectoryScanner scanner = fileset.getDirectoryScanner( getProject());
 
 				int dirmode = fileset.getDirMode( getProject()) & 07777;
-				
-				for ( String entry : scanner.getIncludedFiles()) {
-					if ( zip != null) {
-						URL url = new URL( "jar:" + zip.toURL() + "!/" + entry);
-						builder.addURL( prefix + entry, url, fileset.getFileMode( getProject()) & 07777, dirmode);
-					} else {
-						File file = new File( scanner.getBasedir(), entry);
-						builder.addFile( prefix + entry, file, fileset.getFileMode( getProject()) & 07777, dirmode);
-					}
+				String username = null;
+				String group = null;
+
+				if (fileset instanceof TarFileSet) {
+					TarFileSet tarFileSet = (TarFileSet)fileset;
+					username = tarFileSet.getUserName();
+					group = tarFileSet.getGroup();
 				}
 
+				// include any directories, including empty ones, duplicates will be ignored when we scan included files
+				for (String entry : scanner.getIncludedDirectories()) {
+					String dir = normalizePath(prefix + entry);
+					if (!entry.equals("")) builder.addDirectory(dir, dirmode, null, username, group, true);
+				}
+
+				for ( String entry : scanner.getIncludedFiles()) {
+					if ( archive != null) {
+						URL url = new URL( "jar:" + archive.toURL() + "!/" + entry);
+						builder.addURL( prefix + entry, url, fileset.getFileMode( getProject()) & 07777, dirmode, username, group);
+					} else {
+						File file = new File( scanner.getBasedir(), entry);
+						builder.addFile(prefix + entry, file, fileset.getFileMode( getProject()) & 07777, dirmode, username, group);
+					}
+				}
 			}
 			for ( Link link : links) builder.addLink( link.getPath(), link.getTarget(), link.getPermissions());
 			for ( Depends dependency : depends) builder.addDependencyMore( dependency.getName(), dependency.getVersion());
-			
+
 			log( "Created rpm: " + builder.build( destination));
 		} catch ( IOException e) {
 			throw new BuildException( "Error packaging distribution files.", e);
@@ -144,10 +164,12 @@ public class RedlineTask extends Task {
 	public void setProvides( String provides) { this.provides = provides; }
 	public void setDestination( File destination) { this.destination = destination; }
 	public void addZipfileset( ZipFileSet fileset) { filesets.add( fileset); }
+	public void addTarfileset( TarFileSet fileset) { filesets.add( fileset); }
 	public void addLink( Link link) { links.add( link); }
 	public void addDepends( Depends dependency) { depends.add( dependency); }
 	public void setPreInstallScript( File preInstallScript) { this.preInstallScript = preInstallScript; }
 	public void setPostInstallScript( File postInstallScript) { this.postInstallScript = postInstallScript; }
 	public void setPreUninstallScript( File preUninstallScript) { this.preUninstallScript = preUninstallScript; }
 	public void setPostUninstallScript( File postUninstallScript) { this.postUninstallScript = postUninstallScript; }
+	public void setSourcePackage( String sourcePackage) { this.sourcePackage = sourcePackage; }
 }
