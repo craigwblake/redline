@@ -70,8 +70,7 @@ public class Builder {
 	 */
 	public Builder() {
 		format.getHeader().createEntry( HEADERI18NTABLE, "C");
-		//format.getHeader().createEntry( BUILDTIME, ( int) ( System.currentTimeMillis() / 1000));
-		format.getHeader().createEntry( BUILDTIME, 0);
+		format.getHeader().createEntry( BUILDTIME, ( int) ( System.currentTimeMillis() / 1000));
 		format.getHeader().createEntry( RPMVERSION, "4.4.2");
 		format.getHeader().createEntry( PAYLOADFORMAT, "cpio");
 		format.getHeader().createEntry( PAYLOADCOMPRESSOR, "gzip");
