@@ -59,7 +59,7 @@ public class Main {
 	 * an input file to the RPM, or during RPM creation
 	 */
 	public void run( XmlEditor editor, File destination) throws NoSuchAlgorithmException, IOException {
-		editor.startPrefixMapping( "http://www.freecompany.org/namespace/redline", "rpm");
+		editor.startPrefixMapping( "http://redline-rpm.org/ns", "rpm");
 		Contents include = new Contents();
 
 		for ( Node files : editor.findNodes( "rpm:files")) {

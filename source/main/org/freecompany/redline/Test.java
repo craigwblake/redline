@@ -36,9 +36,9 @@ public class Test {
 		builder.setLicense( "MIT");
 		builder.setGroup( "Miscellaneous");
 		builder.setDistribution( "FreeCompany");
-		builder.setVendor( "FreeCompany RPM Repository http://yum.freecompany.org/");
+		builder.setVendor( "Redline RPM Repository http://redline-rpm.org/rpms");
 		builder.setPackager( "Jane Doe");
-		builder.setUrl( "http://www.freecompany.org/test/");
+		builder.setUrl( "http://redline-rpm.org");
 		builder.setProvides( "test");
 
 		// Adds one file passed as an argument to the package.
