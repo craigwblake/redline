@@ -22,11 +22,11 @@
 
 		<div class='article'>
 			<h3>Ant</h3>
-			<p>Redline can be used to package projects that use the Ant build system. Included in the source and binary distributions is an Ant task that can be used within an Ant build script to construct an RPM distributable. The task can be defined using the antlib namespace convention by binding the namespace <span class='code'>antlib:org.freecompany.redline.ant</span> and using the namespace prefix to reference the <span class='code'>rpm</span> task type. An example of using the build in Ant task follows:
+			<p>Redline can be used to package projects that use the Ant build system. Included in the source and binary distributions is an Ant task that can be used within an Ant build script to construct an RPM distributable. The task can be defined using the antlib namespace convention by binding the namespace <span class='code'>antlib:org.redline_rpm</span> and using the namespace prefix to reference the <span class='code'>rpm</span> task type. An example of using the build in Ant task follows:
 			<div class='code'>
 				<br/>
 				<pre>
-	&lt;project name='test' default='rpm' xmlns:redline='antlib:org.freecompany.redline.ant'>
+	&lt;project name='test' default='rpm' xmlns:redline='antlib:org.redline_rpm'>
 
 	&lt;target name='rpm'>
 	&lt;mkdir dir='rpms'/>
