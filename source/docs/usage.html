@@ -1,0 +1,47 @@
+<html>
+
+	<div class='article'>
+		<h2>Usage</h2>
+		<p>There are several tools provided by the Redline package which are useful when working with RPM files. This includes a scanner for examining existing RPM files, a programmatic interface for generating RPM packages, and an Ant task that can be imported and invoked from build scripts in order to package deployment files.</p>
+	</div>
+
+	<div class='article'>
+		<h3>Scanner</h3>
+		<p>The scanner tool can be invoked from the command line using the main class <span class='code'><a href='javadoc/org/freecompany/redline/Scanner.html'>org.freecompany.redline.Scanner</a></span>. From the command line this class accepts as it's single argument a path to a valid RPM file. If the file specified by the providing path does not exist, or if the file in not a valid RPM archive an exception will be thrown. And example of invoking the scanner follows:
+		<div class='code'>
+			java -cp redline.jar <a href='javadoc/org/freecompany/redline/Scanner.html'>org.freecompany.redline.Scanner</a> test.rpm
+		</div>
+		The scanner is most useful for debugging RPM files and tools as it generates a significant amount of output. For more generalized RPM information the standard RPM tools are recommended.</p>
+	</div>
+
+	<div class='article'>
+		<h3>Builder</h3>
+		<p>The builder is the main entry point for constructing RPM files programmatically. The tool is used by constructing an instance of the <span class='code'><a href='javadoc/org/freecompany/redline/Builder.html'>org.freecompany.redline.Builder</a></span> class and adding files and headers to the archive. When the builder is configured a final call will generate the RPM file to a given <span class='code'>java.nio.channels.FileChannel</span>.</p>
+	</div>
+
+	<div class='article'>
+		<h3>Ant</h3>
+		<p>Redline can be used to package projects that use the Ant build system. Included in the source and binary distributions is an Ant task that can be used within an Ant build script to construct an RPM distributable. The task can be defined using the antlib namespace convention by binding the namespace <span class='code'>antlib:org.freecompany.redline.ant</span> and using the namespace prefix to reference the <span class='code'>rpm</span> task type. An example of using the build in Ant task follows:
+		<div class='code'>
+			<br/>
+			<pre>
+&lt;project name='test' default='rpm' xmlns:redline='antlib:org.freecompany.redline.ant'>
+
+&lt;target name='rpm'>
+&lt;mkdir dir='rpms'/>
+
+&lt;redline:rpm group='Java Development' name='test' version='1.2.3' destination='rpms'>
+  &lt;zipfileset prefix='/usr/share/java' file='test-1.2.3.jar'/>
+  &lt;link path='/usr/share/java/test.jar' target='/usr/share/java/test-1.2.3.jar'/>
+  &lt;depends name='test-lib' version='1.2.3'/>
+&lt;/redline:rpm>
+
+&lt;/target>
+
+&lt;/project>
+			</pre>
+		</div>
+		This build script creates a new RPM file named <span class='code'>test-1.2.3-1.noarch.rpm</span> in the <span class='code'>rpms</span> directory containing the local file <span class='code'>test-1.2.3.jar</span> to be installed into <span class='code'>/use/share/java</span> on the installation machine. In addition a symbolic link is included from the packaged file to <span class='code'>/usr/share/java/test.jar</span>. The resulting RPM has a dependency on an RPM named <span class='code'>test-lib</span>.</p>
+	</div>
+
+</html>
