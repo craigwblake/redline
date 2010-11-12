@@ -131,7 +131,6 @@ public class XmlEditor implements Serializable {
 			}
 			return newNode( parent, name);
 		} catch ( XPathExpressionException e) {
-			// LOGGER.warn( "findNode", e);
 			throw new RuntimeException( path, e);
 		}
 	}
@@ -150,7 +149,6 @@ public class XmlEditor implements Serializable {
 				}
 			};
 		} catch ( XPathExpressionException e) {
-			// LOGGER.warn( "findNodes", e);
 			throw new RuntimeException( path, e);
 		}
 	}
@@ -170,7 +168,6 @@ public class XmlEditor implements Serializable {
 		try {
 			return ( Number) xpath( path).evaluate( context.peek(), NUMBER);
 		} catch ( XPathExpressionException e) {
-			// LOGGER.warn( "findNode", e);
 			throw new RuntimeException( path, e);
 		}
 	}
@@ -241,7 +238,6 @@ public class XmlEditor implements Serializable {
 				}
 			}
 		} catch ( XPathExpressionException e) {
-			// LOGGER.warn( "deleteNodes", e);
 			throw new RuntimeException( path, e);
 		}
 	}
