@@ -7,7 +7,7 @@
 	<description>A test RPM with the default architecture and OS fields.</description>
 	<license>MIT</license>
 	<group>Miscellaneous</group>
-	<vendor>FreeCompany RPM Repository http://yum.freecompany.org/</vendor>
+	<vendor>Redline RPM</vendor>
 	<url>http://redline-rpm.org/test/</url>
 	<files parent='/tmp/' permission='0644'>
 		<file permission='0544'>./build.xml</file>
