@@ -520,6 +520,23 @@ public class Builder {
         contents.addFile( path, source, mode, null, uname, gname, dirmode);
     }
 
+    /**
+     * Add the specified file to the repository payload in order.
+     * The required header entries will automatically be generated
+     * to record the directory names and file names, as well as their
+     * digests.
+     *
+     * @param target the absolute path at which this file will be installed.
+     * @param file the file content to include in this rpm.
+     * @param mode the mode of the target file in standard three octet notation
+     * @param uname user owner for the given file
+     * @param gname group owner for the given file
+
+     */
+    public void addFile( final String path, final File source, final int mode, final int dirmode, final Directive directive, final String uname, final String gname) throws NoSuchAlgorithmException, IOException {
+        contents.addFile( path, source, mode, directive, uname, gname, dirmode);
+    }
+
 	/**
 	 * Add the specified file to the repository payload in order.
 	 * The required header entries will automatically be generated
@@ -590,6 +607,22 @@ public class Builder {
      */
     public void addURL( final String path, final URL source, final int mode, final int dirmode, final String username, final String group) throws NoSuchAlgorithmException, IOException {
         contents.addURL( path, source, mode, null, username, group, dirmode);
+    }
+
+    /**
+     * Add the specified file to the repository payload in order by URL.
+     * The required header entries will automatically be generated
+     * to record the directory names and file names, as well as their
+     * digests.
+     *
+     * @param target the absolute path at which this file will be installed.
+     * @param file the file content to include in this rpm.
+     * @param mode the mode of the target file in standard three octet notation
+     * @param username ownership of added file
+     * @param group ownership of added file
+     */
+    public void addURL( final String path, final URL source, final int mode, final int dirmode, final Directive directive, final String username, final String group) throws NoSuchAlgorithmException, IOException {
+        contents.addURL( path, source, mode, directive, username, group, dirmode);
     }
 
 	/**

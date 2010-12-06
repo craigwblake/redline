@@ -20,6 +20,7 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.ArchiveFileSet;
 import org.apache.tools.ant.types.TarFileSet;
 import org.apache.tools.ant.types.ZipFileSet;
+import org.freecompany.redline.payload.Directive;
 
 import static org.freecompany.redline.Util.normalizePath;
 import static org.freecompany.redline.header.Architecture.NOARCH;
@@ -105,26 +106,31 @@ public class RedlineTask extends Task {
 				int dirmode = fileset.getDirMode( getProject()) & 07777;
 				String username = null;
 				String group = null;
+                Directive directive = null;
 
 				if (fileset instanceof TarFileSet) {
 					TarFileSet tarFileSet = (TarFileSet)fileset;
 					username = tarFileSet.getUserName();
 					group = tarFileSet.getGroup();
+                    if (fileset instanceof RpmFileSet) {
+                        RpmFileSet rpmFileSet = (RpmFileSet)fileset;
+                        directive = rpmFileSet.getDirective();
+                    }
 				}
 
 				// include any directories, including empty ones, duplicates will be ignored when we scan included files
 				for (String entry : scanner.getIncludedDirectories()) {
 					String dir = normalizePath(prefix + entry);
-					if (!entry.equals("")) builder.addDirectory(dir, dirmode, null, username, group, true);
+					if (!entry.equals("")) builder.addDirectory(dir, dirmode, directive, username, group, true);
 				}
 
 				for ( String entry : scanner.getIncludedFiles()) {
 					if ( archive != null) {
 						URL url = new URL( "jar:" + archive.toURL() + "!/" + entry);
-						builder.addURL( prefix + entry, url, fileset.getFileMode( getProject()) & 07777, dirmode, username, group);
+						builder.addURL( prefix + entry, url, fileset.getFileMode( getProject()) & 07777, dirmode, directive, username, group);
 					} else {
 						File file = new File( scanner.getBasedir(), entry);
-						builder.addFile(prefix + entry, file, fileset.getFileMode( getProject()) & 07777, dirmode, username, group);
+						builder.addFile(prefix + entry, file, fileset.getFileMode( getProject()) & 07777, dirmode, directive, username, group);
 					}
 				}
 			}
@@ -165,6 +171,7 @@ public class RedlineTask extends Task {
 	public void setDestination( File destination) { this.destination = destination; }
 	public void addZipfileset( ZipFileSet fileset) { filesets.add( fileset); }
 	public void addTarfileset( TarFileSet fileset) { filesets.add( fileset); }
+    public void addRpmfileset( RpmFileSet fileset) { filesets.add( fileset); }
 	public void addLink( Link link) { links.add( link); }
 	public void addDepends( Depends dependency) { depends.add( dependency); }
 	public void setPreInstallScript( File preInstallScript) { this.preInstallScript = preInstallScript; }

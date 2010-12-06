@@ -224,7 +224,7 @@ public class Contents {
 	 * @param directive directive indicating special handling for this file.
 	 */
 	public void addFile( final String path, final File source, int permissions, final Directive directive) throws FileNotFoundException {
-		addFile(path, source, permissions, null, null, null);
+		addFile(path, source, permissions, directive, null, null);
 	}
 
 	/**

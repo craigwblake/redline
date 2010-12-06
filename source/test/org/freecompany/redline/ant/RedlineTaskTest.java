@@ -11,6 +11,9 @@ import org.freecompany.redline.Scanner;
 import org.freecompany.redline.header.AbstractHeader;
 import org.freecompany.redline.header.Format;
 import org.freecompany.redline.header.Header;
+import org.freecompany.redline.payload.Directive;
+
+import static org.junit.Assert.*;
 
 public class RedlineTaskTest extends TestCase {
 
@@ -38,6 +41,14 @@ public class RedlineTaskTest extends TestCase {
 	}
 
     public void testScripts() throws Exception {
+
+        File dir = new File("target");
+        if(!dir.exists()) {
+            assertTrue(dir.mkdir());
+        }
+
+        File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
+
         Project project = new Project();
         project.setCoreLoader(getClass().getClassLoader());
         project.init();
@@ -45,7 +56,7 @@ public class RedlineTaskTest extends TestCase {
         RedlineTask task = new RedlineTask();
         task.setProject(project);
         
-        task.setDestination(new File("target/"));
+        task.setDestination(dir);
         task.setName("rpmtest");
         task.setVersion("1.0");
         task.setRelease("1");
@@ -54,11 +65,20 @@ public class RedlineTaskTest extends TestCase {
         task.setPostInstallScript(new File("source/test/postin.sh"));
         task.setPreUninstallScript(new File("source/test/preun.sh"));
         task.setPostUninstallScript(new File("source/test/postun.sh"));
+        
+        RpmFileSet fs = new RpmFileSet();
+        fs.setPrefix("/etc");
+        fs.setFile(new File("source/test/prein.sh"));
+        fs.setConfig(true);
+        fs.setNoReplace(true);
+        fs.setDoc(true);
+
+        task.addRpmfileset(fs);
 
         task.execute();
         
         Scanner scanner = new Scanner();
-        Format format = scanner.run(new ReadableChannelWrapper(Channels.newChannel(new FileInputStream("target/rpmtest-1.0-1.noarch.rpm"))));
+        Format format = scanner.run(new ReadableChannelWrapper(Channels.newChannel(new FileInputStream(filename))));
 
         assertHeaderEquals("#!/bin/sh\n\necho Hello Pre Install!\n", format, Header.HeaderTag.PREINSCRIPT);
         assertHeaderEquals("#!/bin/sh\n\necho Hello Post Install!\n", format, Header.HeaderTag.POSTINSCRIPT);
@@ -69,6 +89,9 @@ public class RedlineTaskTest extends TestCase {
         assertHeaderEquals("/bin/sh", format, Header.HeaderTag.POSTINPROG);
         assertHeaderEquals("/bin/sh", format, Header.HeaderTag.PREUNPROG);
         assertHeaderEquals("/bin/sh", format, Header.HeaderTag.POSTUNPROG);
+
+        int expectedFlags = Directive.RPMFILE_CONFIG | Directive.RPMFILE_DOC | Directive.RPMFILE_NOREPLACE;
+        assertInt32EntryHeaderEquals(new int[]{expectedFlags}, format, Header.HeaderTag.FILEFLAGS);
     }
 
     private void assertHeaderEquals(String expected, Format format, AbstractHeader.Tag tag) {
@@ -83,4 +106,18 @@ public class RedlineTaskTest extends TestCase {
 
         assertEquals("Entry value : " + tag.getName(), expected, values[0]);       
     }
+
+    private void assertInt32EntryHeaderEquals(int[] expected, Format format, AbstractHeader.Tag tag) {
+        assertNotNull("null format", format);
+        AbstractHeader.Entry entry = format.getHeader().getEntry(tag);
+        assertNotNull("Entry not found : " + tag.getName(), entry);
+        assertEquals("Entry type : " + tag.getName(), 4, entry.getType());
+
+        int[] values = (int[]) entry.getValues();
+        assertNotNull("null values", values);
+        assertEquals("Entry size : " + tag.getName(), 1, values.length);
+
+        assertArrayEquals("Entry value : " + tag.getName(), expected, values);
+    }
+
 }
