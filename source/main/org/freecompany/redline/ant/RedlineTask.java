@@ -45,7 +45,7 @@ public class RedlineTask extends Task {
 	protected String distribution = "";
 	protected String vendor = "";
 	protected String url = "";
-	protected String sourcePackage = "";
+	protected String sourcePackage = null;
 	protected String provides;
 	protected RpmType type = BINARY;
 	protected Architecture architecture = NOARCH;
