@@ -1,0 +1,15 @@
+<project name='test' default='rpm' xmlns:redline='antlib:org.redline_rpm'>
+
+	<target name='rpm'>
+
+		<mkdir dir='rpms'/>
+
+		<redline:rpm group='Java Development' name='test' version='1.2.3' destination='rpms'>
+			<zipfileset prefix='/usr/share/java' file='test-1.2.3.jar'/>
+			<link path='/usr/share/java/test.jar' target='/usr/share/java/test-1.2.3.jar'/>
+			<depends name='test-lib' version='1.2.3'/>
+		</redline:rpm>
+
+	</target>
+
+</project>
