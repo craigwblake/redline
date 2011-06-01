@@ -7,7 +7,7 @@
 	<packaging>jar</packaging>
 	<name>Redline</name> 
 	<description>Redline is a pure Java library for manipulating RPM Package Manager packages.</description>
-	<url>http://github.com/craigwblake/redline</url>
+	<url>http://redline-rpm.org/</url>
 	<licenses>
 		<license>
 			<name>MIT</name>
@@ -15,6 +15,17 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+	<scm>
+		<connection>scm:git:git://github.com/craigwblake/redline.git</connection>
+		<url>https://github.com/craigwblake/redline</url>
+	</scm>
+	<developers>
+		<developer>
+			<id>craigwblake</id>
+			<name>Craig Blake</name>
+			<email>craigwblake@gmail.com</email>
+		</developer>
+	</developers>
 
 	<build>
 		<defaultGoal>install</defaultGoal>
@@ -93,5 +104,35 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies> 
+
+	<profiles>
+		<profile>
+			<id>release-sign-artifacts</id>
+			<activation>
+				<property>
+					<name>performRelease</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.1</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
 </project>
