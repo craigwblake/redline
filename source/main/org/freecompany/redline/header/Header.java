@@ -23,6 +23,7 @@ public class Header extends AbstractHeader {
 		LICENSE( 1014, 6, "license"),
 		PACKAGER( 1015, 6, "packager"),
 		GROUP( 1016, 9, "group"),
+		CHANGELOG( 1017, 6, "changelog"),
 		URL( 1020, 6, "url"),
 		OS( 1021, 6, "os"),
 		ARCH( 1022, 6, "arch"),
