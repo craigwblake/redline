@@ -47,6 +47,7 @@ public class RedlineTask extends Task {
 	protected String url = "";
 	protected String sourcePackage = null;
 	protected String provides;
+	protected String prefixes;
 	protected RpmType type = BINARY;
 	protected Architecture architecture = NOARCH;
 	protected Os os = LINUX;
@@ -87,6 +88,7 @@ public class RedlineTask extends Task {
 		builder.setVendor( vendor);
 		builder.setUrl( url);
 		builder.setProvides( provides == null ? name : provides);
+		builder.setPrefixes( prefixes == null ? null : prefixes.split(","));
 		if (sourcePackage != null) {
 			builder.addHeaderEntry(Header.HeaderTag.SOURCERPM, sourcePackage);
 		}
@@ -168,6 +170,7 @@ public class RedlineTask extends Task {
 	public void setVendor( String vendor) { this.vendor = vendor; }
 	public void setUrl( String url) { this.url = url; }
 	public void setProvides( String provides) { this.provides = provides; }
+	public void setPrefixes( String prefixes) { this.prefixes = prefixes; }
 	public void setDestination( File destination) { this.destination = destination; }
 	public void addZipfileset( ZipFileSet fileset) { filesets.add( fileset); }
 	public void addTarfileset( TarFileSet fileset) { filesets.add( fileset); }
