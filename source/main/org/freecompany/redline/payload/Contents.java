@@ -310,6 +310,16 @@ public class Contents {
 	}
 
 	/**
+	 * Add additional directory that is assumed to already exist on system where the RPM will be installed
+	 * (e.g. /etc) and should not have an entry in the RPM.
+	 *
+	 * @param directory
+	 */
+	public synchronized static void addBuiltinDirectory( final String directory) {
+		builtin.add(directory);
+	}
+
+	/**
 	 * Retrieve the size of this archive in number of files. This count includes both directory entries and
 	 * soft links.
 	 */

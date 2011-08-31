@@ -25,4 +25,15 @@ public class ContentsTest extends TestCase {
 		assertEquals( "/bin/one/two", list.get( 1));
 		assertEquals( "/bin/one", list.get( 2));
 	}
+
+	public void testListParentsNewBuiltin() throws Exception {
+		ArrayList< String> list = new ArrayList< String>();
+		Contents.addBuiltinDirectory("/home");
+		Contents.listParents( list, new File( "/home/one/two/three/four"));
+
+		assertEquals( 3, list.size());
+		assertEquals( "/home/one/two/three", list.get( 0));
+		assertEquals( "/home/one/two", list.get( 1));
+		assertEquals( "/home/one", list.get( 2));
+	}
 }
