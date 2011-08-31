@@ -46,6 +46,7 @@ public class Contents {
 		builtin.add( "/bin");
 		builtin.add( "/dev");
 		builtin.add( "/etc");
+		builtin.add( "/etc/bash_completion.d");
 		builtin.add( "/etc/cron.d");
 		builtin.add( "/etc/cron.daily");
 		builtin.add( "/etc/cron.hourly");
@@ -64,6 +65,7 @@ public class Contents {
 		builtin.add( "/usr/sbin");
 		builtin.add( "/usr/share");
 		builtin.add( "/usr/share/applications");
+		builtin.add( "/root");
 		builtin.add( "/sbin");
 		builtin.add( "/opt");
 		builtin.add( "/tmp");
