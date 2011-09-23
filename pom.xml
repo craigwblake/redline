@@ -23,6 +23,7 @@
 	</licenses>
 	<scm>
 		<connection>scm:git:git://github.com/craigwblake/redline.git</connection>
+		<developerConnection>scm:git:git@github.com:craigwblake/redline.git</developerConnection>
 		<url>https://github.com/craigwblake/redline</url>
 	</scm>
 	<developers>
