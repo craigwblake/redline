@@ -42,6 +42,18 @@
 	&lt;/project>
 				</pre>
 			</div>
+            <p>Another example, which includes setting the source package property:</p>
+			<div class="code">
+				<br/>
+				<pre>
+	&lt;redline group='Java Development' name='test' version='1.2.6' destination='rpms' sourcePackage='test.rpm'>
+	  &lt;tarfileset  prefix='/tmp/rpmtest/bin' file='bin/*' filemode='744' username='none' group='none'/>
+	  &lt;rpmfileset  prefix='/tmp/rpmtest/conf' config='true' noreplace='true' file='conf/test1.conf' filemode='644' username='none' group='none'/>
+	  &lt;rpmfileset  prefix='/tmp/rpmtest/conf' config='true' file='conf/test2.conf' filemode='644' username='none' group='none'/>
+	  &lt;depends name='test-lib' version='1.2.3'/>
+	&lt;redline>
+				</pre>
+			</div>
 			This build script creates a new RPM file named <span class='code'>test-1.2.3-1.noarch.rpm</span> in the <span class='code'>rpms</span> directory containing the local file <span class='code'>test-1.2.3.jar</span> to be installed into <span class='code'>/use/share/java</span> on the installation machine. In addition a symbolic link is included from the packaged file to <span class='code'>/usr/share/java/test.jar</span>. The resulting RPM has a dependency on an RPM named <span class='code'>test-lib</span>.</p>
 		</div>
 	</body>
