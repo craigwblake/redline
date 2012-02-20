@@ -233,7 +233,7 @@ public abstract class AbstractHeader {
 
 	/**
 	 * Adds a pending entry to this header.  This entry will have the correctly sized buffer allocated, but
-	 * will not be written until the caller writes a value and then invokes {@link writePending} on this
+	 * will not be written until the caller writes a value and then invokes {@link #writePending} on this
 	 * object.
 	 */
 	@SuppressWarnings( "unchecked")

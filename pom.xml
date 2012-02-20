@@ -86,6 +86,12 @@
 						</goals>
 					</execution>
 				</executions>
+                <configuration>
+                    <linksource>true</linksource>
+                    <links>
+                        <link>http://docs.oracle.com/javase/6/docs/api</link>
+                    </links>
+                </configuration>
 			</plugin>
 		</plugins>
 		<resources>
