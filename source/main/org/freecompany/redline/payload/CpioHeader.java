@@ -11,7 +11,6 @@ import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.util.Date;
 import org.freecompany.redline.Util;
-import org.freecompany.redline.Comparison;
 
 import static org.freecompany.redline.Util.normalizePath;
 
@@ -35,7 +34,7 @@ public class CpioHeader {
 	public static final int SOCKET = 12;
 	
 	protected static final int CPIO_HEADER = 110;
-	protected static final CharSequence MAGIC = "070701";
+	protected static final String MAGIC = "070701";
 	protected static final String TRAILER = "TRAILER!!!";
 
 	protected Charset charset = Charset.forName( "ASCII");
@@ -120,7 +119,7 @@ public class CpioHeader {
 	 * the stream.
 	 */
 	public boolean isLast() {
-		return Comparison.equals( TRAILER, name);
+		return TRAILER.equals(name);
 	}
 
 	public void setLast() {
@@ -185,7 +184,7 @@ public class CpioHeader {
 		CharBuffer buffer = charset.decode( descriptor);
 
 		final CharSequence magic = readSix( buffer);
-		if ( !Comparison.equals( MAGIC, magic)) throw new IllegalStateException( "Invalid magic number '" + magic + "' of length '" + magic.length() + "'.");
+		if ( !MAGIC.equals(magic.toString())) throw new IllegalStateException( "Invalid magic number '" + magic + "' of length '" + magic.length() + "'.");
 		inode = readEight( buffer);
 		
 		final int mode = readEight( buffer);
