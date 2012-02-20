@@ -36,8 +36,6 @@
 
 	<build>
 		<defaultGoal>install</defaultGoal>
-		<sourceDirectory>source/main</sourceDirectory>
-		<testSourceDirectory>source/test</testSourceDirectory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -94,14 +92,6 @@
                 </configuration>
 			</plugin>
 		</plugins>
-		<resources>
-			<resource>
-				<directory>source/main</directory>
-				<includes>
-					<include>**/antlib.xml</include>
-				</includes>
-			</resource>
-		</resources>
 	</build>
 		
 	<dependencies>
