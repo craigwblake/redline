@@ -259,7 +259,7 @@ public class Builder {
 	 * Declares a dependency that this package exports, and that other packages can use to
 	 * provide library functions.
 	 *
-	 * @param dependency provided by this package.
+	 * @param provides dependency provided by this package.
 	 */
 	public void setProvides( final CharSequence provides) {
 		if ( provides != null) format.getHeader().createEntry( PROVIDENAME, provides);
@@ -481,8 +481,8 @@ public class Builder {
 	 * to record the directory names and file names, as well as their
 	 * digests.
 	 *
-	 * @param target the absolute path at which this file will be installed.
-	 * @param file the file content to include in this rpm.
+	 * @param path the absolute path at which this file will be installed.
+	 * @param source the file content to include in this rpm.
 	 * @param mode the mode of the target file in standard three octet notation
 	 */
 	public void addFile( final String path, final File source, final int mode) throws NoSuchAlgorithmException, IOException {
@@ -495,8 +495,8 @@ public class Builder {
 	 * to record the directory names and file names, as well as their
 	 * digests.
 	 *
-	 * @param target the absolute path at which this file will be installed.
-	 * @param file the file content to include in this rpm.
+	 * @param path the absolute path at which this file will be installed.
+	 * @param source the file content to include in this rpm.
 	 * @param mode the mode of the target file in standard three octet notation
 	 */
 	public void addFile( final String path, final File source, final int mode, final int dirmode) throws NoSuchAlgorithmException, IOException {
@@ -509,8 +509,8 @@ public class Builder {
      * to record the directory names and file names, as well as their
      * digests.
      *
-     * @param target the absolute path at which this file will be installed.
-     * @param file the file content to include in this rpm.
+     * @param path the absolute path at which this file will be installed.
+     * @param source the file content to include in this rpm.
      * @param mode the mode of the target file in standard three octet notation
      * @param uname user owner for the given file
      * @param gname group owner for the given file
@@ -526,8 +526,8 @@ public class Builder {
      * to record the directory names and file names, as well as their
      * digests.
      *
-     * @param target the absolute path at which this file will be installed.
-     * @param file the file content to include in this rpm.
+     * @param path the absolute path at which this file will be installed.
+     * @param source the file content to include in this rpm.
      * @param mode the mode of the target file in standard three octet notation
      * @param uname user owner for the given file
      * @param gname group owner for the given file
@@ -573,7 +573,7 @@ public class Builder {
 	 * Adds the file to the repository with the default mode of <code>644</code>.
 	 *
 	 * @param path the absolute path at which this file will be installed.
-	 * @param file the file content to include in this rpm.
+	 * @param source the file content to include in this rpm.
 	 */
 	public void addFile( final String path, final File source) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source);
@@ -585,8 +585,8 @@ public class Builder {
 	 * to record the directory names and file names, as well as their
 	 * digests.
 	 *
-	 * @param target the absolute path at which this file will be installed.
-	 * @param file the file content to include in this rpm.
+	 * @param path the absolute path at which this file will be installed.
+	 * @param source the file content to include in this rpm.
 	 * @param mode the mode of the target file in standard three octet notation
 	 */
 	public void addURL( final String path, final URL source, final int mode, final int dirmode) throws NoSuchAlgorithmException, IOException {
@@ -599,8 +599,8 @@ public class Builder {
      * to record the directory names and file names, as well as their
      * digests.
      *
-     * @param target the absolute path at which this file will be installed.
-     * @param file the file content to include in this rpm.
+     * @param path the absolute path at which this file will be installed.
+     * @param source the file content to include in this rpm.
      * @param mode the mode of the target file in standard three octet notation
      * @param username ownership of added file
      * @param group ownership of added file
@@ -615,8 +615,8 @@ public class Builder {
      * to record the directory names and file names, as well as their
      * digests.
      *
-     * @param target the absolute path at which this file will be installed.
-     * @param file the file content to include in this rpm.
+     * @param path the absolute path at which this file will be installed.
+     * @param source the file content to include in this rpm.
      * @param mode the mode of the target file in standard three octet notation
      * @param username ownership of added file
      * @param group ownership of added file
@@ -628,8 +628,7 @@ public class Builder {
 	/**
 	 * Adds the directory to the repository with the default mode of <code>644</code>.
 	 *
-	 * @param path the absolute path at which this file will be installed.
-	 * @param file the file content to include in this rpm.
+	 * @param path the absolute path to add as a directory.
 	 */
 	public void addDirectory( final String path) throws NoSuchAlgorithmException, IOException {
 		contents.addDirectory( path);
