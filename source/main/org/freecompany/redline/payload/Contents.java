@@ -454,7 +454,7 @@ public class Contents {
 	/**
 	 * Caclulates an MD5 hash for each file in the archive.
 	 */
-	public String[] getMD5s() throws FileNotFoundException, NoSuchAlgorithmException, IOException {
+	public String[] getMD5s() throws NoSuchAlgorithmException, IOException {
 		/**
 		 * This could be more efficiently handled during the output phase using a filtering channel,
 		 * but would require placeholder values in the archive and some state. This is left for a
@@ -470,13 +470,13 @@ public class Contents {
 				final ReadableChannelWrapper input = new ReadableChannelWrapper( new FileInputStream(( File) object).getChannel());
 				final Key< byte[]> key = input.start( "MD5");
 				while ( input.read( buffer) != -1) buffer.rewind();
-				value = new String( Util.hex( input.finish( key)));
+				value = Util.hex(input.finish(key));
 				input.close();
 			} else if ( object instanceof URL) {
 				final ReadableChannelWrapper input = new ReadableChannelWrapper( Channels.newChannel((( URL) object).openConnection().getInputStream()));
 				final Key< byte[]> key = input.start( "MD5");
 				while ( input.read( buffer) != -1) buffer.rewind();
-				value = new String( Util.hex( input.finish( key)));
+				value = Util.hex(input.finish(key));
 				input.close();
 			}
 			array[ x++] = value;

@@ -108,8 +108,8 @@ public class CpioHeader {
 	public void setInode( int inode) { this.inode = inode; }
 	public void setFlags( int flags) { this.flags = flags; }
 
-	public String getUname() { return this.uname; };
-	public String getGname() { return this.gname; };
+	public String getUname() { return this.uname; }
+	public String getGname() { return this.gname; }
 	public void setUname( String uname) { this.uname = uname; }
 	public void setGname( String gname) { this.gname = gname; }
 

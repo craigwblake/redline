@@ -5,8 +5,8 @@ import org.apache.tools.ant.types.TarFileSet;
 import org.freecompany.redline.payload.Directive;
 
 /**
- * A {@code RpmFileSet} is a {@link FileSet) to support RPM directives that can't be expressed
- * using ant's built-in {@code FileSet) classes.
+ * A {@code RpmFileSet} is a {@link FileSet} to support RPM directives that can't be expressed
+ * using ant's built-in {@code FileSet} classes.
  */
 public class RpmFileSet extends TarFileSet {
 

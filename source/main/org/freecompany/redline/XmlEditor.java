@@ -251,9 +251,9 @@ public class XmlEditor implements Serializable {
 
 	public void appendCollection( String nodePath, Collection values) {
 		modified = true;
-		for ( Iterator i = values.iterator(); i.hasNext(); ) {
-			setValue( appendNode( nodePath), i.next().toString());
-		}
+        for (Object value : values) {
+            setValue(appendNode(nodePath), value.toString());
+        }
 	}
 
 	public void replaceCollection( String nodePath, Collection values) {

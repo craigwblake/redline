@@ -105,6 +105,7 @@ public class RedlineTask extends Task {
 				if ( !prefix.endsWith( "/")) prefix += "/";
 				DirectoryScanner scanner = fileset.getDirectoryScanner( getProject());
 
+                int filemode = fileset.getFileMode( getProject()) & 07777;
 				int dirmode = fileset.getDirMode( getProject()) & 07777;
 				String username = null;
 				String group = null;
@@ -129,10 +130,10 @@ public class RedlineTask extends Task {
 				for ( String entry : scanner.getIncludedFiles()) {
 					if ( archive != null) {
 						URL url = new URL( "jar:" + archive.toURL() + "!/" + entry);
-						builder.addURL( prefix + entry, url, fileset.getFileMode( getProject()) & 07777, dirmode, directive, username, group);
+						builder.addURL( prefix + entry, url, filemode, dirmode, directive, username, group);
 					} else {
 						File file = new File( scanner.getBasedir(), entry);
-						builder.addFile(prefix + entry, file, fileset.getFileMode( getProject()) & 07777, dirmode, directive, username, group);
+						builder.addFile(prefix + entry, file, filemode, dirmode, directive, username, group);
 					}
 				}
 			}

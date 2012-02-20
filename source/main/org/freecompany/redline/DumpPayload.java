@@ -2,7 +2,6 @@ package org.freecompany.redline;
 
 import org.freecompany.redline.header.Format;
 import java.io.FileOutputStream;
-import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;

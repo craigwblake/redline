@@ -23,5 +23,5 @@ public enum Os {
 	MINT,
 	OS390,
 	VMESA,
-	LINUX390;
+	LINUX390
 }

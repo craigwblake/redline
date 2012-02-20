@@ -1,11 +1,9 @@
 package org.freecompany.redline;
 
 import org.freecompany.redline.header.Architecture;
-import org.freecompany.redline.header.Format;
 import org.freecompany.redline.header.Os;
 import org.freecompany.redline.header.RpmType;
 import org.freecompany.redline.payload.Contents;
-import org.freecompany.redline.payload.CpioHeader;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -52,7 +50,7 @@ public class Main {
 	 * Runs the tool using a configuration provided in the given configuration and output file.
 	 *
 	 * @param editor the XML configuration file, parsed by the XmlEditor utility
-	 * @param file the destination file to use in creating the RPM
+	 * @param destination the destination file to use in creating the RPM
 	 * @throws NoSuchAlgorithmException if an operation attempted during RPM creation fails due
 	 * to a missing encryption algorithm
 	 * @throws IOException if an IO error occurs either in reading the configuration file, reading
@@ -93,7 +91,7 @@ public class Main {
 	 * @param version the version of the created RPM
 	 * @param release the release version of the created RPM
 	 * @param include the contents to include in the generated RPM file
-	 * @param file the destination file to use in creating the RPM
+	 * @param destination the destination file to use in creating the RPM
 	 * @throws NoSuchAlgorithmException if an operation attempted during RPM creation fails due
 	 * to a missing encryption algorithm
 	 * @throws IOException if an IO error occurs either in reading the configuration file, reading
