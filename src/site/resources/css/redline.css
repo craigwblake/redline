@@ -19,3 +19,7 @@ div.syntaxhighlighter {
 .syntaxhighlighter, .syntaxhighlighter .line.alt1, .syntaxhighlighter .line.alt2 {
     background-color: transparent;
 }
+
+#poweredBy {
+    display: none;
+}
