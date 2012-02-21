@@ -84,13 +84,18 @@
 						</goals>
 					</execution>
 				</executions>
-                <configuration>
-                    <linksource>true</linksource>
-                    <links>
-                        <link>http://docs.oracle.com/javase/6/docs/api</link>
-                    </links>
-                </configuration>
 			</plugin>
+          <plugin>
+            <artifactId>maven-site-plugin</artifactId>
+            <version>2.3</version>
+            <dependencies>
+              <dependency>
+                <groupId>org.apache.maven.doxia</groupId>
+                <artifactId>doxia-module-xhtml</artifactId>
+                <version>1.2</version>
+              </dependency>
+            </dependencies>
+          </plugin>
 		</plugins>
 	</build>
 		
@@ -138,4 +143,26 @@
 		</profile>
 	</profiles>
 
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <linksource>true</linksource>
+                    <links>
+                        <link>http://docs.oracle.com/javase/6/docs/api</link>
+                    </links>
+                    <quiet>true</quiet>
+                </configuration>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>javadoc</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>
