@@ -12,7 +12,10 @@
     <name>Redline RPM</name>
   </bannerLeft>
 
-  <body>    
+  <body>
+    <head>
+      <link href="css/redline.css" type="text/css" rel="stylesheet" />
+    </head>
     <menu name="Redline">
       <item name="Home" href="index.html"/>
       <item name="Usage" href="usage.html"/>

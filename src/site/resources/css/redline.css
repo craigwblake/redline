@@ -20,6 +20,11 @@ div.syntaxhighlighter {
     background-color: transparent;
 }
 
-#poweredBy {
+#poweredBy, #publishDate, li.divider {
     display: none;
+}
+
+a.externalLink[href^=http] {
+    background: none;
+    padding-right: 0;
 }
