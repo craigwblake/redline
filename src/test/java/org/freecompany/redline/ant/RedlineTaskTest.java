@@ -61,14 +61,14 @@ public class RedlineTaskTest extends TestCase {
         task.setVersion("1.0");
         task.setRelease("1");
         task.setGroup("Application/Office");
-        task.setPreInstallScript(new File("source/test/prein.sh"));
-        task.setPostInstallScript(new File("source/test/postin.sh"));
-        task.setPreUninstallScript(new File("source/test/preun.sh"));
-        task.setPostUninstallScript(new File("source/test/postun.sh"));
+        task.setPreInstallScript(new File("src/test/resources/prein.sh"));
+        task.setPostInstallScript(new File("src/test/resources/postin.sh"));
+        task.setPreUninstallScript(new File("src/test/resources/preun.sh"));
+        task.setPostUninstallScript(new File("src/test/resources/postun.sh"));
         
         RpmFileSet fs = new RpmFileSet();
         fs.setPrefix("/etc");
-        fs.setFile(new File("source/test/prein.sh"));
+        fs.setFile(new File("src/test/resources/prein.sh"));
         fs.setConfig(true);
         fs.setNoReplace(true);
         fs.setDoc(true);
