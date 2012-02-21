@@ -1,0 +1,83 @@
+<html>
+<head>
+    <title>Redline RPM - Usage</title>
+    <link href="css/shCoreDefault.css" type="text/css" rel="stylesheet" />
+    <script type="text/javascript" src="js/shCore.js"></script>
+    <script type="text/javascript" src="js/shBrushXml.js"></script>
+</head>
+<body>
+
+<h1>Usage</h1>
+
+<p>There are several tools provided by the Redline package which are useful when working with RPM files. This includes
+a scanner for examining existing RPM files, a programmatic interface for generating RPM packages, and an Ant task that
+can be imported and invoked from build scripts in order to package deployment files.</p>
+
+
+<h2>Scanner</h2>
+
+<p>The scanner tool can be invoked from the command line using the main class <code>
+<a href="apidocs/org/freecompany/redline/Scanner.html">org.freecompany.redline.Scanner</a></code>. From the command line
+this class accepts as it's single argument a path to a valid RPM file. If the file specified by the providing path does
+not exist, or if the file in not a valid RPM archive an exception will be thrown. And example of invoking the scanner
+follows:</p>
+
+<pre>   java -cp redline.jar <a href="apidocs/org/freecompany/redline/Scanner.html">org.freecompany.redline.Scanner</a> test.rpm</pre>
+
+<p>The scanner is most useful for debugging RPM files and tools as it generates a significant amount of output.
+For more generalized RPM information the standard RPM tools are recommended.</p>
+
+
+<h2>Builder</h2>
+
+<p>The builder is the main entry point for constructing RPM files programmatically. The tool is used by
+constructing an instance of the <code><a href="apidocs/org/freecompany/redline/Builder.html">org.freecompany.redline.Builder</a></code>
+class and adding files and headers to the archive. When the builder is configured a final call will generate the RPM
+file to a given <code>java.nio.channels.FileChannel</code>.</p>
+
+
+<h2>Ant</h2>
+
+<p>Redline can be used to package projects that use the Ant build system. Included in the source and binary distributions
+is an Ant task that can be used within an Ant build script to construct an RPM distributable. The task can be defined
+using the antlib namespace convention by binding the namespace <code>antlib:org.redline_rpm</code>
+and using the namespace prefix to reference the <code>rpm</code> task type. An example of using the build
+in Ant task follows:</p>
+
+<pre class="brush: xml;">
+    &lt;project name="test" default="rpm" xmlns:redline="antlib:org.redline_rpm">
+    
+      &lt;target name="rpm">
+        &lt;mkdir dir="rpms"/>
+        
+        &lt;redline:rpm group="Java Development" name="test" version="1.2.3" destination="rpms">
+          &lt;zipfileset prefix="/usr/share/java" file="test-1.2.3.jar"/>
+          &lt;link path="/usr/share/java/test.jar" target="/usr/share/java/test-1.2.3.jar"/>
+          &lt;depends name="test-lib" version="1.2.3"/>
+        &lt;/redline:rpm>
+        
+      &lt;/target>
+    
+    &lt;/project></pre>
+
+<p>Another example, which includes setting the source package property:</p>
+
+<pre class="brush: xml;">
+    &lt;redline group="Java Development" name="test" version="1.2.6" destination="rpms" sourcePackage="test.rpm">
+      &lt;tarfileset prefix="/tmp/rpmtest/bin" file="bin/*" filemode="744" username="none" group="none"/>
+      &lt;rpmfileset prefix="/tmp/rpmtest/conf" config="true" noreplace="true" file="conf/test1.conf"
+                  filemode="644" username="none" group="none"/>
+      &lt;rpmfileset prefix="/tmp/rpmtest/conf" config="true" file="conf/test2.conf"
+                  filemode="644" username="none" group="none"/>
+      &lt;depends name="test-lib" version="1.2.3"/>
+    &lt;redline></pre>
+
+<p>This build script creates a new RPM file named <code>test-1.2.3-1.noarch.rpm</code> in the <code>rpms</code> directory
+containing the local file <code>test-1.2.3.jar</code> to be installed into <code>/use/share/java</code> on the installation
+machine. In addition a symbolic link is included from the packaged file to <code>/usr/share/java/test.jar</code>.
+The resulting RPM has a dependency on an RPM named <code>test-lib</code>.</p>
+
+<script type="text/javascript" src="js/shConfig.js"></script>
+
+</body>
+</html>
