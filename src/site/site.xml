@@ -21,6 +21,7 @@
       <item name="Usage" href="usage.html"/>
       <item name="Download" href="http://github.com/craigwblake/redline/downloads"/>
       <item name="Source code" href="http://github.com/craigwblake/redline"/>
+      <item name="JavaDoc" href="javadoc"/>
       <item name="Issues" href="http://code.google.com/p/redline-rpm/issues/list"/>
     </menu>
 
