@@ -2,6 +2,8 @@ package org.freecompany.redline;
 
 import org.freecompany.redline.header.Format;
 import org.freecompany.redline.payload.CpioHeader;
+
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -33,10 +35,11 @@ public class Scanner {
 	 * reading the RPM file or it's contents
 	 */
 	public static void main( String[] args) throws Exception {
-		ReadableChannelWrapper in = new ReadableChannelWrapper( Channels.newChannel( System.in));
+	        InputStream fios = new FileInputStream ( args[0] );
+		ReadableChannelWrapper in = new ReadableChannelWrapper( Channels.newChannel( fios));
 		Format format = new Scanner().run( in);
 		System.out.println( format);
-		InputStream uncompressed = new GZIPInputStream( System.in);
+		InputStream uncompressed = new GZIPInputStream( fios );
 		in = new ReadableChannelWrapper( Channels.newChannel( uncompressed));
 		CpioHeader header;
 		int total = 0;
