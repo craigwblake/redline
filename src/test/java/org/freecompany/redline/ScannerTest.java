@@ -1,8 +1,7 @@
 package org.freecompany.redline;
 
 import java.io.File;
-
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 public class ScannerTest extends TestBase
 {
