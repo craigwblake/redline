@@ -48,6 +48,31 @@ public class RpmFileSet extends TarFileSet {
     }
 
     /**
+     * Supports RPM's {@code %ghost} directive, used to flag the specified file as being a ghost file.
+     * By adding this directive to the line containing a file, RPM will know about the ghosted file, but will
+     * not add it to the package.
+     * <p/>
+     * Permitted values for this directive are:
+     * <ul>
+     * <li> {@code true}    (equivalent to specifying {@code %ghost}
+     * <li> {@code false}     (equivalent to omitting {@code %ghost})
+     * </ul>
+     *
+     * @see <a href="http://www.rpm.org/max-rpm-snapshot/s1-rpm-inside-files-list-directives.html">rpm.com</a>
+     * @see #directive
+     *
+     * @param ghost to set
+     */
+    public void setGhost(boolean ghost) {
+        checkRpmFileSetAttributesAllowed();
+        if(ghost) {
+            directive.set(Directive.RPMFILE_GHOST);
+        } else {
+            directive.unset(Directive.RPMFILE_GHOST);
+        }
+    }
+
+    /**
      * Supports RPM's {@code %config} directive, used to flag the specified file as being a configuration file.
      * RPM performs additional processing for config files when packages are erased, and during installations
      * and upgrades.
