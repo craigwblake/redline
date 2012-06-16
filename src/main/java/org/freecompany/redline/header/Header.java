@@ -62,6 +62,11 @@ public class Header extends AbstractHeader {
 		PREUNPROG( 1087, 6, "preunprog"),
 		POSTUNPROG( 1088, 6, "postunprog"),
 
+		PRETRANSSCRIPT( 1151, 6, "pretrans"),
+		POSTTRANSSCRIPT( 1152, 6, "posttrans"),
+		PRETRANSPROG( 1153, 6, "pretransprog"),
+		POSTTRANSPROG( 1154, 6, "pretransprog"),
+
 		OLDFILENAMES( 1027, 6, "oldfilenames"),
 		FILESIZES( 1028, 4, "filesizes"),
 		FILEMODES( 1030, 3, "filemodes"),

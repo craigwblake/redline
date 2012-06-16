@@ -55,10 +55,12 @@ public class RedlineTask extends Task {
 	protected List< ArchiveFileSet> filesets = new ArrayList< ArchiveFileSet>();
 	protected List< Link> links = new ArrayList< Link>();
 	protected List< Depends> depends = new ArrayList< Depends>();
+	protected File preTransScript;
 	protected File preInstallScript;
 	protected File postInstallScript;
 	protected File preUninstallScript;
 	protected File postUninstallScript;
+	protected File postTransScript;
 
 	public RedlineTask() {
 		try {
@@ -94,10 +96,12 @@ public class RedlineTask extends Task {
 		}
 
 		try {
+			builder.setPreTransScript( preTransScript);
 			builder.setPreInstallScript( preInstallScript);
 			builder.setPostInstallScript( postInstallScript);
 			builder.setPreUninstallScript( preUninstallScript);
 			builder.setPostUninstallScript( postUninstallScript);
+			builder.setPostTransScript( postTransScript);
 
 			for ( ArchiveFileSet fileset : filesets) {
 				File archive = fileset.getSrc( getProject());
@@ -178,9 +182,11 @@ public class RedlineTask extends Task {
     public void addRpmfileset( RpmFileSet fileset) { filesets.add( fileset); }
 	public void addLink( Link link) { links.add( link); }
 	public void addDepends( Depends dependency) { depends.add( dependency); }
+	public void setPreTransScript( File preTransScript) { this.preTransScript = preTransScript; }
 	public void setPreInstallScript( File preInstallScript) { this.preInstallScript = preInstallScript; }
 	public void setPostInstallScript( File postInstallScript) { this.postInstallScript = postInstallScript; }
 	public void setPreUninstallScript( File preUninstallScript) { this.preUninstallScript = preUninstallScript; }
 	public void setPostUninstallScript( File postUninstallScript) { this.postUninstallScript = postUninstallScript; }
+	public void setPostTransScript( File postTransScript) { this.postTransScript = postTransScript; }
 	public void setSourcePackage( String sourcePackage) { this.sourcePackage = sourcePackage; }
 }
