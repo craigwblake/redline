@@ -340,6 +340,40 @@ public class Builder {
     }
 
     /**
+	 * Declares a script to be run as part of the RPM pre-transaction. The
+	 * script will be run using the interpreter declared with the
+	 * {@link #setPreTransProgram(String)} method.
+	 *
+	 * @param script Script contents to run (i.e. shell commands)
+	 */ 
+	public void setPreTransScript( final String script) {
+		setPreTransProgram(readProgram(script));
+		if ( script != null) format.getHeader().createEntry( PRETRANSSCRIPT, script);
+	}
+
+	/**
+	 * Declares a script file to be run as part of the RPM pre-transaction. The
+	 * script will be run using the interpreter declared with the
+	 * {@link #setPreTransProgram(String)} method.
+	 *
+	 * @param file Script to run (i.e. shell commands)
+	 */
+	public void setPreTransScript( final File file) throws IOException {
+		setPreTransScript(readScript(file));
+	}
+
+	/**
+	 * Declares the interpreter to be used when invoking the RPM
+	 * pre-transaction script that can be set with the
+	 * {@link #setPreTransScript(String)} method.
+	 *
+	 * @param program Path to the interpreter
+	 */
+	public void setPreTransProgram( final String program) {
+		if ( program != null) format.getHeader().createEntry( PRETRANSPROG, program);
+	}
+    
+	/**
 	 * Declares a script to be run as part of the RPM pre-installation. The
 	 * script will be run using the interpretter declared with the
 	 * {@link #setPreInstallProgram(String)} method.
@@ -473,6 +507,40 @@ public class Builder {
 	 */
 	public void setPostUninstallProgram( final String program) {
 		if ( program != null) format.getHeader().createEntry( POSTUNPROG, program);
+	}
+
+	/**
+	 * Declares a script to be run as part of the RPM post-transaction. The
+	 * script will be run using the interpreter declared with the
+	 * {@link #setPostTransProgram(String)} method.
+	 *
+	 * @param script Script contents to run (i.e. shell commands)
+	 */
+	public void setPostTransScript( final String script) {
+		setPostTransProgram(readProgram(script));
+		if ( script != null) format.getHeader().createEntry( POSTTRANSSCRIPT, script);
+	}
+
+	/**
+	 * Declares a script file to be run as part of the RPM post-transaction. The
+	 * script will be run using the interpreter declared with the
+	 * {@link #setPostTransProgram(String)} method.
+	 *
+	 * @param file Script contents to run (i.e. shell commands)
+	 */
+	public void setPostTransScript( final File file) throws IOException {
+		setPostTransScript(readScript(file));
+	}
+
+	/**
+	 * Declares the interpreter to be used when invoking the RPM
+	 * post-transaction script that can be set with the
+	 * {@link #setPostTransScript(String)} method.
+	 *
+	 * @param program Path to the interpreter
+	 */
+	public void setPostTransProgram( final String program) {
+		if ( program != null) format.getHeader().createEntry( POSTTRANSPROG, program);
 	}
 
 	/**
@@ -800,6 +868,9 @@ public class Builder {
 		int total = 0;
 		final ByteBuffer buffer = ByteBuffer.allocate( 4096);
 		for ( CpioHeader header : contents.headers()) {
+			if ( ( header.getFlags() & Directive.RPMFILE_GHOST ) == Directive.RPMFILE_GHOST ) {
+				continue;
+			}
 			final String path = header.getName();
 			if ( path.startsWith( "/")) header.setName( "." + path);
 			total = header.write( compressor, total);
