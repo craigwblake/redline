@@ -5,7 +5,9 @@ public class Flags {
 	public static int LESS = 0x02;
 	public static int GREATER = 0x04;
 	public static int EQUAL = 0x08;
+	public static int SCRIPT_POSTTRANS = 0x20;
 	public static int PREREQ = 0x40;
+	public static int SCRIPT_PRETRANS = 0x80;
 	public static int INTERP = 0x100;
 	public static int SCRIPT_PRE = 0x200;
 	public static int SCRIPT_POST = 0x400;
