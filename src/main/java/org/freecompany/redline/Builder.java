@@ -851,12 +851,14 @@ public class Builder {
 		format.getHeader().createEntry( DIRINDEXES, contents.getDirIndexes());
 		format.getHeader().createEntry( BASENAMES, contents.getBaseNames());
 
-		format.getHeader().createEntry( TRIGGERSCRIPTS, triggerscripts.toArray( new String[ triggerscripts.size()]));
-		format.getHeader().createEntry( TRIGGERNAME, triggernames.toArray( new String[ triggernames.size()]));
-		format.getHeader().createEntry( TRIGGERVERSION, triggerversions.toArray( new String[ triggerversions.size()]));
-		format.getHeader().createEntry( TRIGGERFLAGS, convert( triggerflags.toArray( new Integer[ triggerflags.size()])));
-		format.getHeader().createEntry( TRIGGERINDEX, convert( triggerindexes.toArray( new Integer[ triggerindexes.size()])));
-		format.getHeader().createEntry( TRIGGERSCRIPTPROG, triggerscriptprogs.toArray( new String[ triggerscriptprogs.size()]));
+		if ( 0 < triggerCounter) {
+			format.getHeader().createEntry( TRIGGERSCRIPTS, triggerscripts.toArray( new String[ triggerscripts.size()]));
+			format.getHeader().createEntry( TRIGGERNAME, triggernames.toArray( new String[ triggernames.size()]));
+			format.getHeader().createEntry( TRIGGERVERSION, triggerversions.toArray( new String[ triggerversions.size()]));
+			format.getHeader().createEntry( TRIGGERFLAGS, convert( triggerflags.toArray( new Integer[ triggerflags.size()])));
+			format.getHeader().createEntry( TRIGGERINDEX, convert( triggerindexes.toArray( new Integer[ triggerindexes.size()])));
+			format.getHeader().createEntry( TRIGGERSCRIPTPROG, triggerscriptprogs.toArray( new String[ triggerscriptprogs.size()]));
+		}
 
 		format.getHeader().createEntry( FILEMD5S, contents.getMD5s());
 		format.getHeader().createEntry( FILESIZES, contents.getSizes());
