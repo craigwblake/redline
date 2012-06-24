@@ -13,6 +13,8 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -56,6 +58,16 @@ public class Builder {
 	protected final Set< PrivateKey> signatures = new HashSet< PrivateKey>();
 	protected final Map< String, CharSequence> dependencies = new LinkedHashMap< String, CharSequence>();
 	protected final Map< String, Integer> flags = new LinkedHashMap< String, Integer>();
+
+	protected final List< String> triggerscripts = new LinkedList< String>();
+	protected final List< String> triggerscriptprogs = new LinkedList< String>();
+
+	protected final List< String> triggernames = new LinkedList< String>();
+	protected final List< String> triggerversions = new LinkedList< String>();
+	protected final List< Integer> triggerflags = new LinkedList< Integer>();
+	protected final List< Integer> triggerindexes = new LinkedList< Integer>();
+
+	private int triggerCounter = 0;
 
 	@SuppressWarnings( "unchecked")
 	protected final Entry< byte[]> signature = ( Entry< byte[]>) format.getSignature().addEntry( SIGNATURES, 16);
@@ -544,6 +556,32 @@ public class Builder {
 	}
 
 	/**
+	 * Adds a trigger to the RPM package.
+	 *
+	 * @param script the script to add.
+	 * @param prog the interpreter with which to run the script (default: /bin/sh).
+	 * @param depends the map of rpms and versions that will trigger the script
+	 * @param flag the trigger type (SCRIPT_TRIGGERPREIN, SCRIPT_TRIGGERIN, SCRIPT_TRIGGERUN, or SCRIPT_TRIGGERPOSTUN)
+	 */
+	public void addTrigger( final File script, final String prog, final Map< String, String> depends, final int flag) throws IOException {
+		triggerscripts.add(readScript(script));
+		if ( null == prog) {
+			triggerscriptprogs.add("/bin/sh");
+		} else if ( 0 == prog.length()){
+			triggerscriptprogs.add("/bin/sh");
+		} else {
+			triggerscriptprogs.add(prog);
+		}
+		for ( Map.Entry< String, String> depend : depends.entrySet()) {
+			triggernames.add( depend.getKey());
+			triggerversions.add( depend.getValue());
+			triggerflags.add( GREATER | EQUAL | flag);
+			triggerindexes.add ( triggerCounter);
+		}
+		triggerCounter++;
+	}
+
+	/**
 	 * Add the specified file to the repository payload in order.
 	 * The required header entries will automatically be generated
 	 * to record the directory names and file names, as well as their
@@ -812,6 +850,14 @@ public class Builder {
 		format.getHeader().createEntry( DIRNAMES, contents.getDirNames());
 		format.getHeader().createEntry( DIRINDEXES, contents.getDirIndexes());
 		format.getHeader().createEntry( BASENAMES, contents.getBaseNames());
+
+		format.getHeader().createEntry( TRIGGERSCRIPTS, triggerscripts.toArray( new String[ triggerscripts.size()]));
+		format.getHeader().createEntry( TRIGGERNAME, triggernames.toArray( new String[ triggernames.size()]));
+		format.getHeader().createEntry( TRIGGERVERSION, triggerversions.toArray( new String[ triggerversions.size()]));
+		format.getHeader().createEntry( TRIGGERFLAGS, convert( triggerflags.toArray( new Integer[ triggerflags.size()])));
+		format.getHeader().createEntry( TRIGGERINDEX, convert( triggerindexes.toArray( new Integer[ triggerindexes.size()])));
+		format.getHeader().createEntry( TRIGGERSCRIPTPROG, triggerscriptprogs.toArray( new String[ triggerscriptprogs.size()]));
+
 		format.getHeader().createEntry( FILEMD5S, contents.getMD5s());
 		format.getHeader().createEntry( FILESIZES, contents.getSizes());
 		format.getHeader().createEntry( FILEMODES, contents.getModes());

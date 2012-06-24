@@ -67,6 +67,13 @@ public class Header extends AbstractHeader {
 		PRETRANSPROG( 1153, 6, "pretransprog"),
 		POSTTRANSPROG( 1154, 6, "pretransprog"),
 
+		TRIGGERSCRIPTS( 1065, 8, "triggerscripts"),
+		TRIGGERNAME( 1066, 8, "triggername"),
+		TRIGGERVERSION( 1067, 8, "triggerversion"),
+		TRIGGERFLAGS( 1068, 4, "triggerflags"),
+		TRIGGERINDEX( 1069, 4, "triggerindex"),
+		TRIGGERSCRIPTPROG( 1092, 8, "triggerscriptprog"),
+
 		OLDFILENAMES( 1027, 6, "oldfilenames"),
 		FILESIZES( 1028, 4, "filesizes"),
 		FILEMODES( 1030, 3, "filemodes"),

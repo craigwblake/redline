@@ -55,6 +55,12 @@ public class RedlineTask extends Task {
 	protected List< ArchiveFileSet> filesets = new ArrayList< ArchiveFileSet>();
 	protected List< Link> links = new ArrayList< Link>();
 	protected List< Depends> depends = new ArrayList< Depends>();
+
+	protected List< TriggerPreIn> triggersPreIn = new ArrayList< TriggerPreIn>();
+	protected List< TriggerIn> triggersIn = new ArrayList< TriggerIn>();
+	protected List< TriggerUn> triggersUn = new ArrayList< TriggerUn>();
+	protected List< TriggerPostUn> triggersPostUn = new ArrayList< TriggerPostUn>();
+
 	protected File preTransScript;
 	protected File preInstallScript;
 	protected File postInstallScript;
@@ -144,6 +150,11 @@ public class RedlineTask extends Task {
 			for ( Link link : links) builder.addLink( link.getPath(), link.getTarget(), link.getPermissions());
 			for ( Depends dependency : depends) builder.addDependencyMore( dependency.getName(), dependency.getVersion());
 
+			for ( TriggerPreIn triggerPreIn : triggersPreIn) builder.addTrigger( triggerPreIn.getScript(), "", triggerPreIn.getDepends(), triggerPreIn.getFlag());
+			for ( TriggerIn triggerIn : triggersIn) builder.addTrigger( triggerIn.getScript(), "", triggerIn.getDepends(), triggerIn.getFlag());
+			for ( TriggerUn triggerUn : triggersUn) builder.addTrigger( triggerUn.getScript(), "", triggerUn.getDepends(), triggerUn.getFlag());
+			for ( TriggerPostUn triggerPostUn : triggersPostUn) builder.addTrigger( triggerPostUn.getScript(), "", triggerPostUn.getDepends(), triggerPostUn.getFlag());
+
 			log( "Created rpm: " + builder.build( destination));
 		} catch ( IOException e) {
 			throw new BuildException( "Error packaging distribution files.", e);
@@ -182,6 +193,10 @@ public class RedlineTask extends Task {
     public void addRpmfileset( RpmFileSet fileset) { filesets.add( fileset); }
 	public void addLink( Link link) { links.add( link); }
 	public void addDepends( Depends dependency) { depends.add( dependency); }
+	public void addTriggerPreIn( TriggerPreIn triggerPreIn) { triggersPreIn.add( triggerPreIn); }
+	public void addTriggerIn( TriggerIn triggerIn) { triggersIn.add( triggerIn); }
+	public void addTriggerUn( TriggerUn triggerUn) { triggersUn.add( triggerUn); }
+	public void addTriggerPostUn( TriggerPostUn triggerPostUn) { triggersPostUn.add( triggerPostUn); }
 	public void setPreTransScript( File preTransScript) { this.preTransScript = preTransScript; }
 	public void setPreInstallScript( File preInstallScript) { this.preInstallScript = preInstallScript; }
 	public void setPostInstallScript( File postInstallScript) { this.postInstallScript = postInstallScript; }
