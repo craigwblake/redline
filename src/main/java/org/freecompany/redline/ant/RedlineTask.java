@@ -102,12 +102,30 @@ public class RedlineTask extends Task {
 		}
 
 		try {
-			builder.setPreTransScript( preTransScript);
-			builder.setPreInstallScript( preInstallScript);
-			builder.setPostInstallScript( postInstallScript);
-			builder.setPreUninstallScript( preUninstallScript);
-			builder.setPostUninstallScript( postUninstallScript);
-			builder.setPostTransScript( postTransScript);
+			if ( null != preTransScript) {
+				builder.setPreTransScript( preTransScript);
+				builder.setPreTransProgram( "");
+			}
+			if ( null != preInstallScript) {
+				builder.setPreInstallScript( preInstallScript);
+				builder.setPreInstallProgram( "");
+			}
+			if ( null != postInstallScript) {
+				builder.setPostInstallScript( postInstallScript);
+				builder.setPostInstallProgram( "");
+			}
+			if ( null != preUninstallScript) {
+				builder.setPreUninstallScript( preUninstallScript);
+				builder.setPreUninstallProgram( "");
+			}
+			if ( null != postUninstallScript) {
+				builder.setPostUninstallScript( postUninstallScript);
+				builder.setPostUninstallProgram( "");
+			}
+			if ( null != postTransScript) {
+				builder.setPostTransScript( postTransScript);
+				builder.setPostTransProgram( "");
+			}
 
 			for ( ArchiveFileSet fileset : filesets) {
 				File archive = fileset.getSrc( getProject());

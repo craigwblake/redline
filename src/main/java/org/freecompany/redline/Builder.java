@@ -54,6 +54,8 @@ public class Builder {
 	private static final int SHASIZE = 41;
 	private static final int MD5SIZE = 32;
 
+	private static final String DEFAULTSCRIPTPROG = "/bin/sh";
+
 	protected final Format format = new Format();
 	protected final Set< PrivateKey> signatures = new HashSet< PrivateKey>();
 	protected final Map< String, CharSequence> dependencies = new LinkedHashMap< String, CharSequence>();
@@ -382,7 +384,13 @@ public class Builder {
 	 * @param program Path to the interpreter
 	 */
 	public void setPreTransProgram( final String program) {
-		if ( program != null) format.getHeader().createEntry( PRETRANSPROG, program);
+		if ( null == program) {
+			format.getHeader().createEntry( PRETRANSPROG, DEFAULTSCRIPTPROG);
+		} else if ( 0 == program.length()){
+			format.getHeader().createEntry( PRETRANSPROG, DEFAULTSCRIPTPROG);
+		} else {
+			format.getHeader().createEntry( PRETRANSPROG, program);
+		}
 	}
     
 	/**
@@ -416,7 +424,13 @@ public class Builder {
 	 * @param program Path to the interpretter
 	 */
 	public void setPreInstallProgram( final String program) {
-		if ( program != null) format.getHeader().createEntry( PREINPROG, program);
+		if ( null == program) {
+			format.getHeader().createEntry( PREINPROG, DEFAULTSCRIPTPROG);
+		} else if ( 0 == program.length()){
+			format.getHeader().createEntry( PREINPROG, DEFAULTSCRIPTPROG);
+		} else {
+			format.getHeader().createEntry( PREINPROG, program);
+		}
 	}
 	
 	/**
@@ -450,7 +464,13 @@ public class Builder {
 	 * @param program Path to the interpretter
 	 */
 	public void setPostInstallProgram( final String program) {
-		if ( program != null) format.getHeader().createEntry( POSTINPROG, program);
+		if ( null == program) {
+			format.getHeader().createEntry( POSTINPROG, DEFAULTSCRIPTPROG);
+		} else if ( 0 == program.length()){
+			format.getHeader().createEntry( POSTINPROG, DEFAULTSCRIPTPROG);
+		} else {
+			format.getHeader().createEntry( POSTINPROG, program);
+		}
 	}
 
 	/**
@@ -484,7 +504,13 @@ public class Builder {
 	 * @param program Path to the interpretter
 	 */
 	public void setPreUninstallProgram( final String program) {
-		if ( program != null) format.getHeader().createEntry( PREUNPROG, program);
+		if ( null == program) {
+			format.getHeader().createEntry( PREUNPROG, DEFAULTSCRIPTPROG);
+		} else if ( 0 == program.length()){
+			format.getHeader().createEntry( PREUNPROG, DEFAULTSCRIPTPROG);
+		} else {
+			format.getHeader().createEntry( PREUNPROG, program);
+		}
 	}
 
 	/**
@@ -518,7 +544,13 @@ public class Builder {
 	 * @param program Path to the interpretter
 	 */
 	public void setPostUninstallProgram( final String program) {
-		if ( program != null) format.getHeader().createEntry( POSTUNPROG, program);
+		if ( null == program) {
+			format.getHeader().createEntry( POSTUNPROG, DEFAULTSCRIPTPROG);
+		} else if ( 0 == program.length()){
+			format.getHeader().createEntry( POSTUNPROG, DEFAULTSCRIPTPROG);
+		} else {
+			format.getHeader().createEntry( POSTUNPROG, program);
+		}
 	}
 
 	/**
@@ -552,23 +584,29 @@ public class Builder {
 	 * @param program Path to the interpreter
 	 */
 	public void setPostTransProgram( final String program) {
-		if ( program != null) format.getHeader().createEntry( POSTTRANSPROG, program);
+		if ( null == program) {
+			format.getHeader().createEntry( POSTTRANSPROG, DEFAULTSCRIPTPROG);
+		} else if ( 0 == program.length()){
+			format.getHeader().createEntry( POSTTRANSPROG, DEFAULTSCRIPTPROG);
+		} else {
+			format.getHeader().createEntry( POSTTRANSPROG, program);
+		}
 	}
 
 	/**
 	 * Adds a trigger to the RPM package.
 	 *
 	 * @param script the script to add.
-	 * @param prog the interpreter with which to run the script (default: /bin/sh).
+	 * @param prog the interpreter with which to run the script.
 	 * @param depends the map of rpms and versions that will trigger the script
 	 * @param flag the trigger type (SCRIPT_TRIGGERPREIN, SCRIPT_TRIGGERIN, SCRIPT_TRIGGERUN, or SCRIPT_TRIGGERPOSTUN)
 	 */
 	public void addTrigger( final File script, final String prog, final Map< String, String> depends, final int flag) throws IOException {
 		triggerscripts.add(readScript(script));
 		if ( null == prog) {
-			triggerscriptprogs.add("/bin/sh");
+			triggerscriptprogs.add(DEFAULTSCRIPTPROG);
 		} else if ( 0 == prog.length()){
-			triggerscriptprogs.add("/bin/sh");
+			triggerscriptprogs.add(DEFAULTSCRIPTPROG);
 		} else {
 			triggerscriptprogs.add(prog);
 		}
