@@ -13,6 +13,8 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -52,10 +54,22 @@ public class Builder {
 	private static final int SHASIZE = 41;
 	private static final int MD5SIZE = 32;
 
+	private static final String DEFAULTSCRIPTPROG = "/bin/sh";
+
 	protected final Format format = new Format();
 	protected final Set< PrivateKey> signatures = new HashSet< PrivateKey>();
 	protected final Map< String, CharSequence> dependencies = new LinkedHashMap< String, CharSequence>();
 	protected final Map< String, Integer> flags = new LinkedHashMap< String, Integer>();
+
+	protected final List< String> triggerscripts = new LinkedList< String>();
+	protected final List< String> triggerscriptprogs = new LinkedList< String>();
+
+	protected final List< String> triggernames = new LinkedList< String>();
+	protected final List< String> triggerversions = new LinkedList< String>();
+	protected final List< Integer> triggerflags = new LinkedList< Integer>();
+	protected final List< Integer> triggerindexes = new LinkedList< Integer>();
+
+	private int triggerCounter = 0;
 
 	@SuppressWarnings( "unchecked")
 	protected final Entry< byte[]> signature = ( Entry< byte[]>) format.getSignature().addEntry( SIGNATURES, 16);
@@ -78,6 +92,20 @@ public class Builder {
 		addDependencyLess( "rpmlib(VersionedDependencies)", "3.0.3-1");
 		addDependencyLess( "rpmlib(CompressedFileNames)", "3.0.4-1");
 		addDependencyLess( "rpmlib(PayloadFilesHavePrefix)", "4.0-1");
+	}
+
+	/**
+	 * Adds a dependency to the RPM package. This dependency version will be marked as the exact
+	 * requirement, and the package will require the named dependency with exactly this version at
+	 * install time.
+	 *
+	 * @param name the name of the dependency.
+	 * @param comparison the comparison flag.
+	 * @param version the version identifier.
+	 */
+	public void addDependency( final String name, final int comparison, final String version ) {
+		dependencies.put( name, version);
+		flags.put( name, comparison);
 	}
 
 	/**
@@ -370,7 +398,13 @@ public class Builder {
 	 * @param program Path to the interpreter
 	 */
 	public void setPreTransProgram( final String program) {
-		if ( program != null) format.getHeader().createEntry( PRETRANSPROG, program);
+		if ( null == program) {
+			format.getHeader().createEntry( PRETRANSPROG, DEFAULTSCRIPTPROG);
+		} else if ( 0 == program.length()){
+			format.getHeader().createEntry( PRETRANSPROG, DEFAULTSCRIPTPROG);
+		} else {
+			format.getHeader().createEntry( PRETRANSPROG, program);
+		}
 	}
     
 	/**
@@ -404,7 +438,13 @@ public class Builder {
 	 * @param program Path to the interpretter
 	 */
 	public void setPreInstallProgram( final String program) {
-		if ( program != null) format.getHeader().createEntry( PREINPROG, program);
+		if ( null == program) {
+			format.getHeader().createEntry( PREINPROG, DEFAULTSCRIPTPROG);
+		} else if ( 0 == program.length()){
+			format.getHeader().createEntry( PREINPROG, DEFAULTSCRIPTPROG);
+		} else {
+			format.getHeader().createEntry( PREINPROG, program);
+		}
 	}
 	
 	/**
@@ -438,7 +478,13 @@ public class Builder {
 	 * @param program Path to the interpretter
 	 */
 	public void setPostInstallProgram( final String program) {
-		if ( program != null) format.getHeader().createEntry( POSTINPROG, program);
+		if ( null == program) {
+			format.getHeader().createEntry( POSTINPROG, DEFAULTSCRIPTPROG);
+		} else if ( 0 == program.length()){
+			format.getHeader().createEntry( POSTINPROG, DEFAULTSCRIPTPROG);
+		} else {
+			format.getHeader().createEntry( POSTINPROG, program);
+		}
 	}
 
 	/**
@@ -472,7 +518,13 @@ public class Builder {
 	 * @param program Path to the interpretter
 	 */
 	public void setPreUninstallProgram( final String program) {
-		if ( program != null) format.getHeader().createEntry( PREUNPROG, program);
+		if ( null == program) {
+			format.getHeader().createEntry( PREUNPROG, DEFAULTSCRIPTPROG);
+		} else if ( 0 == program.length()){
+			format.getHeader().createEntry( PREUNPROG, DEFAULTSCRIPTPROG);
+		} else {
+			format.getHeader().createEntry( PREUNPROG, program);
+		}
 	}
 
 	/**
@@ -506,7 +558,13 @@ public class Builder {
 	 * @param program Path to the interpretter
 	 */
 	public void setPostUninstallProgram( final String program) {
-		if ( program != null) format.getHeader().createEntry( POSTUNPROG, program);
+		if ( null == program) {
+			format.getHeader().createEntry( POSTUNPROG, DEFAULTSCRIPTPROG);
+		} else if ( 0 == program.length()){
+			format.getHeader().createEntry( POSTUNPROG, DEFAULTSCRIPTPROG);
+		} else {
+			format.getHeader().createEntry( POSTUNPROG, program);
+		}
 	}
 
 	/**
@@ -540,7 +598,39 @@ public class Builder {
 	 * @param program Path to the interpreter
 	 */
 	public void setPostTransProgram( final String program) {
-		if ( program != null) format.getHeader().createEntry( POSTTRANSPROG, program);
+		if ( null == program) {
+			format.getHeader().createEntry( POSTTRANSPROG, DEFAULTSCRIPTPROG);
+		} else if ( 0 == program.length()){
+			format.getHeader().createEntry( POSTTRANSPROG, DEFAULTSCRIPTPROG);
+		} else {
+			format.getHeader().createEntry( POSTTRANSPROG, program);
+		}
+	}
+
+	/**
+	 * Adds a trigger to the RPM package.
+	 *
+	 * @param script the script to add.
+	 * @param prog the interpreter with which to run the script.
+	 * @param depends the map of rpms and versions that will trigger the script
+	 * @param flag the trigger type (SCRIPT_TRIGGERPREIN, SCRIPT_TRIGGERIN, SCRIPT_TRIGGERUN, or SCRIPT_TRIGGERPOSTUN)
+	 */
+	public void addTrigger( final File script, final String prog, final Map< String, IntString> depends, final int flag) throws IOException {
+		triggerscripts.add(readScript(script));
+		if ( null == prog) {
+			triggerscriptprogs.add(DEFAULTSCRIPTPROG);
+		} else if ( 0 == prog.length()){
+			triggerscriptprogs.add(DEFAULTSCRIPTPROG);
+		} else {
+			triggerscriptprogs.add(prog);
+		}
+		for ( Map.Entry< String, IntString> depend : depends.entrySet()) {
+			triggernames.add( depend.getKey());
+			triggerflags.add( depend.getValue().getInt() | flag);
+			triggerversions.add( depend.getValue().getString());
+			triggerindexes.add ( triggerCounter);
+		}
+		triggerCounter++;
 	}
 
 	/**
@@ -812,6 +902,16 @@ public class Builder {
 		format.getHeader().createEntry( DIRNAMES, contents.getDirNames());
 		format.getHeader().createEntry( DIRINDEXES, contents.getDirIndexes());
 		format.getHeader().createEntry( BASENAMES, contents.getBaseNames());
+
+		if ( 0 < triggerCounter) {
+			format.getHeader().createEntry( TRIGGERSCRIPTS, triggerscripts.toArray( new String[ triggerscripts.size()]));
+			format.getHeader().createEntry( TRIGGERNAME, triggernames.toArray( new String[ triggernames.size()]));
+			format.getHeader().createEntry( TRIGGERVERSION, triggerversions.toArray( new String[ triggerversions.size()]));
+			format.getHeader().createEntry( TRIGGERFLAGS, convert( triggerflags.toArray( new Integer[ triggerflags.size()])));
+			format.getHeader().createEntry( TRIGGERINDEX, convert( triggerindexes.toArray( new Integer[ triggerindexes.size()])));
+			format.getHeader().createEntry( TRIGGERSCRIPTPROG, triggerscriptprogs.toArray( new String[ triggerscriptprogs.size()]));
+		}
+
 		format.getHeader().createEntry( FILEMD5S, contents.getMD5s());
 		format.getHeader().createEntry( FILESIZES, contents.getSizes());
 		format.getHeader().createEntry( FILEMODES, contents.getModes());
