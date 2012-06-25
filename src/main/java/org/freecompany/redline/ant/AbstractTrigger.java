@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Iterator;
+import org.freecompany.redline.IntString;
 
 /**
  * Object describing an RPM Trigger
@@ -27,11 +28,11 @@ public abstract class AbstractTrigger {
         this.depends.add( depends);
     }
 
-    public Map< String, String> getDepends() {
-        Map< String, String> dependsMap = new HashMap< String, String>();
+    public Map< String, IntString> getDepends() {
+        Map< String, IntString> dependsMap = new HashMap< String, IntString>();
         for ( Iterator< Depends> i = this.depends.iterator(); i.hasNext();) {
             Depends d = i.next();
-            dependsMap.put( d.getName(), d.getVersion());
+            dependsMap.put( d.getName(), new IntString(d.getComparison(), d.getVersion()));
         }
         return dependsMap;
     }

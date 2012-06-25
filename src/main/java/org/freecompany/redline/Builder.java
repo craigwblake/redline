@@ -95,6 +95,20 @@ public class Builder {
 	}
 
 	/**
+	 * Adds a dependency to the RPM package. This dependency version will be marked as the exact
+	 * requirement, and the package will require the named dependency with exactly this version at
+	 * install time.
+	 *
+	 * @param name the name of the dependency.
+	 * @param comparison the comparison flag.
+	 * @param version the version identifier.
+	 */
+	public void addDependency( final String name, final int comparison, final String version ) {
+		dependencies.put( name, version);
+		flags.put( name, comparison);
+	}
+
+	/**
 	 * Adds a dependency to the RPM package. This dependecy version will be marked as the maximum
 	 * allowed, and the package will require the named dependency with this version or lower at
 	 * install time.
@@ -601,7 +615,7 @@ public class Builder {
 	 * @param depends the map of rpms and versions that will trigger the script
 	 * @param flag the trigger type (SCRIPT_TRIGGERPREIN, SCRIPT_TRIGGERIN, SCRIPT_TRIGGERUN, or SCRIPT_TRIGGERPOSTUN)
 	 */
-	public void addTrigger( final File script, final String prog, final Map< String, String> depends, final int flag) throws IOException {
+	public void addTrigger( final File script, final String prog, final Map< String, IntString> depends, final int flag) throws IOException {
 		triggerscripts.add(readScript(script));
 		if ( null == prog) {
 			triggerscriptprogs.add(DEFAULTSCRIPTPROG);
@@ -610,10 +624,10 @@ public class Builder {
 		} else {
 			triggerscriptprogs.add(prog);
 		}
-		for ( Map.Entry< String, String> depend : depends.entrySet()) {
+		for ( Map.Entry< String, IntString> depend : depends.entrySet()) {
 			triggernames.add( depend.getKey());
-			triggerversions.add( depend.getValue());
-			triggerflags.add( GREATER | EQUAL | flag);
+			triggerflags.add( depend.getValue().getInt() | flag);
+			triggerversions.add( depend.getValue().getString());
 			triggerindexes.add ( triggerCounter);
 		}
 		triggerCounter++;

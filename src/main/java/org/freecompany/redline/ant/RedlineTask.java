@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import org.freecompany.redline.Builder;
+import org.freecompany.redline.IntString;
 import org.freecompany.redline.header.Architecture;
 import org.freecompany.redline.header.Header;
 import org.freecompany.redline.header.Os;
@@ -166,7 +167,7 @@ public class RedlineTask extends Task {
 				}
 			}
 			for ( Link link : links) builder.addLink( link.getPath(), link.getTarget(), link.getPermissions());
-			for ( Depends dependency : depends) builder.addDependencyMore( dependency.getName(), dependency.getVersion());
+			for ( Depends dependency : depends) builder.addDependency( dependency.getName(), dependency.getComparison(), dependency.getVersion());
 
 			for ( TriggerPreIn triggerPreIn : triggersPreIn) builder.addTrigger( triggerPreIn.getScript(), "", triggerPreIn.getDepends(), triggerPreIn.getFlag());
 			for ( TriggerIn triggerIn : triggersIn) builder.addTrigger( triggerIn.getScript(), "", triggerIn.getDepends(), triggerIn.getFlag());
