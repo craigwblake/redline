@@ -13,4 +13,8 @@ public class Flags {
 	public static int SCRIPT_POST = 0x400;
 	public static int SCRIPT_PREUN = 0x800;
 	public static int SCRIPT_POSTUN = 0x1000;
+	public static int SCRIPT_TRIGGERIN = 0x10000;
+	public static int SCRIPT_TRIGGERUN = 0x20000;
+	public static int SCRIPT_TRIGGERPOSTUN = 0x40000;
+	public static int SCRIPT_TRIGGERPREIN = 0x2000000;
 }
