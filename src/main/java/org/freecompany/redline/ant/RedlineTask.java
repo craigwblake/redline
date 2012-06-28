@@ -54,6 +54,7 @@ public class RedlineTask extends Task {
 	protected Os os = LINUX;
 	protected File destination;
 	protected List< ArchiveFileSet> filesets = new ArrayList< ArchiveFileSet>();
+	protected List< Ghost> ghosts = new ArrayList< Ghost>();
 	protected List< Link> links = new ArrayList< Link>();
 	protected List< Depends> depends = new ArrayList< Depends>();
 
@@ -166,6 +167,9 @@ public class RedlineTask extends Task {
 					}
 				}
 			}
+			for ( Ghost ghost : ghosts) {
+				builder.addFile( ghost.getPath(), null, ghost.getFilemode(), ghost.getDirmode(), Directive.GHOST, ghost.getUsername(), ghost.getGroup());
+			}
 			for ( Link link : links) builder.addLink( link.getPath(), link.getTarget(), link.getPermissions());
 			for ( Depends dependency : depends) builder.addDependency( dependency.getName(), dependency.getComparison(), dependency.getVersion());
 
@@ -210,6 +214,7 @@ public class RedlineTask extends Task {
 	public void addZipfileset( ZipFileSet fileset) { filesets.add( fileset); }
 	public void addTarfileset( TarFileSet fileset) { filesets.add( fileset); }
     public void addRpmfileset( RpmFileSet fileset) { filesets.add( fileset); }
+	public void addGhost( Ghost ghost) { ghosts.add( ghost); }
 	public void addLink( Link link) { links.add( link); }
 	public void addDepends( Depends dependency) { depends.add( dependency); }
 	public void addTriggerPreIn( TriggerPreIn triggerPreIn) { triggersPreIn.add( triggerPreIn); }

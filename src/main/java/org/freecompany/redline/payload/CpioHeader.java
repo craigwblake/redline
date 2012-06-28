@@ -24,6 +24,8 @@ public class CpioHeader {
 
 	public static final int DEFAULT_FILE_PERMISSION = 0644;
 	public static final int DEFAULT_DIRECTORY_PERMISSION = 0755;
+	public static final String DEFAULT_USERNAME = "root";
+	public static final String DEFAULT_GROUP = "root";
 
 	public static final int FIFO = 1;
 	public static final int CDEV = 2;
