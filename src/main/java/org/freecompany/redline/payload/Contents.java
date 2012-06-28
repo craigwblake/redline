@@ -28,6 +28,9 @@ import static java.util.logging.Level.FINE;
 import static java.util.logging.Logger.getLogger;
 import static org.freecompany.redline.Util.normalizePath;
 import static org.freecompany.redline.payload.CpioHeader.DEFAULT_DIRECTORY_PERMISSION;
+import static org.freecompany.redline.payload.CpioHeader.DEFAULT_FILE_PERMISSION;
+import static org.freecompany.redline.payload.CpioHeader.DEFAULT_USERNAME;
+import static org.freecompany.redline.payload.CpioHeader.DEFAULT_GROUP;
 import static org.freecompany.redline.payload.CpioHeader.DIR;
 import static org.freecompany.redline.payload.CpioHeader.FILE;
 import static org.freecompany.redline.payload.CpioHeader.SYMLINK;
@@ -175,11 +178,26 @@ public class Contents {
 		CpioHeader header = new CpioHeader( path);
 		header.setType( DIR);
 		header.setInode( inode++);
-		if (uname != null) header.setUname(uname);
-		if (gname != null) header.setGname(gname);
+		if ( null == uname) {
+			header.setUname(DEFAULT_USERNAME);
+		} else if (0 == uname.length()) {
+			header.setUname(DEFAULT_USERNAME);
+		} else {
+			header.setUname(uname);
+		}
+		if ( null == gname) {
+			header.setUname(DEFAULT_GROUP);
+		} else if (0 == gname.length()) {
+			header.setUname(DEFAULT_GROUP);
+		} else {
+			header.setUname(gname);
+		}
 		header.setMtime( System.currentTimeMillis());
-		if ( permissions != -1) header.setPermissions( permissions);
-		else header.setPermissions( DEFAULT_DIRECTORY_PERMISSION);
+		if ( -1 == permissions) {
+			header.setPermissions( DEFAULT_DIRECTORY_PERMISSION);
+		} else {
+			header.setPermissions( permissions);
+		}
 		headers.add( header);
 		sources.put( header, "");
 		if ( directive != null) header.setFlags( directive.flag());
@@ -259,12 +277,33 @@ public class Contents {
 		addParents( new File( path), dirmode, uname, gname);
 		files.add( path);
 		logger.log( FINE, "Adding file ''{0}''.", path);
-		CpioHeader header = new CpioHeader( path, source);
+		CpioHeader header;
+		if ( ( directive.flag() & Directive.RPMFILE_GHOST ) == Directive.RPMFILE_GHOST ) {
+			header = new CpioHeader( path);
+		} else {
+			header = new CpioHeader( path, source);
+		}
 		header.setType( FILE);
 		header.setInode( inode++);
-		if (uname != null) header.setUname(uname);
-		if (gname != null) header.setGname(gname);
-		if ( permissions != -1) header.setPermissions( permissions);
+		if ( null == uname) {
+			header.setUname(DEFAULT_USERNAME);
+		} else if (0 == uname.length()) {
+			header.setUname(DEFAULT_USERNAME);
+		} else {
+			header.setUname(uname);
+		}
+		if ( null == gname) {
+			header.setGname(DEFAULT_GROUP);
+		} else if (0 == gname.length()) {
+			header.setGname(DEFAULT_GROUP);
+		} else {
+			header.setGname(gname);
+		}
+		if ( -1 == permissions) {
+			header.setPermissions(DEFAULT_FILE_PERMISSION);
+		} else {
+			header.setPermissions( permissions);
+		}
 		headers.add( header);
 		sources.put( header, source);
 		
