@@ -186,11 +186,11 @@ public class Contents {
 			header.setUname(uname);
 		}
 		if ( null == gname) {
-			header.setUname(DEFAULT_GROUP);
+			header.setGname(DEFAULT_GROUP);
 		} else if (0 == gname.length()) {
-			header.setUname(DEFAULT_GROUP);
+			header.setGname(DEFAULT_GROUP);
 		} else {
-			header.setUname(gname);
+			header.setGname(gname);
 		}
 		header.setMtime( System.currentTimeMillis());
 		if ( -1 == permissions) {
