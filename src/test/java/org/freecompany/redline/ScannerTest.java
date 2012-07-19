@@ -11,7 +11,7 @@ public class ScannerTest extends TestBase
         Scanner.main ( new String[]{ getTestResourcesDirectory ( ) + File.separator + "rpm-1-1.0-1.noarch.rpm" } );
     }
 
-    @Test
+    @Test(expected = ArrayIndexOutOfBoundsException.class)
     public void scanSomeArchTest() throws Exception {
         Scanner.main ( new String[]{ getTestResourcesDirectory ( ) + File.separator + "rpm-3-1.0-1.somearch.rpm" } );
     }
