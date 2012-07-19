@@ -73,7 +73,12 @@ public class Lead {
 		while (( b = data.get()) != 0) builder.append(( char) b);
 		name = builder.toString();
 
-		os = Os.values()[ lead.getShort()];
+		// Unknown rpm tag defaults to 0xFF (see rpmtag.h)
+		short o = lead.getShort();
+		if ( o != 0xFF)
+		    os = Os.values()[ o];
+		else
+		    os = Os.UNKNOWN;		
 		sigtype = lead.getShort();
 		if ( lead.remaining() != 16) throw new IllegalStateException( "Expected 16 remaining, found '" + lead.remaining() + "'.");
 	}
@@ -91,7 +96,8 @@ public class Lead {
 		System.arraycopy( encoded, 0, data, 0, encoded.length);
 		buffer.put( data);
 
-		buffer.putShort(( short) os.ordinal());
+		// Unknown rpm tag defaults to 0xFF (see rpmtag.h)		
+		buffer.putShort(( short) (os.ordinal() != 0 ? os.ordinal() : 0xFF));
 		buffer.putShort( sigtype);
 		buffer.position( buffer.position() + 16);
 		buffer.flip();
