@@ -184,7 +184,7 @@ public class Builder {
 	 * <b>Required Field</b>. Sets the platform related headers for the resulting RPM. The platform is specified as a
 	 * combination of target architecture and OS.
 	 *
-	 * @param arch the target architectur.
+	 * @param arch the target architecture.
 	 * @param os the target operating system.
 	 */
 	public void setPlatform( final Architecture arch, final Os os) {
@@ -199,6 +199,24 @@ public class Builder {
 		format.getHeader().createEntry( RHNPLATFORM, archName);
 	}
 
+    /**
+     * <b>Required Field</b>. Sets the platform related headers for the resulting RPM. The platform is specified as a
+     * combination of target architecture and OS. 
+     *
+     * @param arch the target architecture.
+     * @param osName the non-standard target operating system.
+     */
+    public void setPlatform( final Architecture arch, final CharSequence osName) {
+            format.getLead().setArch( arch);
+            format.getLead().setOs( Os.UNKNOWN);
+            
+            final CharSequence archName = arch.toString().toLowerCase();
+            format.getHeader().createEntry( ARCH, archName);
+            format.getHeader().createEntry( OS, osName);
+            format.getHeader().createEntry( PLATFORM, archName + "-" + osName);
+            format.getHeader().createEntry( RHNPLATFORM, archName);
+    }
+	
 	/**
 	 * <b>Required Field</b>. Sets the summary text for the file. The summary is generally a short, one line description of the
 	 * function of the package, and is often shown by RPM tools.

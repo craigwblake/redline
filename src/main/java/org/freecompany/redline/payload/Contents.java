@@ -278,11 +278,10 @@ public class Contents {
 		files.add( path);
 		logger.log( FINE, "Adding file ''{0}''.", path);
 		CpioHeader header;
-		if ( ( directive.flag() & Directive.RPMFILE_GHOST ) == Directive.RPMFILE_GHOST ) {
+		if ( directive != null && (( directive.flag() & Directive.RPMFILE_GHOST ) == Directive.RPMFILE_GHOST ))
 			header = new CpioHeader( path);
-		} else {
+		else
 			header = new CpioHeader( path, source);
-		}
 		header.setType( FILE);
 		header.setInode( inode++);
 		if ( null == uname) {
