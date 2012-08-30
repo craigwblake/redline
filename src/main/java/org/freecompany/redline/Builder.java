@@ -117,7 +117,11 @@ public class Builder {
 	 * @param version the version identifier.
 	 */
 	public void addDependencyLess( final CharSequence name, final CharSequence version) {
-		addDependency( name, version, LESS | EQUAL);
+		int flag = LESS | EQUAL;
+		if (name.toString().startsWith("rpmlib(")){
+			flag = flag | RPMLIB; 
+		}
+		addDependency( name, version, flag);
 	}
 
 	/**
