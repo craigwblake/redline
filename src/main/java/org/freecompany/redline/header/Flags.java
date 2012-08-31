@@ -17,4 +17,6 @@ public class Flags {
 	public static int SCRIPT_TRIGGERUN = 0x20000;
 	public static int SCRIPT_TRIGGERPOSTUN = 0x40000;
 	public static int SCRIPT_TRIGGERPREIN = 0x2000000;
+	public static int RPMLIB = (0x1000000 | PREREQ);
+
 }
