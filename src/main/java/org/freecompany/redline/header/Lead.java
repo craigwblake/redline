@@ -70,7 +70,7 @@ public class Lead {
 		lead.get( data.array());
 		StringBuilder builder = new StringBuilder();
 		byte b;
-		while (( b = data.get()) != 0) builder.append(( char) b);
+        while ((data.hasRemaining() && (b = data.get()) != 0)) builder.append(( char) b);
 		name = builder.toString();
 
 		// Unknown rpm tag defaults to 0xFF (see rpmtag.h)
