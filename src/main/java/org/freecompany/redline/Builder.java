@@ -171,6 +171,7 @@ public class Builder {
 		format.getHeader().createEntry( NAME, name);
 		format.getHeader().createEntry( VERSION, version);
 		format.getHeader().createEntry( RELEASE, release);
+		format.getHeader().createEntry( PROVIDENAME, 8, new String[] { String.valueOf(name) });
 		format.getHeader().createEntry( PROVIDEVERSION, 8, new String[] { "0:" + version + "-" + release});
 		format.getHeader().createEntry( PROVIDEFLAGS, new int[] { 8});
 	}
