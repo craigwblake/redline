@@ -171,6 +171,7 @@ public class Builder {
 		format.getHeader().createEntry( NAME, name);
 		format.getHeader().createEntry( VERSION, version);
 		format.getHeader().createEntry( RELEASE, release);
+		format.getHeader().createEntry( PROVIDENAME, 8, new String[] { String.valueOf(name) });
 		format.getHeader().createEntry( PROVIDEVERSION, 8, new String[] { "0:" + version + "-" + release});
 		format.getHeader().createEntry( PROVIDEFLAGS, new int[] { 8});
 	}
@@ -715,6 +716,24 @@ public class Builder {
      */
     public void addFile( final String path, final File source, final int mode, final int dirmode, final Directive directive, final String uname, final String gname) throws NoSuchAlgorithmException, IOException {
         contents.addFile( path, source, mode, directive, uname, gname, dirmode);
+    }
+
+    /**
+     * Add the specified file to the repository payload in order.
+     * The required header entries will automatically be generated
+     * to record the directory names and file names, as well as their
+     * digests.
+     *
+     * @param path the absolute path at which this file will be installed.
+     * @param source the file content to include in this rpm.
+     * @param mode the mode of the target file in standard three octet notation, or -1 for default.
+     * @param dirmode the mode of the parent directories in standard three octet notation, or -1 for default.
+     * @param uname user owner for the given file, or null for default user.
+     * @param gname group owner for the given file, or null for default group.
+     * @param addParents whether to create parent directories for the file, defaults to true for other methods.
+     */
+    public void addFile( final String path, final File source, final int mode, final int dirmode, final Directive directive, final String uname, final String gname, final boolean addParents) throws NoSuchAlgorithmException, IOException {
+        contents.addFile( path, source, mode, directive, uname, gname, dirmode, addParents);
     }
 
 	/**
