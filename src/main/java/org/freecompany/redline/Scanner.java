@@ -63,6 +63,7 @@ public class Scanner {
 	 */
 	public Format run( ReadableChannelWrapper in) throws Exception {
 		Format format = new Format();
+        Key< Integer> headerStartKey = in.start();
 		
 		Key< Integer> lead = in.start();
 		format.getLead().read( in);
@@ -73,10 +74,14 @@ public class Scanner {
 		int expected = ByteBuffer.wrap(( byte[]) format.getSignature().getEntry( SIGNATURES).getValues(), 8, 4).getInt() / -16;
 		System.out.println( "Signature ended at '" + in.finish( signature) + "' and contained '" + count + "' headers (expected '" + expected + "').");
 
-		Key< Integer> header = in.start();
+        Integer headerStartPos = in.finish(headerStartKey);
+        format.getHeader().setStartPos(headerStartPos);
+		Key< Integer> headerKey = in.start();
 		count = format.getHeader().read( in);
 		expected = ByteBuffer.wrap(( byte[]) format.getHeader().getEntry( HEADERIMMUTABLE).getValues(), 8, 4).getInt() / -16;
-		System.out.println( "Header ended at '" + in.finish( header) + " and contained '" + count + "' headers (expected '" + expected + "').");
+        Integer headerLength = in.finish(headerKey);
+        format.getHeader().setEndPos(headerStartPos + headerLength);
+        System.out.println( "Header ended at '" + headerLength + " and contained '" + count + "' headers (expected '" + expected + "').");
 
 		return format;
 	}
