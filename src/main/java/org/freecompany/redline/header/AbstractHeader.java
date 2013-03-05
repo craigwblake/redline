@@ -34,6 +34,9 @@ public abstract class AbstractHeader {
 	protected final Map< Integer, Entry< ?>> entries = new TreeMap< Integer, Entry< ?>>();
 	protected final Map< Entry< ?>, Integer> pending = new LinkedHashMap< Entry< ?>, Integer>();
 
+    protected int startPos;
+    protected int endPos;
+
 	protected abstract boolean pad();
 
 	/**
@@ -284,7 +287,23 @@ public abstract class AbstractHeader {
 		throw new IllegalStateException( "Unknown entry type '" + type + "'.");
 	}
 
-	public interface Entry< T> {
+    public int getEndPos() {
+        return endPos;
+    }
+
+    public void setEndPos(int endPos) {
+        this.endPos = endPos;
+    }
+
+    public int getStartPos() {
+        return startPos;
+    }
+
+    public void setStartPos(int startPos) {
+        this.startPos = startPos;
+    }
+
+    public interface Entry< T> {
 		void setTag( int tag);
 		void setSize( int size);
 		void setCount( int count);
