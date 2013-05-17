@@ -4,3 +4,5 @@ nbactions.xml
 /.settings
 /target
 /test-output
+*.iml
+.idea
