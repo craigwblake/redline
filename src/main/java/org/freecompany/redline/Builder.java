@@ -998,7 +998,7 @@ public class Builder {
 		final Key< byte[]> md5key = output.start( "MD5");
 
 		immutable.setValues( getImmutable( format.getHeader().count()));
-		int headerPadding = format.getHeader().write( output);
+		format.getHeader().write( output);
 		sha.setValues( new String[] { Util.hex( output.finish( shakey))});
 		//Util.empty( output, ByteBuffer.allocate( headerPadding));
 

@@ -1,9 +1,9 @@
 package org.freecompany.redline.header;
 
 import org.freecompany.redline.Util;
-import java.lang.reflect.Array;
+
 import java.io.IOException;
-import java.net.URL;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -510,7 +510,6 @@ public abstract class AbstractHeader {
 			for ( int x = 0; x < count; x++) {
 				int length = 0;
 				while ( buffer.get( buffer.position() + length) != 0) length++;
-				byte[] bytes = new byte[ length];
 
 				final ByteBuffer slice = buffer.slice();
 				buffer.position( buffer.position() + length + 1);
