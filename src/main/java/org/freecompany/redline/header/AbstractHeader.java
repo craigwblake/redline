@@ -144,8 +144,8 @@ public abstract class AbstractHeader {
 			index.position( 0);
 			offset = writeData( buffers, index, first, offset);
 			index.position( index.limit());
-		} catch ( Throwable t) {
-			throw new RuntimeException( "Error while writing '" + entry + "'.", t);
+		} catch ( IllegalArgumentException e) {
+			throw new RuntimeException( "Error while writing '" + entry + "'.", e);
 		}
 		ByteBuffer data = ByteBuffer.allocate( offset);
 		for ( ByteBuffer buffer : buffers) data.put( buffer);
@@ -177,8 +177,9 @@ public abstract class AbstractHeader {
 				entry.write( data);
 				channel.position( Lead.LEAD_SIZE + HEADER_HEADER_SIZE + count() * ENTRY_SIZE + pending.get( entry));
 				Util.empty( channel, ( ByteBuffer) data.flip());
-			} catch ( Throwable t) {
-				throw new RuntimeException( "Error writing pending entry '" + entry.getTag() + "'.", t);
+			}
+            catch ( Exception e) {
+				throw new RuntimeException( "Error writing pending entry '" + entry.getTag() + "'.", e);
 			}
 		}
 	}
