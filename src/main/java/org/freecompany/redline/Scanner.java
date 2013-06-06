@@ -2,6 +2,8 @@ package org.freecompany.redline;
 
 import org.freecompany.redline.header.Format;
 import org.freecompany.redline.payload.CpioHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,6 +29,7 @@ import static org.freecompany.redline.header.Signature.SignatureTag.SIGNATURES;
  * contained in the embedded CPIO payload.
  */
 public class Scanner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Scanner.class);  
     private final PrintStream output;
 
     public Scanner() {
@@ -99,7 +102,9 @@ public class Scanner {
 	}
 
     private void log(final String text) {
-        if ( output != null){
+        if ( output == null){
+            LOGGER.info(text);
+        }else{
             output.println(text);
         }
     }
