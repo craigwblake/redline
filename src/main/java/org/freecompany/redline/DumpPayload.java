@@ -10,7 +10,8 @@ import java.nio.channels.ReadableByteChannel;
  * RPM file to a file. This is useful in debugging
  * problems in RPM generation.
  */
-public class DumpPayload {
+public final class DumpPayload {
+    private DumpPayload(){}
 
 	/**
 	 * Dumps the contents of the payload for an RPM file to

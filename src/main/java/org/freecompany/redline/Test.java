@@ -12,7 +12,8 @@ import static org.freecompany.redline.header.Os.LINUX;
  * results of this test class can be read in
  * by the scanner to validate it's format.
  */
-public class Test {
+public final class Test {
+    private Test(){}
 
 	/**
 	 * Builds a test RPM file using the provided optional arguments.
