@@ -79,7 +79,7 @@ public class RedlineTask extends Task {
 	}
 
 	@Override
-	public void execute() throws BuildException {
+	public void execute() {
 		if ( name == null) throw new BuildException( "Attribute 'name' is required.");
 		if ( version == null) throw new BuildException( "Attribute 'version' is required.");
 		if ( group == null) throw new BuildException( "Attribute 'group' is required.");
