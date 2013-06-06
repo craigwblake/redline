@@ -4,6 +4,7 @@ import org.freecompany.redline.header.Format;
 import org.freecompany.redline.payload.CpioHeader;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
@@ -72,7 +73,7 @@ public class Scanner {
 	 * @return information describing the RPM file
 	 * @throws Exception if an error occurs reading the file
 	 */
-	public Format run( ReadableChannelWrapper in) throws Exception {
+	public Format run( ReadableChannelWrapper in) throws IOException {
 		Format format = new Format();
         Key< Integer> headerStartKey = in.start();
 		
