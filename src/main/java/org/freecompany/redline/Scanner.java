@@ -2,8 +2,11 @@ package org.freecompany.redline;
 
 import org.freecompany.redline.header.Format;
 import org.freecompany.redline.payload.CpioHeader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
@@ -26,6 +29,7 @@ import static org.freecompany.redline.header.Signature.SignatureTag.SIGNATURES;
  * contained in the embedded CPIO payload.
  */
 public class Scanner {
+    private static final Logger LOGGER = LoggerFactory.getLogger(Scanner.class);  
     private final PrintStream output;
 
     public Scanner() {
@@ -72,7 +76,7 @@ public class Scanner {
 	 * @return information describing the RPM file
 	 * @throws Exception if an error occurs reading the file
 	 */
-	public Format run( ReadableChannelWrapper in) throws Exception {
+	public Format run( ReadableChannelWrapper in) throws IOException {
 		Format format = new Format();
         Key< Integer> headerStartKey = in.start();
 		
@@ -98,7 +102,9 @@ public class Scanner {
 	}
 
     private void log(final String text) {
-        if ( output != null){
+        if ( output == null){
+            LOGGER.info(text);
+        }else{
             output.println(text);
         }
     }

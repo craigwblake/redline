@@ -1,9 +1,9 @@
 package org.freecompany.redline.header;
 
 import org.freecompany.redline.Util;
-import java.lang.reflect.Array;
+
 import java.io.IOException;
-import java.net.URL;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
@@ -144,8 +144,8 @@ public abstract class AbstractHeader {
 			index.position( 0);
 			offset = writeData( buffers, index, first, offset);
 			index.position( index.limit());
-		} catch ( Throwable t) {
-			throw new RuntimeException( "Error while writing '" + entry + "'.", t);
+		} catch ( IllegalArgumentException e) {
+			throw new RuntimeException( "Error while writing '" + entry + "'.", e);
 		}
 		ByteBuffer data = ByteBuffer.allocate( offset);
 		for ( ByteBuffer buffer : buffers) data.put( buffer);
@@ -177,8 +177,9 @@ public abstract class AbstractHeader {
 				entry.write( data);
 				channel.position( Lead.LEAD_SIZE + HEADER_HEADER_SIZE + count() * ENTRY_SIZE + pending.get( entry));
 				Util.empty( channel, ( ByteBuffer) data.flip());
-			} catch ( Throwable t) {
-				throw new RuntimeException( "Error writing pending entry '" + entry.getTag() + "'.", t);
+			}
+            catch ( Exception e) {
+				throw new RuntimeException( "Error writing pending entry '" + entry.getTag() + "'.", e);
 			}
 		}
 	}
@@ -283,8 +284,9 @@ public abstract class AbstractHeader {
 				return new StringArrayEntry();
 			case 9:
 				return new I18NStringEntry();
-		}
-		throw new IllegalStateException( "Unknown entry type '" + type + "'.");
+            default:
+                throw new IllegalStateException( "Unknown entry type '" + type + "'.");
+        }
 	}
 
     public int getEndPos() {
@@ -337,7 +339,7 @@ public abstract class AbstractHeader {
 		public T getValues() { return values; }
 		public int getTag() { return tag; }
 
-		public int getOffset( int offset) { return offset; }//Util.round( offset, 1); }
+		public int getOffset( int offset) { return offset; }
 
 		/**
 		 * Returns true if this entry is ready to write, indicated by the presence of
@@ -397,7 +399,7 @@ public abstract class AbstractHeader {
 
 	class CharEntry extends AbstractEntry< byte[]> {
 		public int getType() { return 1; }
-		public int size() { return count * ( Byte.SIZE / 8); }
+		public int size() { return count ; }
 		public void read( final ByteBuffer buffer) {
 			byte[] values = new byte[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.get();
@@ -416,7 +418,7 @@ public abstract class AbstractHeader {
 
 	class Int8Entry extends AbstractEntry< byte[]> {
 		public int getType() { return 2; }
-		public int size() { return count * ( Byte.SIZE / 8); }
+		public int size() { return count; }
 		public void read( final ByteBuffer buffer) {
 			byte[] values = new byte[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.get();
@@ -510,7 +512,6 @@ public abstract class AbstractHeader {
 			for ( int x = 0; x < count; x++) {
 				int length = 0;
 				while ( buffer.get( buffer.position() + length) != 0) length++;
-				byte[] bytes = new byte[ length];
 
 				final ByteBuffer slice = buffer.slice();
 				buffer.position( buffer.position() + length + 1);

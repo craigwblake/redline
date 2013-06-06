@@ -1,12 +1,12 @@
 package org.freecompany.redline.ant;
 
+import org.freecompany.redline.IntString;
+
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
-import org.freecompany.redline.IntString;
 
 /**
  * Object describing an RPM Trigger
@@ -30,9 +30,8 @@ public abstract class AbstractTrigger {
 
     public Map< String, IntString> getDepends() {
         Map< String, IntString> dependsMap = new HashMap< String, IntString>();
-        for ( Iterator< Depends> i = this.depends.iterator(); i.hasNext();) {
-            Depends d = i.next();
-            dependsMap.put( d.getName(), new IntString(d.getComparison(), d.getVersion()));
+        for (Depends d : this.depends) {
+            dependsMap.put(d.getName(), new IntString(d.getComparison(), d.getVersion()));
         }
         return dependsMap;
     }

@@ -1,5 +1,9 @@
 package org.freecompany.redline.payload;
 
+import org.freecompany.redline.ChannelWrapper.Key;
+import org.freecompany.redline.ReadableChannelWrapper;
+import org.freecompany.redline.Util;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,9 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
-import org.freecompany.redline.ChannelWrapper.Key;
-import org.freecompany.redline.ReadableChannelWrapper;
-import org.freecompany.redline.Util;
 
 import static java.util.Arrays.asList;
 import static java.util.logging.Level.FINE;
@@ -29,8 +30,8 @@ import static java.util.logging.Logger.getLogger;
 import static org.freecompany.redline.Util.normalizePath;
 import static org.freecompany.redline.payload.CpioHeader.DEFAULT_DIRECTORY_PERMISSION;
 import static org.freecompany.redline.payload.CpioHeader.DEFAULT_FILE_PERMISSION;
-import static org.freecompany.redline.payload.CpioHeader.DEFAULT_USERNAME;
 import static org.freecompany.redline.payload.CpioHeader.DEFAULT_GROUP;
+import static org.freecompany.redline.payload.CpioHeader.DEFAULT_USERNAME;
 import static org.freecompany.redline.payload.CpioHeader.DIR;
 import static org.freecompany.redline.payload.CpioHeader.FILE;
 import static org.freecompany.redline.payload.CpioHeader.SYMLINK;
@@ -42,44 +43,44 @@ import static org.freecompany.redline.payload.CpioHeader.SYMLINK;
  */
 public class Contents {
 
-	private static final Set< String> builtin = new HashSet< String>();
-	private static final Set< String> docDirs = new HashSet< String>();
+	private static final Set< String> BUILTIN = new HashSet< String>();
+	private static final Set< String> DOC_DIRS = new HashSet< String>();
 	static {
-		builtin.add( "/");
-		builtin.add( "/bin");
-		builtin.add( "/dev");
-		builtin.add( "/etc");
-		builtin.add( "/etc/bash_completion.d");
-		builtin.add( "/etc/cron.d");
-		builtin.add( "/etc/cron.daily");
-		builtin.add( "/etc/cron.hourly");
-		builtin.add( "/etc/cron.monthly");
-		builtin.add( "/etc/cron.weekly");
-		builtin.add( "/etc/default");
-		builtin.add( "/etc/init.d");
-		builtin.add( "/etc/logrotate.d");
-		builtin.add( "/lib");
-		builtin.add( "/usr");
-		builtin.add( "/usr/bin");
-		builtin.add( "/usr/lib");
-		builtin.add( "/usr/local");
-		builtin.add( "/usr/local/bin");
-		builtin.add( "/usr/local/lib");
-		builtin.add( "/usr/sbin");
-		builtin.add( "/usr/share");
-		builtin.add( "/usr/share/applications");
-		builtin.add( "/root");
-		builtin.add( "/sbin");
-		builtin.add( "/opt");
-		builtin.add( "/tmp");
-		builtin.add( "/var");
-		builtin.add( "/var/log");
-		docDirs.add( "/usr/doc");
-		docDirs.add( "/usr/man");
-		docDirs.add( "/usr/X11R6/man");
-		docDirs.add( "/usr/share/doc");
-		docDirs.add( "/usr/share/man");
-		docDirs.add( "/usr/share/info");
+		BUILTIN.add( "/");
+		BUILTIN.add( "/bin");
+		BUILTIN.add( "/dev");
+		BUILTIN.add( "/etc");
+		BUILTIN.add( "/etc/bash_completion.d");
+		BUILTIN.add( "/etc/cron.d");
+		BUILTIN.add( "/etc/cron.daily");
+		BUILTIN.add( "/etc/cron.hourly");
+		BUILTIN.add( "/etc/cron.monthly");
+		BUILTIN.add( "/etc/cron.weekly");
+		BUILTIN.add( "/etc/default");
+		BUILTIN.add( "/etc/init.d");
+		BUILTIN.add( "/etc/logrotate.d");
+		BUILTIN.add( "/lib");
+		BUILTIN.add( "/usr");
+		BUILTIN.add( "/usr/bin");
+		BUILTIN.add( "/usr/lib");
+		BUILTIN.add( "/usr/local");
+		BUILTIN.add( "/usr/local/bin");
+		BUILTIN.add( "/usr/local/lib");
+		BUILTIN.add( "/usr/sbin");
+		BUILTIN.add( "/usr/share");
+		BUILTIN.add( "/usr/share/applications");
+		BUILTIN.add( "/root");
+		BUILTIN.add( "/sbin");
+		BUILTIN.add( "/opt");
+		BUILTIN.add( "/tmp");
+		BUILTIN.add( "/var");
+		BUILTIN.add( "/var/log");
+		DOC_DIRS.add("/usr/doc");
+		DOC_DIRS.add("/usr/man");
+		DOC_DIRS.add("/usr/X11R6/man");
+		DOC_DIRS.add("/usr/share/doc");
+		DOC_DIRS.add("/usr/share/man");
+		DOC_DIRS.add("/usr/share/info");
 	}
 
 	private Logger logger = getLogger( Contents.class.getName());
@@ -370,7 +371,7 @@ public class Contents {
 	 * @param directory
 	 */
 	public synchronized static void addBuiltinDirectory( final String directory) {
-		builtin.add(directory);
+		BUILTIN.add(directory);
 	}
 
 	/**
@@ -672,7 +673,7 @@ public class Contents {
 		if ( parent == null) return;
 		
 		final String path = normalizePath( parent.getPath());
-		if ( builtin.contains( path)) return;
+		if ( BUILTIN.contains( path)) return;
 
 		parents.add( path);
 		listParents( parents, parent);
