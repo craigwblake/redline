@@ -338,7 +338,7 @@ public abstract class AbstractHeader {
 		public T getValues() { return values; }
 		public int getTag() { return tag; }
 
-		public int getOffset( int offset) { return offset; }//Util.round( offset, 1); }
+		public int getOffset( int offset) { return offset; }
 
 		/**
 		 * Returns true if this entry is ready to write, indicated by the presence of

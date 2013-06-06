@@ -925,14 +925,6 @@ public class Builder {
 	public void build( final FileChannel original) throws NoSuchAlgorithmException, IOException {
 		final WritableChannelWrapper output = new WritableChannelWrapper( original);
 
-		/*
-		final Map< PrivateKey, Entry< byte[]>> map = new HashMap< PrivateKey, Entry< byte[]>>();
-		for ( PrivateKey key : signatures) {
-			if ( "MD5withRSA".equals( key.getAlgorithm())) map.put( key, ( Entry< byte[]>) format.getSignature().addEntry( GPG, GPGSIZE));
-			else if ( "SHA1withDSA".equals( key.getAlgorithm())) map.put( key, ( Entry< byte[]>) format.getSignature().addEntry( DSAHEADER, DSASIZE));
-			else throw new IOException( "Unknown key type '" + key.getAlgorithm() + "'.");
-		}
-		 */
 
 		format.getHeader().createEntry( EPOCH, 0);
 		format.getHeader().createEntry( REQUIRENAME, dependencies.keySet().toArray( new String[ dependencies.size()]));
@@ -966,10 +958,6 @@ public class Builder {
 		format.getHeader().createEntry( FILEDEVICES, contents.getDevices());
 		format.getHeader().createEntry( FILEINODES, contents.getInodes());
 		format.getHeader().createEntry( FILELANGS, contents.getLangs());
-		//format.getHeader().createEntry( FILEDEPENDSX, contents.getDependsX());
-		//format.getHeader().createEntry( FILEDEPENDSN, contents.getDependsN());
-		//format.getHeader().createEntry( FILECOLORS, contents.getColors());
-		//format.getHeader().createEntry( FILECLASS, contents.getClasses());
 		format.getHeader().createEntry( FILECONTEXTS, contents.getContexts());
 
 		format.getHeader().createEntry( PAYLOADFLAGS, new String[] { "9"});
@@ -984,15 +972,6 @@ public class Builder {
 		signature.setValues( getSignature( format.getSignature().count()));
 		Util.empty( output, ByteBuffer.allocate( format.getSignature().write( original)));
 
-		/*
-		for ( PrivateKey key : map.keySet()) {
-			final Entry< byte[]> entry = map.get( key);
-			final WritableByteChannel encrypted = new EncryptionChannel( channel) {
-				public void sign( final byte[] signature) { entry.setValues( signature); }
-			};
-		}
-		 */
-
 		final Key< Integer> sigsizekey = output.start();
 		final Key< byte[]> shakey = output.start( "SHA");
 		final Key< byte[]> md5key = output.start( "MD5");
@@ -1000,7 +979,6 @@ public class Builder {
 		immutable.setValues( getImmutable( format.getHeader().count()));
 		format.getHeader().write( output);
 		sha.setValues( new String[] { Util.hex( output.finish( shakey))});
-		//Util.empty( output, ByteBuffer.allocate( headerPadding));
 
 		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( output));
 		final WritableChannelWrapper compressor = new WritableChannelWrapper( Channels.newChannel( zip));
