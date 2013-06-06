@@ -398,7 +398,7 @@ public abstract class AbstractHeader {
 
 	class CharEntry extends AbstractEntry< byte[]> {
 		public int getType() { return 1; }
-		public int size() { return count * ( Byte.SIZE / 8); }
+		public int size() { return count ; }
 		public void read( final ByteBuffer buffer) {
 			byte[] values = new byte[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.get();
@@ -417,7 +417,7 @@ public abstract class AbstractHeader {
 
 	class Int8Entry extends AbstractEntry< byte[]> {
 		public int getType() { return 2; }
-		public int size() { return count * ( Byte.SIZE / 8); }
+		public int size() { return count; }
 		public void read( final ByteBuffer buffer) {
 			byte[] values = new byte[ count];
 			for ( int x = 0; x < count; x++) values[ x] = buffer.get();
