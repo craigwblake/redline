@@ -284,8 +284,9 @@ public abstract class AbstractHeader {
 				return new StringArrayEntry();
 			case 9:
 				return new I18NStringEntry();
-		}
-		throw new IllegalStateException( "Unknown entry type '" + type + "'.");
+            default:
+                throw new IllegalStateException( "Unknown entry type '" + type + "'.");
+        }
 	}
 
     public int getEndPos() {
