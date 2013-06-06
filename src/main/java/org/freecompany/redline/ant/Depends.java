@@ -26,13 +26,13 @@ public class Depends {
 
 	public void setComparison( ComparisonEnum comparisonEnum) {
 		String comparisonValue = comparisonEnum.getValue();
-		if ( comparisonValue.equals( "equal")) {
+		if ("equal".equals(comparisonValue)) {
 			this.comparison = EQUAL;
-		} else if ( comparisonValue.equals( "greater")) {
+		} else if ("greater".equals(comparisonValue)) {
 			this.comparison = GREATER;
-		} else if ( comparisonValue.equals( "greater|equal")) {
+		} else if ("greater|equal".equals(comparisonValue)) {
 			this.comparison = GREATER | EQUAL;
-		} else if ( comparisonValue.equals( "less")) {
+		} else if ("less".equals(comparisonValue)) {
 			this.comparison = LESS;
 		} else { // must be ( comparisonValue.equals( "less|equal"))
 			this.comparison = LESS | EQUAL;
