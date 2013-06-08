@@ -1,27 +1,27 @@
 package org.freecompany.redline.ant;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.net.URL;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import org.freecompany.redline.Builder;
-import org.freecompany.redline.IntString;
-import org.freecompany.redline.header.Architecture;
-import org.freecompany.redline.header.Header;
-import org.freecompany.redline.header.Os;
-import org.freecompany.redline.header.RpmType;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.ArchiveFileSet;
 import org.apache.tools.ant.types.TarFileSet;
 import org.apache.tools.ant.types.ZipFileSet;
+import org.freecompany.redline.Builder;
+import org.freecompany.redline.header.Architecture;
+import org.freecompany.redline.header.Header;
+import org.freecompany.redline.header.Os;
+import org.freecompany.redline.header.RpmType;
 import org.freecompany.redline.payload.Directive;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import static org.freecompany.redline.Util.normalizePath;
 import static org.freecompany.redline.header.Architecture.NOARCH;
@@ -79,7 +79,7 @@ public class RedlineTask extends Task {
 	}
 
 	@Override
-	public void execute() throws BuildException {
+	public void execute() {
 		if ( name == null) throw new BuildException( "Attribute 'name' is required.");
 		if ( version == null) throw new BuildException( "Attribute 'version' is required.");
 		if ( group == null) throw new BuildException( "Attribute 'group' is required.");
@@ -154,7 +154,7 @@ public class RedlineTask extends Task {
 				// include any directories, including empty ones, duplicates will be ignored when we scan included files
 				for (String entry : scanner.getIncludedDirectories()) {
 					String dir = normalizePath(prefix + entry);
-					if (!entry.equals("")) builder.addDirectory(dir, dirmode, directive, username, group, true);
+					if (!"".equals(entry)) builder.addDirectory(dir, dirmode, directive, username, group, true);
 				}
 
 				for ( String entry : scanner.getIncludedFiles()) {

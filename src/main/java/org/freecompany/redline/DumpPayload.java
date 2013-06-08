@@ -1,6 +1,5 @@
 package org.freecompany.redline;
 
-import org.freecompany.redline.header.Format;
 import java.io.FileOutputStream;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
@@ -11,7 +10,8 @@ import java.nio.channels.ReadableByteChannel;
  * RPM file to a file. This is useful in debugging
  * problems in RPM generation.
  */
-public class DumpPayload {
+public final class DumpPayload {
+    private DumpPayload(){}
 
 	/**
 	 * Dumps the contents of the payload for an RPM file to
@@ -21,7 +21,7 @@ public class DumpPayload {
 	 */
 	public static void main( String[] args) throws Exception {
 		ReadableByteChannel in = Channels.newChannel( System.in);
-		Format format = new Scanner().run( new ReadableChannelWrapper( in));
+		new Scanner().run( new ReadableChannelWrapper( in));
 		FileChannel out = new FileOutputStream( args[ 0]).getChannel();
 		
 		long position = 0;

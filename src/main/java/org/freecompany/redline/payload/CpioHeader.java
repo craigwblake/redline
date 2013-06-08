@@ -1,5 +1,9 @@
 package org.freecompany.redline.payload;
 
+import org.freecompany.redline.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -10,7 +14,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.util.Date;
-import org.freecompany.redline.Util;
 
 import static org.freecompany.redline.Util.normalizePath;
 
@@ -21,7 +24,8 @@ import static org.freecompany.redline.Util.normalizePath;
  * to read from the channel for the file content.
  */
 public class CpioHeader {
-
+    private final Logger LOGGER = LoggerFactory.getLogger(CpioHeader.class);
+    
 	public static final int DEFAULT_FILE_PERMISSION = 0644;
 	public static final int DEFAULT_DIRECTORY_PERMISSION = 0755;
 	public static final String DEFAULT_USERNAME = "root";
@@ -168,7 +172,7 @@ public class CpioHeader {
 
 	protected int skip( final ReadableByteChannel channel, final int total) throws IOException {
 		int skipped = Util.difference( total, 3);
-		//System.out.println( "Skipping '" + skipped + "' bytes from stream at position '" + total + "'.");
+		LOGGER.info("Skipping '{}' bytes from stream at position '{}'.",skipped,total);
 		Util.fill( channel, skipped);
 		return skipped;
 	}
@@ -176,7 +180,7 @@ public class CpioHeader {
 	public int skip( final WritableByteChannel channel, int total) throws IOException {
 		int skipped = Util.difference( total, 3);
 		Util.empty( channel, ByteBuffer.allocate( skipped));
-		//System.out.println( "Skipping '" + skipped + "' bytes from stream at position '" + total + "'.");
+        LOGGER.info("Skipping '{}' bytes from stream at position '{}'.",skipped,total);
 		return skipped;
 	}
 
