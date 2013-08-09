@@ -6,6 +6,7 @@ public class Header extends AbstractHeader {
 		for ( HeaderTag tag : HeaderTag.values()) tags.put( tag.getCode(), tag);
 	}
 
+	@Override
 	protected boolean pad() { return false; }
 
 	public enum HeaderTag implements Tag {
@@ -96,9 +97,9 @@ public class Header extends AbstractHeader {
 		REQUIREFLAGS( 1048, 4, "requireflags"),
 		REQUIRENAME( 1049, 8, "requirename"),
 		REQUIREVERSION( 1050, 8, "requireversion"),
-		CONFLICTFLAGS( 1053, 6, "conflictflags"),
-		CONFLICTNAME( 1054, 6, "conflictname"),
-		CONFLICTVERSION( 1055, 6, "conflictversion"),
+		CONFLICTFLAGS( 1053, 4, "conflictflags"),
+		CONFLICTNAME( 1054, 8, "conflictname"),
+		CONFLICTVERSION( 1055, 8, "conflictversion"),
 		OBSOLETENAME( 1090, 6, "obsoletename"),
 		PROVIDEFLAGS( 1112, 4, "provideflags"),
 		PROVIDEVERSION( 1113, 6, "provideversion"),

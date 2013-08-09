@@ -1,8 +1,16 @@
 package org.freecompany.redline.payload;
 
-import org.freecompany.redline.ChannelWrapper.Key;
-import org.freecompany.redline.ReadableChannelWrapper;
-import org.freecompany.redline.Util;
+import static java.util.Arrays.asList;
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Logger.getLogger;
+import static org.freecompany.redline.Util.normalizePath;
+import static org.freecompany.redline.payload.CpioHeader.DEFAULT_DIRECTORY_PERMISSION;
+import static org.freecompany.redline.payload.CpioHeader.DEFAULT_FILE_PERMISSION;
+import static org.freecompany.redline.payload.CpioHeader.DEFAULT_GROUP;
+import static org.freecompany.redline.payload.CpioHeader.DEFAULT_USERNAME;
+import static org.freecompany.redline.payload.CpioHeader.DIR;
+import static org.freecompany.redline.payload.CpioHeader.FILE;
+import static org.freecompany.redline.payload.CpioHeader.SYMLINK;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,17 +32,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import static java.util.Arrays.asList;
-import static java.util.logging.Level.FINE;
-import static java.util.logging.Logger.getLogger;
-import static org.freecompany.redline.Util.normalizePath;
-import static org.freecompany.redline.payload.CpioHeader.DEFAULT_DIRECTORY_PERMISSION;
-import static org.freecompany.redline.payload.CpioHeader.DEFAULT_FILE_PERMISSION;
-import static org.freecompany.redline.payload.CpioHeader.DEFAULT_GROUP;
-import static org.freecompany.redline.payload.CpioHeader.DEFAULT_USERNAME;
-import static org.freecompany.redline.payload.CpioHeader.DIR;
-import static org.freecompany.redline.payload.CpioHeader.FILE;
-import static org.freecompany.redline.payload.CpioHeader.SYMLINK;
+import org.freecompany.redline.ChannelWrapper.Key;
+import org.freecompany.redline.ReadableChannelWrapper;
+import org.freecompany.redline.RpmFile;
+import org.freecompany.redline.Util;
 
 /**
  * The contents of an RPM archive. These entries define the files and links that
@@ -82,14 +83,35 @@ public class Contents {
 		DOC_DIRS.add("/usr/share/man");
 		DOC_DIRS.add("/usr/share/info");
 	}
+	
+	private String defaultGroup = DEFAULT_USERNAME;
+	private String defaultUser = DEFAULT_GROUP;
+	private int defaultFilePerm = DEFAULT_FILE_PERMISSION;
+	private int defaultDirPerm = DEFAULT_DIRECTORY_PERMISSION;
 
-	private Logger logger = getLogger( Contents.class.getName());
+	private final Logger logger = getLogger( Contents.class.getName());
 	private int inode = 1;
 
 	protected final Set< CpioHeader> headers = new TreeSet< CpioHeader>( new HeaderComparator());
 	protected final Set< String> files = new HashSet< String>();
 	protected final Map< CpioHeader, Object> sources = new HashMap< CpioHeader, Object>();
 
+	/**
+	 * set default attributes for files/directories
+	 * @param defaultUser
+	 * @param defaultGroup
+	 * @param defaultPerm
+	 * @param defaultDirPerm 
+	 */
+	public void setDefaultAttr(String defaultUser, String defaultGroup,
+			int defaultFilePerm, int defaultDirPerm) {
+		this.defaultUser=defaultUser;
+		this.defaultGroup = defaultGroup;
+		this.defaultFilePerm = defaultFilePerm;
+		this.defaultDirPerm = defaultDirPerm;
+		
+	}
+	
 	/**
 	 * Adds a directory entry to the archive with the default permissions of 644.
 	 *
@@ -180,22 +202,22 @@ public class Contents {
 		header.setType( DIR);
 		header.setInode( inode++);
 		if ( null == uname) {
-			header.setUname(DEFAULT_USERNAME);
+			header.setUname(defaultUser);
 		} else if (0 == uname.length()) {
-			header.setUname(DEFAULT_USERNAME);
+			header.setUname(defaultUser);
 		} else {
 			header.setUname(uname);
 		}
 		if ( null == gname) {
-			header.setGname(DEFAULT_GROUP);
+			header.setGname(defaultGroup);
 		} else if (0 == gname.length()) {
-			header.setGname(DEFAULT_GROUP);
+			header.setGname(defaultGroup);
 		} else {
 			header.setGname(gname);
 		}
 		header.setMtime( System.currentTimeMillis());
 		if ( -1 == permissions) {
-			header.setPermissions( DEFAULT_DIRECTORY_PERMISSION);
+			header.setPermissions( defaultDirPerm);
 		} else {
 			header.setPermissions( permissions);
 		}
@@ -324,6 +346,37 @@ public class Contents {
 		sources.put( header, source);
 		
 		if ( directive != null) header.setFlags( directive.flag());
+	}
+	public synchronized void addFile(RpmFile file) {
+		String path=file.getDestination();
+		
+		if ( files.contains( path)) return;
+		
+		File source = file.getSource();
+		Directive directive = file.getDirective();
+	
+		if ( file.isAddParents()){
+			addParents( new File( file.getDestination()), file.getDirPermissions(), file.getUname(), file.getGroupName());
+		}
+		files.add( file.getDestination());
+		logger.log( FINE, "Adding file ''{0}''.", file.getDestination());
+		CpioHeader header;
+		if ( directive != null && (( directive.flag() & Directive.RPMFILE_GHOST ) == Directive.RPMFILE_GHOST ))
+			header = new CpioHeader( path);
+		else
+			header = new CpioHeader( path, source);
+		header.setType( FILE);
+		header.setInode( inode++);
+		
+		header.setUname(getSafe(file.getUname(),defaultUser));
+		header.setGname(getSafe(file.getGroupName(),defaultGroup));
+		header.setPermissions(getSafePermissions(file.getFilePermissions(), defaultFilePerm));
+
+		headers.add( header);
+		sources.put( header, source);
+		
+		if ( directive != null) header.setFlags( directive.flag());
+		
 	}
 
 	/**
@@ -690,5 +743,27 @@ public class Contents {
 		public boolean equals( final CpioHeader one, final CpioHeader two) {
 			return one.getName().equals( two.getName());
 		}
+	}
+	
+	/**
+	 * helper method to provide valide permissions
+	 * @param filePermissions
+	 * @param defaultFilePerm
+	 * @return
+	 */
+	private static int getSafePermissions(int filePermissions, int defaultFilePerm) {
+		return (RpmFile.PERMISIONS_NOT_SET==filePermissions)?defaultFilePerm:filePermissions;
+	}
+
+	/**
+	 * helper method to validate that value is not null & empty
+	 * @param value
+	 * @param defaultValue
+	 * @return - non null,non epmty value
+	 */
+	private static String getSafe(String value, String defaultValue) {
+		if(value==null) return defaultValue;
+		if(value.length()==0) return defaultValue;
+		return value;
 	}
 }

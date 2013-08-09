@@ -1,5 +1,86 @@
 package org.freecompany.redline;
 
+import static org.freecompany.redline.header.Flags.EQUAL;
+import static org.freecompany.redline.header.Flags.GREATER;
+import static org.freecompany.redline.header.Flags.LESS;
+import static org.freecompany.redline.header.Flags.RPMLIB;
+import static org.freecompany.redline.header.Header.HeaderTag.ARCH;
+import static org.freecompany.redline.header.Header.HeaderTag.BASENAMES;
+import static org.freecompany.redline.header.Header.HeaderTag.BUILDHOST;
+import static org.freecompany.redline.header.Header.HeaderTag.BUILDTIME;
+import static org.freecompany.redline.header.Header.HeaderTag.CONFLICTFLAGS;
+import static org.freecompany.redline.header.Header.HeaderTag.CONFLICTNAME;
+import static org.freecompany.redline.header.Header.HeaderTag.CONFLICTVERSION;
+import static org.freecompany.redline.header.Header.HeaderTag.DESCRIPTION;
+import static org.freecompany.redline.header.Header.HeaderTag.DIRINDEXES;
+import static org.freecompany.redline.header.Header.HeaderTag.DIRNAMES;
+import static org.freecompany.redline.header.Header.HeaderTag.DISTRIBUTION;
+import static org.freecompany.redline.header.Header.HeaderTag.EPOCH;
+import static org.freecompany.redline.header.Header.HeaderTag.FILECONTEXTS;
+import static org.freecompany.redline.header.Header.HeaderTag.FILEDEVICES;
+import static org.freecompany.redline.header.Header.HeaderTag.FILEFLAGS;
+import static org.freecompany.redline.header.Header.HeaderTag.FILEGROUPNAME;
+import static org.freecompany.redline.header.Header.HeaderTag.FILEINODES;
+import static org.freecompany.redline.header.Header.HeaderTag.FILELANGS;
+import static org.freecompany.redline.header.Header.HeaderTag.FILELINKTOS;
+import static org.freecompany.redline.header.Header.HeaderTag.FILEMD5S;
+import static org.freecompany.redline.header.Header.HeaderTag.FILEMODES;
+import static org.freecompany.redline.header.Header.HeaderTag.FILEMTIMES;
+import static org.freecompany.redline.header.Header.HeaderTag.FILERDEVS;
+import static org.freecompany.redline.header.Header.HeaderTag.FILESIZES;
+import static org.freecompany.redline.header.Header.HeaderTag.FILEUSERNAME;
+import static org.freecompany.redline.header.Header.HeaderTag.FILEVERIFYFLAGS;
+import static org.freecompany.redline.header.Header.HeaderTag.GROUP;
+import static org.freecompany.redline.header.Header.HeaderTag.HEADERI18NTABLE;
+import static org.freecompany.redline.header.Header.HeaderTag.HEADERIMMUTABLE;
+import static org.freecompany.redline.header.Header.HeaderTag.LICENSE;
+import static org.freecompany.redline.header.Header.HeaderTag.NAME;
+import static org.freecompany.redline.header.Header.HeaderTag.OS;
+import static org.freecompany.redline.header.Header.HeaderTag.PACKAGER;
+import static org.freecompany.redline.header.Header.HeaderTag.PAYLOADCOMPRESSOR;
+import static org.freecompany.redline.header.Header.HeaderTag.PAYLOADFLAGS;
+import static org.freecompany.redline.header.Header.HeaderTag.PAYLOADFORMAT;
+import static org.freecompany.redline.header.Header.HeaderTag.PLATFORM;
+import static org.freecompany.redline.header.Header.HeaderTag.POSTINPROG;
+import static org.freecompany.redline.header.Header.HeaderTag.POSTINSCRIPT;
+import static org.freecompany.redline.header.Header.HeaderTag.POSTTRANSPROG;
+import static org.freecompany.redline.header.Header.HeaderTag.POSTTRANSSCRIPT;
+import static org.freecompany.redline.header.Header.HeaderTag.POSTUNPROG;
+import static org.freecompany.redline.header.Header.HeaderTag.POSTUNSCRIPT;
+import static org.freecompany.redline.header.Header.HeaderTag.PREFIXES;
+import static org.freecompany.redline.header.Header.HeaderTag.PREINPROG;
+import static org.freecompany.redline.header.Header.HeaderTag.PREINSCRIPT;
+import static org.freecompany.redline.header.Header.HeaderTag.PRETRANSPROG;
+import static org.freecompany.redline.header.Header.HeaderTag.PRETRANSSCRIPT;
+import static org.freecompany.redline.header.Header.HeaderTag.PREUNPROG;
+import static org.freecompany.redline.header.Header.HeaderTag.PREUNSCRIPT;
+import static org.freecompany.redline.header.Header.HeaderTag.PROVIDEFLAGS;
+import static org.freecompany.redline.header.Header.HeaderTag.PROVIDENAME;
+import static org.freecompany.redline.header.Header.HeaderTag.PROVIDEVERSION;
+import static org.freecompany.redline.header.Header.HeaderTag.RELEASE;
+import static org.freecompany.redline.header.Header.HeaderTag.REQUIREFLAGS;
+import static org.freecompany.redline.header.Header.HeaderTag.REQUIRENAME;
+import static org.freecompany.redline.header.Header.HeaderTag.REQUIREVERSION;
+import static org.freecompany.redline.header.Header.HeaderTag.RHNPLATFORM;
+import static org.freecompany.redline.header.Header.HeaderTag.RPMVERSION;
+import static org.freecompany.redline.header.Header.HeaderTag.SIZE;
+import static org.freecompany.redline.header.Header.HeaderTag.SOURCERPM;
+import static org.freecompany.redline.header.Header.HeaderTag.SUMMARY;
+import static org.freecompany.redline.header.Header.HeaderTag.TRIGGERFLAGS;
+import static org.freecompany.redline.header.Header.HeaderTag.TRIGGERINDEX;
+import static org.freecompany.redline.header.Header.HeaderTag.TRIGGERNAME;
+import static org.freecompany.redline.header.Header.HeaderTag.TRIGGERSCRIPTPROG;
+import static org.freecompany.redline.header.Header.HeaderTag.TRIGGERSCRIPTS;
+import static org.freecompany.redline.header.Header.HeaderTag.TRIGGERVERSION;
+import static org.freecompany.redline.header.Header.HeaderTag.URL;
+import static org.freecompany.redline.header.Header.HeaderTag.VENDOR;
+import static org.freecompany.redline.header.Header.HeaderTag.VERSION;
+import static org.freecompany.redline.header.Signature.SignatureTag.LEGACY_MD5;
+import static org.freecompany.redline.header.Signature.SignatureTag.LEGACY_SIGSIZE;
+import static org.freecompany.redline.header.Signature.SignatureTag.PAYLOADSIZE;
+import static org.freecompany.redline.header.Signature.SignatureTag.SHA1HEADER;
+import static org.freecompany.redline.header.Signature.SignatureTag.SIGNATURES;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -11,8 +92,10 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +103,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
+
+import org.freecompany.redline.ChannelWrapper.Key;
+import org.freecompany.redline.header.AbstractHeader.Entry;
+import org.freecompany.redline.header.AbstractHeader.Tag;
 import org.freecompany.redline.header.Architecture;
 import org.freecompany.redline.header.Format;
 import org.freecompany.redline.header.Os;
@@ -29,12 +114,6 @@ import org.freecompany.redline.header.RpmType;
 import org.freecompany.redline.payload.Contents;
 import org.freecompany.redline.payload.CpioHeader;
 import org.freecompany.redline.payload.Directive;
-
-import static org.freecompany.redline.ChannelWrapper.*;
-import static org.freecompany.redline.header.AbstractHeader.*;
-import static org.freecompany.redline.header.Flags.*;
-import static org.freecompany.redline.header.Signature.SignatureTag.*;
-import static org.freecompany.redline.header.Header.HeaderTag.*;
 
 /**
  * The normal entry point to the API used for
@@ -58,8 +137,9 @@ public class Builder {
 
 	protected final Format format = new Format();
 	protected final Set< PrivateKey> signatures = new HashSet< PrivateKey>();
-	protected final Map< String, CharSequence> dependencies = new LinkedHashMap< String, CharSequence>();
-	protected final Map< String, Integer> flags = new LinkedHashMap< String, Integer>();
+	protected final List<RpmTuple3> dependencies = new ArrayList<RpmTuple3>();
+	protected final List<RpmTuple3> conflicts = new ArrayList<RpmTuple3>();
+	protected final List<RpmTuple3> provides = new ArrayList<RpmTuple3>();
 
 	protected final List< String> triggerscripts = new LinkedList< String>();
 	protected final List< String> triggerscriptprogs = new LinkedList< String>();
@@ -70,6 +150,8 @@ public class Builder {
 	protected final List< Integer> triggerindexes = new LinkedList< Integer>();
 
 	private int triggerCounter = 0;
+	
+	
 
 	@SuppressWarnings( "unchecked")
 	protected final Entry< byte[]> signature = ( Entry< byte[]>) format.getSignature().addEntry( SIGNATURES, 16);
@@ -78,6 +160,7 @@ public class Builder {
 	protected final Entry< byte[]> immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
 
 	protected Contents contents = new Contents();
+
 
 	/**
 	 * Initializes the builder and sets some required fields to known values.
@@ -104,8 +187,7 @@ public class Builder {
 	 * @param version the version identifier.
 	 */
 	public void addDependency( final String name, final int comparison, final String version ) {
-		dependencies.put( name, version);
-		flags.put( name, comparison);
+		dependencies.add( RpmTuple3.builder().setName(name).setDetail(version, comparison));
 	}
 
 	/**
@@ -145,8 +227,16 @@ public class Builder {
 	 * @param version the version identifier.
 	 */
 	protected void addDependency( final CharSequence name, final CharSequence version, final int flag) {
-		dependencies.put( name.toString(), version);
-		flags.put( name.toString(), flag);
+		dependencies.add( RpmTuple3.builder().setName(name.toString()).setDetail(version.toString(), flag));
+	}
+	
+	/**
+	 * Declare virtual package provisioning in standard rpm format
+	 * Provides: name [>,<,=,...  version]
+	 * @param provide
+	 */
+	public void addProvide(RpmTuple3 provide){
+		provides.add(provide);
 	}
 	
 	/**
@@ -309,11 +399,12 @@ public class Builder {
 	/**
 	 * Declares a dependency that this package exports, and that other packages can use to
 	 * provide library functions.
-	 *
+	 * @deprecated this method never worked properly as it added wrong operator and version. use {@link Builder#addProvides(RpmTuple3)}
 	 * @param provides dependency provided by this package.
 	 */
+	@Deprecated
 	public void setProvides( final CharSequence provides) {
-		if ( provides != null) format.getHeader().createEntry( PROVIDENAME, provides);
+		if ( provides != null) this.provides.add(RpmTuple3.builder().setName(provides.toString()));
 	}
 
 	/**
@@ -344,6 +435,17 @@ public class Builder {
 	 */
 	public void setPrefixes( final String... prefixes) {
 		if ( prefixes != null) format.getHeader().createEntry( PREFIXES, prefixes);
+	}
+	
+	/**
+	 * Set default %file section attributes 
+	 * @param defaultUser
+	 * @param defaultGroup
+	 * @param defaultPerm
+	 * @param i 
+	 */
+	public void setDefaultAttr(final String defaultUser, final String defaultGroup, final int defaultFilePerm, int defaultDirPerm){
+		contents.setDefaultAttr(defaultUser, defaultGroup, defaultFilePerm, defaultDirPerm);
 	}
 
     /**
@@ -927,9 +1029,20 @@ public class Builder {
 
 
 		format.getHeader().createEntry( EPOCH, 0);
-		format.getHeader().createEntry( REQUIRENAME, dependencies.keySet().toArray( new String[ dependencies.size()]));
-		format.getHeader().createEntry( REQUIREVERSION, dependencies.values().toArray( new String[ dependencies.size()]));
-		format.getHeader().createEntry( REQUIREFLAGS, convert( flags.values().toArray( new Integer[ flags.size()])));
+		format.getHeader().createEntry( REQUIRENAME, RpmTuple3.getNameArray(dependencies));
+		format.getHeader().createEntry( REQUIREVERSION, RpmTuple3.getVersionArray(dependencies));
+		format.getHeader().createEntry( REQUIREFLAGS, RpmTuple3.getOperatorsArray(dependencies));
+
+		if (conflicts.size() > 0) {
+			format.getHeader().createEntry(CONFLICTNAME, RpmTuple3.getNameArray(conflicts));
+			format.getHeader().createEntry(CONFLICTVERSION, RpmTuple3.getVersionArray(conflicts));
+			format.getHeader().createEntry(CONFLICTFLAGS, RpmTuple3.getOperatorsArray(conflicts));
+		}
+		if(conflicts.size() > 0){
+			format.getHeader().createEntry(PROVIDENAME, RpmTuple3.getNameArray(provides));
+			format.getHeader().createEntry(PROVIDEVERSION, RpmTuple3.getVersionArray(provides));
+			format.getHeader().createEntry(PROVIDEFLAGS, RpmTuple3.getOperatorsArray(provides));
+		}
 
 		format.getHeader().createEntry( SIZE, contents.getTotalSize());
 		format.getHeader().createEntry( DIRNAMES, contents.getDirNames());
@@ -1068,4 +1181,15 @@ public class Builder {
 		for ( int i : ints) array[ count++] = i;
 		return array;
 	}
+
+	public void addFile(RpmFile file) {
+		contents.addFile(file);
+		
+	}
+
+	public void addConflicts(RpmTuple3 conflictItem) {
+		conflicts.add(conflictItem);
+	}
+
+	
 }
