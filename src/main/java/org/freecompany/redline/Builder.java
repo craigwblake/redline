@@ -139,6 +139,7 @@ public class Builder {
 	protected final Set< PrivateKey> signatures = new HashSet< PrivateKey>();
 	protected final List<RpmTuple3> dependencies = new ArrayList<RpmTuple3>();
 	protected final List<RpmTuple3> conflicts = new ArrayList<RpmTuple3>();
+	protected final List<RpmTuple3> provides = new ArrayList<RpmTuple3>();
 
 	protected final List< String> triggerscripts = new LinkedList< String>();
 	protected final List< String> triggerscriptprogs = new LinkedList< String>();
@@ -159,6 +160,7 @@ public class Builder {
 	protected final Entry< byte[]> immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
 
 	protected Contents contents = new Contents();
+
 
 	/**
 	 * Initializes the builder and sets some required fields to known values.
@@ -226,6 +228,15 @@ public class Builder {
 	 */
 	protected void addDependency( final CharSequence name, final CharSequence version, final int flag) {
 		dependencies.add( RpmTuple3.builder().setName(name.toString()).setDetail(version.toString(), flag));
+	}
+	
+	/**
+	 * Declare virtual package provisioning in standard rpm format
+	 * Provides: name [>,<,=,...  version]
+	 * @param provide
+	 */
+	public void addProvide(RpmTuple3 provide){
+		provides.add(provide);
 	}
 	
 	/**
@@ -388,11 +399,12 @@ public class Builder {
 	/**
 	 * Declares a dependency that this package exports, and that other packages can use to
 	 * provide library functions.
-	 *
+	 * @deprecated this method never worked properly as it added wrong operator and version. use {@link Builder#addProvides(RpmTuple3)}
 	 * @param provides dependency provided by this package.
 	 */
+	@Deprecated
 	public void setProvides( final CharSequence provides) {
-		if ( provides != null) format.getHeader().createEntry( PROVIDENAME, provides);
+		if ( provides != null) this.provides.add(RpmTuple3.builder().setName(provides.toString()));
 	}
 
 	/**
@@ -1025,6 +1037,11 @@ public class Builder {
 			format.getHeader().createEntry(CONFLICTNAME, RpmTuple3.getNameArray(conflicts));
 			format.getHeader().createEntry(CONFLICTVERSION, RpmTuple3.getVersionArray(conflicts));
 			format.getHeader().createEntry(CONFLICTFLAGS, RpmTuple3.getOperatorsArray(conflicts));
+		}
+		if(conflicts.size() > 0){
+			format.getHeader().createEntry(PROVIDENAME, RpmTuple3.getNameArray(provides));
+			format.getHeader().createEntry(PROVIDEVERSION, RpmTuple3.getVersionArray(provides));
+			format.getHeader().createEntry(PROVIDEFLAGS, RpmTuple3.getOperatorsArray(provides));
 		}
 
 		format.getHeader().createEntry( SIZE, contents.getTotalSize());

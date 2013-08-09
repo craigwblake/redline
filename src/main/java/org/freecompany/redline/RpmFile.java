@@ -7,8 +7,6 @@ import org.freecompany.redline.payload.Directive;
 /**
  * Representation of File for rpm Builder with metadata
  * 
- * @author Pavel Nemec <nemecp4@gmail.com>
- * 
  */
 public class RpmFile {
 	

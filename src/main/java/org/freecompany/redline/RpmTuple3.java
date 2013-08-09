@@ -1,7 +1,5 @@
 package org.freecompany.redline;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.freecompany.redline.header.Flags;
