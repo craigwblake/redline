@@ -160,13 +160,31 @@ public class Builder {
 	}
 
 	/**
+	 * @param variable the character sequence to check for dashes.
+	 * @param variableName the name to include in IllegalArgumentException
+	 * @throws IllegalArgumentException if passed in character sequence contains dashes.
+	 */
+	private void checkVariableContainsDashes(final CharSequence variable, final String variableName) {
+		for (int i = 0; i < variable.length(); i++) {
+			char currChar = variable.charAt(i);
+			if (currChar == '-') {
+				throw new IllegalArgumentException(variableName + " with value: '" + variable + "' contains dashes");
+			}
+		}
+	}
+
+	/**
 	 * <b>Required Field</b>. Sets the package information, such as the rpm name, the version, and the release number.
 	 * 
 	 * @param name the name of the RPM package.
 	 * @param version the version of the new package.
 	 * @param release the release number, specified after the version, of the new RPM.
+	 * @throws IllegalArgumentException if version or release contain
+	 *         dashes, as they are explicitly disallowed by RPM file format.
 	 */
 	public void setPackage( final CharSequence name, final CharSequence version, final CharSequence release) {
+		checkVariableContainsDashes(version, "version");
+		checkVariableContainsDashes(release, "release");
 		format.getLead().setName( name + "-" + version + "-" + release);
 		format.getHeader().createEntry( NAME, name);
 		format.getHeader().createEntry( VERSION, version);
@@ -319,7 +337,7 @@ public class Builder {
 	/**
 	 * Sets the group of contents to include in this RPM. Note that this method causes the existing
 	 * file set to be overwritten and therefore should be called before adding any other contents via
-	 * the {@link #addFile()} methods.
+	 * the <code>addFile()</code> methods.
 	 *
 	 * @param contents the set of contents to use in constructing this RPM.
 	 */

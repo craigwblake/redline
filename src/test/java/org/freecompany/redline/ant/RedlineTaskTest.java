@@ -17,6 +17,33 @@ import static org.junit.Assert.*;
 
 public class RedlineTaskTest extends TestCase {
 
+    public void testBadVersionWithDashes() throws Exception {
+	try {
+	    RedlineTask task = new RedlineTask();
+	    task.setName("nameRequired");
+	    task.setVersion("1.0-beta");
+	    task.setGroup("groupRequired");
+	    task.execute();
+	    fail();
+	} catch (IllegalArgumentException iae) {
+	    // Pass
+	}
+    }
+
+    public void testBadReleaseWithDashes() throws Exception {
+	try {
+	    RedlineTask task = new RedlineTask();
+	    task.setName("nameRequired");
+	    task.setVersion("versionRequired");
+	    task.setGroup("groupRequired");
+	    task.setRelease("2-3");
+	    task.execute();
+	    fail();
+	} catch (IllegalArgumentException iae) {
+	    // Pass
+	}
+    }
+
 	public void testRestrict() throws Exception {
 		Depends one = new Depends();
 		one.setName( "one");
