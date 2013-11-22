@@ -96,7 +96,7 @@ public class Header extends AbstractHeader {
 		REQUIREFLAGS( 1048, 4, "requireflags"),
 		REQUIRENAME( 1049, 8, "requirename"),
 		REQUIREVERSION( 1050, 8, "requireversion"),
-		CONFLICTFLAGS( 1053, 6, "conflictflags"),
+		CONFLICTFLAGS( 1053, 4, "conflictflags"),
 		CONFLICTNAME( 1054, 8, "conflictname"),
 		CONFLICTVERSION( 1055, 8, "conflictversion"),
 		OBSOLETENAME( 1090, 8, "obsoletename"),
