@@ -102,7 +102,7 @@ public class Header extends AbstractHeader {
 		OBSOLETENAME( 1090, 6, "obsoletename"),
 		PROVIDEFLAGS( 1112, 4, "provideflags"),
 		PROVIDEVERSION( 1113, 6, "provideversion"),
-		OBSOLETEFLAGS( 1114, 6, "obsoleteflags"),
+		OBSOLETEFLAGS( 1114, 4, "obsoleteflags"),
 		OBSOLETEVERSION( 1115, 6, "obsoleteversion");
 
 		private int code;
