@@ -96,14 +96,14 @@ public class Header extends AbstractHeader {
 		REQUIREFLAGS( 1048, 4, "requireflags"),
 		REQUIRENAME( 1049, 8, "requirename"),
 		REQUIREVERSION( 1050, 8, "requireversion"),
-		CONFLICTFLAGS( 1053, 6, "conflictflags"),
-		CONFLICTNAME( 1054, 6, "conflictname"),
-		CONFLICTVERSION( 1055, 6, "conflictversion"),
-		OBSOLETENAME( 1090, 6, "obsoletename"),
+		CONFLICTFLAGS( 1053, 4, "conflictflags"),
+		CONFLICTNAME( 1054, 8, "conflictname"),
+		CONFLICTVERSION( 1055, 8, "conflictversion"),
+		OBSOLETENAME( 1090, 8, "obsoletename"),
 		PROVIDEFLAGS( 1112, 4, "provideflags"),
 		PROVIDEVERSION( 1113, 6, "provideversion"),
-		OBSOLETEFLAGS( 1114, 6, "obsoleteflags"),
-		OBSOLETEVERSION( 1115, 6, "obsoleteversion");
+		OBSOLETEFLAGS( 1114, 4, "obsoleteflags"),
+		OBSOLETEVERSION( 1115, 8, "obsoleteversion");
 
 		private int code;
 		private int type;
