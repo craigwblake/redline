@@ -1,7 +1,14 @@
 package org.freecompany.redline;
 
+import org.apache.commons.compress.compressors.xz.XZCompressorInputStream;
+import org.freecompany.redline.header.AbstractHeader.Entry;
+import org.freecompany.redline.header.Header;
+import org.freecompany.redline.header.Header.HeaderTag;
+import org.freecompany.redline.header.PayloadCompressionType;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
@@ -10,6 +17,7 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
 import java.util.Formatter;
+import java.util.zip.GZIPInputStream;
 
 /**
  * General utilities needed to read and write
@@ -176,4 +184,41 @@ public class Util {
 		printer.flush();
 		return baos.toString();
 	}
+
+   /**
+    * Create the proper stream wrapper to handling the rpmIS payload section based on the
+    * payload compression header tag.
+    *
+    * @param header
+    * @param rpmIS
+    * @return
+    */
+   public static InputStream openPayloadStream(Header header, InputStream rpmIS) throws IOException {
+      Entry pcEntry = header.getEntry(HeaderTag.PAYLOADCOMPRESSOR);
+      String[] pc = (String[]) pcEntry.getValues();
+      PayloadCompressionType pcType = PayloadCompressionType.valueOf(pc[0]);
+      InputStream payloadIS = rpmIS;
+      switch (pcType) {
+         case none:
+            break;
+         case gzip:
+            payloadIS = new GZIPInputStream(rpmIS);
+            break;
+         case bzip2:
+            try {
+               payloadIS = new org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream(rpmIS);
+            } catch (Exception e) {
+               throw new IOException("Failed to load BZIP2 compression stream", e);
+            }
+            break;
+         case xz:
+            try {
+               payloadIS = new XZCompressorInputStream(rpmIS);
+            } catch (Exception e) {
+               throw new IOException("Failed to load XZ compression stream", e);
+            }
+            break;
+      }
+      return payloadIS;
+   }
 }

@@ -1,6 +1,8 @@
 package org.freecompany.redline;
 
 import org.freecompany.redline.header.Format;
+import org.freecompany.redline.header.Header;
+import org.freecompany.redline.header.Header.HeaderTag;
 import org.freecompany.redline.payload.CpioHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +13,6 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
-import java.util.zip.GZIPInputStream;
 
 import static org.freecompany.redline.ChannelWrapper.Key;
 import static org.freecompany.redline.header.Header.HeaderTag.HEADERIMMUTABLE;
@@ -54,7 +55,9 @@ public class Scanner {
         Scanner scanner = new Scanner(System.out);
         Format format = scanner.run(in);
 		scanner.log( format.toString());
-		InputStream uncompressed = new GZIPInputStream( fios );
+      Header rpmHeader = format.getHeader();
+      scanner.log("Payload compression: "+rpmHeader.getEntry(HeaderTag.PAYLOADCOMPRESSOR));
+		InputStream uncompressed = Util.openPayloadStream(rpmHeader, fios);
 		in = new ReadableChannelWrapper( Channels.newChannel( uncompressed));
 		CpioHeader header;
 		int total = 0;

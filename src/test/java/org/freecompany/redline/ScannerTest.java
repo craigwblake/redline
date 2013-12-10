@@ -1,11 +1,11 @@
 package org.freecompany.redline;
 
+import org.freecompany.redline.header.Format;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.nio.channels.Channels;
-
-import org.freecompany.redline.header.Format;
-import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,6 +21,11 @@ public class ScannerTest extends TestBase
     public void scanSomeArchTest() throws Exception {
         Scanner.main ( new String[]{ getTestResourcesDirectory ( ) + File.separator + "rpm-3-1.0-1.somearch.rpm" } );
     }
+
+   @Test
+   public void scanXZArchTest() throws Exception {
+       Scanner.main ( new String[]{ getTestResourcesDirectory ( ) + File.separator + "rpmtest-3-0.1.XZ.fc19.noarch.rpm" } );
+   }
 
     @Test
     public void setHeaderStartAndEndPosition() throws Exception {
