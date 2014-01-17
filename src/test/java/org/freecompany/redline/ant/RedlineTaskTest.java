@@ -20,6 +20,39 @@ import static org.junit.Assert.*;
 
 public class RedlineTaskTest extends TestCase {
 
+	public void testBadName() throws Exception {
+		RedlineTask task = new RedlineTask();
+		task.setVersion("1.0");
+		task.setGroup("groupRequired");
+
+		task.setName("test");
+		task.execute();
+
+		task.setName("test-invalid");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+
+		task.setName("test invalid");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+
+		task.setName("test\tinvalid");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+	}
+
 	public void testBadVersion() throws Exception {
 		RedlineTask task = new RedlineTask();
 		task.setName("nameRequired");

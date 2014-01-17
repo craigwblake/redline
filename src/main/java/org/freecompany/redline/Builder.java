@@ -56,6 +56,9 @@ public class Builder {
 
 	private static final String DEFAULTSCRIPTPROG = "/bin/sh";
 
+	private static final char[] ILLEGAL_CHARS_VARIABLE = new char[] { '-', '~', '/' };
+	private static final char[] ILLEGAL_CHARS_NAME = new char[] { '-', '~', '/', ' ', '\t', '\n', '\r' };
+
 	protected final Format format = new Format();
 	protected final Set< PrivateKey> signatures = new HashSet< PrivateKey>();
 	protected final Map< String, CharSequence> dependencies = new LinkedHashMap< String, CharSequence>();
@@ -207,15 +210,18 @@ public class Builder {
 	}
 
 	/**
-	 * @param variable the character sequence to check for dashes.
+	 * @param illegalChars the illegal characters to check for.
+	 * @param variable the character sequence to check for illegal characters.
 	 * @param variableName the name to include in IllegalArgumentException
 	 * @throws IllegalArgumentException if passed in character sequence contains dashes.
 	 */
-	private void checkVariableContainsIllegalChars(final CharSequence variable, final String variableName) {
+	private void checkVariableContainsIllegalChars(final char[] illegalChars, final CharSequence variable, final String variableName) {
 		for (int i = 0; i < variable.length(); i++) {
 			char currChar = variable.charAt(i);
-			if (currChar == '-' || currChar == '~' || currChar == '/') {
-				throw new IllegalArgumentException(variableName + " with value: '" + variable + "' contains illegal character " + currChar);
+			for (char illegalChar : illegalChars) {
+				if (currChar == illegalChar) {
+					throw new IllegalArgumentException(variableName + " with value: '" + variable + "' contains illegal character " + currChar);
+				}
 			}
 		}
 	}
@@ -230,8 +236,9 @@ public class Builder {
 	 *         dashes, as they are explicitly disallowed by RPM file format.
 	 */
 	public void setPackage( final CharSequence name, final CharSequence version, final CharSequence release) {
-		checkVariableContainsIllegalChars(version, "version");
-		checkVariableContainsIllegalChars(release, "release");
+		checkVariableContainsIllegalChars(ILLEGAL_CHARS_NAME, name, "name");
+		checkVariableContainsIllegalChars(ILLEGAL_CHARS_VARIABLE, version, "version");
+		checkVariableContainsIllegalChars(ILLEGAL_CHARS_VARIABLE, release, "release");
 		format.getLead().setName( name + "-" + version + "-" + release);
 		format.getHeader().createEntry( NAME, name);
 		format.getHeader().createEntry( VERSION, version);
