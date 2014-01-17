@@ -1,8 +1,15 @@
 package org.freecompany.redline;
 
+import org.bouncycastle.openpgp.PGPException;
+import org.bouncycastle.openpgp.PGPPrivateKey;
+import org.bouncycastle.openpgp.PGPSignatureGenerator;
+import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
+import sun.security.jca.JCAUtil;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.WritableByteChannel;
+import java.security.SignatureException;
 import java.util.HashMap;
 import java.util.Map;
 import java.security.InvalidKeyException;
@@ -10,6 +17,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Signature;
+
+import static org.bouncycastle.bcpg.HashAlgorithmTags.SHA1;
+import static org.bouncycastle.openpgp.PGPSignature.BINARY_DOCUMENT;
 
 /**
  * Wraps an IO channel so that bytes may be observed
@@ -102,7 +112,68 @@ public abstract class ChannelWrapper {
 		return object;
 	}
 
-	/**
+    /**
+     * Initialize a PGP signatue on the channel
+     *
+     * @param key       the private key to use in signing this data stream.
+     * @param algorithm the algorithm to use. Can be extracted from public key.
+     * @throws PGPException if something with PGP got wrong
+     */
+    public Key<byte[]> start( final PGPPrivateKey key, int algorithm ) {
+        BcPGPContentSignerBuilder contentSignerBuilder = new BcPGPContentSignerBuilder( algorithm, SHA1 );
+        final PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator( contentSignerBuilder );
+        try {
+            signatureGenerator.init( BINARY_DOCUMENT, key );
+        } catch ( PGPException e ) {
+            throw new RuntimeException( "Could not initialize PGP signature generator", e );
+        }
+
+        final Key<byte[]> object = new Key<byte[]>();
+        consumers.put( object, new Consumer<byte[]>() {
+
+            public void consume( final ByteBuffer buffer ) {
+                if ( !buffer.hasRemaining() ) {
+                    return;
+                }
+                try {
+                    write( buffer );
+                } catch ( SignatureException e ) {
+                    throw new RuntimeException( "Could not write buffer to PGP signature generator.", e );
+                }
+            }
+
+            private void write( ByteBuffer buffer ) throws SignatureException {
+                if ( buffer.hasArray() ) {
+                    byte[] bufferBytes = buffer.array();
+                    int offset = buffer.arrayOffset();
+                    int position = buffer.position();
+                    int limit = buffer.limit();
+                    signatureGenerator.update( bufferBytes, offset + position, limit - position );
+                    buffer.position( limit );
+                } else {
+                    int length = buffer.remaining();
+                    byte[] bytes = new byte[JCAUtil.getTempArraySize( length )];
+                    while ( length > 0 ) {
+                        int chunk = Math.min( length, bytes.length );
+                        buffer.get( bytes, 0, chunk );
+                        signatureGenerator.update( bytes, 0, chunk );
+                        length -= chunk;
+                    }
+                }
+            }
+
+            public byte[] finish() {
+                try {
+                    return signatureGenerator.generate().getEncoded();
+                } catch ( Exception e ) {
+                    throw new RuntimeException( "Could not generate signature.", e );
+                }
+            }
+        });
+        return object;
+    }
+
+    /**
 	 * Initialize a digest on this channel.
 	 *
 	 * @param algorithm the digest algorithm to use in computing the hash
