@@ -28,7 +28,7 @@ public class RedlineTaskTest extends TestCase {
 		task.setName("test");
 		task.execute();
 
-		task.setName("test-invalid");
+		task.setName("test/invalid");
 		try {
 			task.execute();
 			fail();
