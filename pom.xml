@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -11,7 +12,7 @@
 	<artifactId>redline</artifactId>
 	<version>1.1.13-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Redline</name> 
+	<name>Redline</name>
 	<description>Redline is a pure Java library for manipulating RPM Package Manager packages.</description>
 	<url>http://redline-rpm.org/</url>
 	<licenses>
@@ -53,7 +54,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.12</version>
 				<configuration>
-					<excludes />
+					<excludes/>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -106,20 +107,20 @@
 					</execution>
 				</executions>
 			</plugin>
-		  <plugin>
-			<artifactId>maven-site-plugin</artifactId>
-			<version>2.3</version>
-			<dependencies>
-			  <dependency>
-				<groupId>org.apache.maven.doxia</groupId>
-				<artifactId>doxia-module-xhtml</artifactId>
-				<version>1.2</version>
-			  </dependency>
-			</dependencies>
-		  </plugin>
+			<plugin>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>2.3</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.maven.doxia</groupId>
+						<artifactId>doxia-module-xhtml</artifactId>
+						<version>1.2</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 	</build>
-		
+
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.ant</groupId>
@@ -132,22 +133,22 @@
 			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.7.5</version>
-    </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <version>1.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.tukaani</groupId>
-            <artifactId>xz</artifactId>
-            <version>1.4</version>
-        </dependency>
-	</dependencies> 
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.5</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-compress</artifactId>
+			<version>1.6</version>
+		</dependency>
+		<dependency>
+			<groupId>org.tukaani</groupId>
+			<artifactId>xz</artifactId>
+			<version>1.4</version>
+		</dependency>
+	</dependencies>
 
 	<profiles>
 		<profile>
