@@ -22,6 +22,8 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+
+import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.freecompany.redline.header.Architecture;
 import org.freecompany.redline.header.Format;
 import org.freecompany.redline.header.Os;
@@ -84,6 +86,10 @@ public class Builder {
 	protected final Entry< byte[]> immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
 
 	protected Contents contents = new Contents();
+    protected File privateKeyRingFile;
+    protected String privateKeyId;
+    protected String privateKeyPassphrase;
+    protected PGPPrivateKey privateKey;
 
 	/**
 	 * Initializes the builder and sets some required fields to known values.
@@ -965,7 +971,44 @@ public class Builder {
 		signatures.add( key);
 	}
 
-	/**
+    /**
+     * Sets the PGP key ring file used for header and header + payload signature.
+     * Alternatively you can set the private key directly with {@link #setPrivateKey(org.bouncycastle.openpgp.PGPPrivateKey)}
+     * @param privateKeyRingFile
+     */
+    public void setPrivateKeyRingFile( File privateKeyRingFile ) {
+        this.privateKeyRingFile = privateKeyRingFile;
+    }
+
+    /**
+     * Selects a private key from the current {@link #setPrivateKeyRingFile(java.io.File) private ky ring file}.
+     * If no key is specified, the first signing key will be selected.
+     * @param privateKeyId hex key id
+     */
+    public void setPrivateKeyId( String privateKeyId ) {
+        this.privateKeyId = privateKeyId;
+    }
+
+    /**
+     * Passphrase for the private key
+     * @param privateKeyPassphrase
+     */
+    public void setPrivateKeyPassphrase( String privateKeyPassphrase ) {
+        this.privateKeyPassphrase = privateKeyPassphrase;
+    }
+
+    /**
+     * Sets the private key for header and payload signing directly. Alternatively, you can set
+     * {@link #setPrivateKeyRingFile(java.io.File) key ring file}, {@link #setPrivateKeyId(String) key id}
+     * and {@link #setPrivateKeyPassphrase(String) passphrase} directly. Setting the private key has more
+     * priorisation than providing key ring file.
+     * @param privateKey
+     */
+    public void setPrivateKey( PGPPrivateKey privateKey ) {
+        this.privateKey = privateKey;
+    }
+
+    /**
 	 * Generates an RPM with a standard name consisting of the RPM package name, version, release,
 	 * and type in teh given directory.
 	 *
@@ -1048,6 +1091,9 @@ public class Builder {
 		final Entry< String[]> sha = ( Entry< String[]>) format.getSignature().addEntry( SHA1HEADER, 1);
 		sha.setSize( SHASIZE);
 
+        SignatureGenerator signatureGenerator = createSignatureGenerator();
+        signatureGenerator.prepare( format.getSignature() );
+
 		format.getLead().write( original);
 		signature.setValues( getSignature( format.getSignature().count()));
 		Util.empty( output, ByteBuffer.allocate( format.getSignature().write( original)));
@@ -1055,10 +1101,12 @@ public class Builder {
 		final Key< Integer> sigsizekey = output.start();
 		final Key< byte[]> shakey = output.start( "SHA");
 		final Key< byte[]> md5key = output.start( "MD5");
+        signatureGenerator.startBeforeHeader( output );
 
 		immutable.setValues( getImmutable( format.getHeader().count()));
 		format.getHeader().write( output);
 		sha.setValues( new String[] { Util.hex( output.finish( shakey))});
+        signatureGenerator.finishAfterHeader( output );
 
 		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( output));
 		final WritableChannelWrapper compressor = new WritableChannelWrapper( Channels.newChannel( zip));
@@ -1113,11 +1161,19 @@ public class Builder {
 		
 		md5.setValues( output.finish( md5key));
 		sigsize.setValues( new int[] { output.finish( sigsizekey)});
+        signatureGenerator.finishAfterPayload( output );
 		format.getSignature().writePending( original);
 		output.close();
 	}
 
-	protected byte[] getSignature( final int count) {
+    protected SignatureGenerator createSignatureGenerator() {
+        if (privateKey != null) {
+           return new SignatureGenerator( privateKey );
+        }
+        return new SignatureGenerator( privateKeyRingFile, privateKeyId, privateKeyPassphrase);
+    }
+
+    protected byte[] getSignature( final int count) {
 		return getSpecial( 0x0000003E, count);
 	}
 
