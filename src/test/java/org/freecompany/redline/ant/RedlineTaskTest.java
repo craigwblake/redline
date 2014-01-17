@@ -20,12 +20,31 @@ import static org.junit.Assert.*;
 
 public class RedlineTaskTest extends TestCase {
 
-	public void testBadVersionWithDashes() throws Exception {
+	public void testBadVersion() throws Exception {
+		RedlineTask task = new RedlineTask();
+		task.setName("nameRequired");
+		task.setGroup("groupRequired");
+		// test version with illegal char -
+		task.setVersion("1.0-beta");
 		try {
-			RedlineTask task = new RedlineTask();
-			task.setName("nameRequired");
-			task.setVersion("1.0-beta");
-			task.setGroup("groupRequired");
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+
+		// test version with illegal char ~
+		task.setVersion("1.0~beta");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+
+		// test version with illegal char /
+		task.setVersion("1.0/beta");
+		try {
 			task.execute();
 			fail();
 		} catch (IllegalArgumentException iae) {
@@ -33,13 +52,33 @@ public class RedlineTaskTest extends TestCase {
 		}
 	}
 
-	public void testBadReleaseWithDashes() throws Exception {
+	public void testBadRelease() throws Exception {
+		RedlineTask task = new RedlineTask();
+		task.setName("nameRequired");
+		task.setVersion("versionRequired");
+		task.setGroup("groupRequired");
+
+		// test release with illegal char -
+		task.setRelease("2-3");
 		try {
-			RedlineTask task = new RedlineTask();
-			task.setName("nameRequired");
-			task.setVersion("versionRequired");
-			task.setGroup("groupRequired");
-			task.setRelease("2-3");
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+
+		// test release with illegal char ~
+		task.setRelease("2~3");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+
+		// test release with illegal char /
+		task.setRelease("2/3");
+		try {
 			task.execute();
 			fail();
 		} catch (IllegalArgumentException iae) {
@@ -201,7 +240,7 @@ public class RedlineTaskTest extends TestCase {
 		try {
 			task.execute();
 		} catch (Exception e) {
-			fail("Test failed: RedlineException shoudl not thrown.");
+			fail("Test failed: RedlineException should not thrown.");
 		}
 
 	}

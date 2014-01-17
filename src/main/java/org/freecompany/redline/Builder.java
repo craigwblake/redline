@@ -211,11 +211,11 @@ public class Builder {
 	 * @param variableName the name to include in IllegalArgumentException
 	 * @throws IllegalArgumentException if passed in character sequence contains dashes.
 	 */
-	private void checkVariableContainsDashes(final CharSequence variable, final String variableName) {
+	private void checkVariableContainsIllegalChars(final CharSequence variable, final String variableName) {
 		for (int i = 0; i < variable.length(); i++) {
 			char currChar = variable.charAt(i);
-			if (currChar == '-') {
-				throw new IllegalArgumentException(variableName + " with value: '" + variable + "' contains dashes");
+			if (currChar == '-' || currChar == '~' || currChar == '/') {
+				throw new IllegalArgumentException(variableName + " with value: '" + variable + "' contains illegal character " + currChar);
 			}
 		}
 	}
@@ -230,8 +230,8 @@ public class Builder {
 	 *         dashes, as they are explicitly disallowed by RPM file format.
 	 */
 	public void setPackage( final CharSequence name, final CharSequence version, final CharSequence release) {
-		checkVariableContainsDashes(version, "version");
-		checkVariableContainsDashes(release, "release");
+		checkVariableContainsIllegalChars(version, "version");
+		checkVariableContainsIllegalChars(release, "release");
 		format.getLead().setName( name + "-" + version + "-" + release);
 		format.getHeader().createEntry( NAME, name);
 		format.getHeader().createEntry( VERSION, version);
