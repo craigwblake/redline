@@ -70,6 +70,10 @@ public class RedlineTask extends Task {
 	protected File postUninstallScript;
 	protected File postTransScript;
 
+    protected File privateKeyRingFile;
+    protected String privateKeyId;
+    protected String privateKeyPassphrase;
+
 	public RedlineTask() {
 		try {
 			host = InetAddress.getLocalHost().getHostName();
@@ -99,6 +103,9 @@ public class RedlineTask extends Task {
 		builder.setUrl( url);
 		builder.setProvides( provides == null ? name : provides);
 		builder.setPrefixes( prefixes == null ? null : prefixes.split(","));
+        builder.setPrivateKeyRingFile( privateKeyRingFile);
+        builder.setPrivateKeyId( privateKeyId);
+        builder.setPrivateKeyPassphrase( privateKeyPassphrase);
 		if (sourcePackage != null) {
 			builder.addHeaderEntry(Header.HeaderTag.SOURCERPM, sourcePackage);
 		}
@@ -228,4 +235,7 @@ public class RedlineTask extends Task {
 	public void setPostUninstallScript( File postUninstallScript) { this.postUninstallScript = postUninstallScript; }
 	public void setPostTransScript( File postTransScript) { this.postTransScript = postTransScript; }
 	public void setSourcePackage( String sourcePackage) { this.sourcePackage = sourcePackage; }
+    public void setPrivateKeyRingFile( File privateKeyRingFile) { this.privateKeyRingFile = privateKeyRingFile; }
+    public void setPrivateKeyId( String privateKeyId ) { this.privateKeyId = privateKeyId; }
+    public void setPrivateKeyPassphrase( String privateKeyPassphrase ) { this.privateKeyPassphrase = privateKeyPassphrase; }
 }
