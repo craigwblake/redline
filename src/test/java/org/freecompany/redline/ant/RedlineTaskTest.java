@@ -2,24 +2,28 @@ package org.freecompany.redline.ant;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.channels.Channels;
-
-import junit.framework.TestCase;
 
 import org.apache.tools.ant.Project;
 import org.freecompany.redline.ReadableChannelWrapper;
 import org.freecompany.redline.RedlineException;
 import org.freecompany.redline.Scanner;
+import org.freecompany.redline.TestBase;
 import org.freecompany.redline.header.AbstractHeader;
 import org.freecompany.redline.header.Format;
 import org.freecompany.redline.header.Header;
 import org.freecompany.redline.payload.Directive;
 import org.junit.Test;
 
+import static org.freecompany.redline.header.Signature.SignatureTag.LEGACY_PGP;
+import static org.freecompany.redline.header.Signature.SignatureTag.RSAHEADER;
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
-public class RedlineTaskTest extends TestCase {
+public class RedlineTaskTest extends TestBase {
 
+    @Test
 	public void testBadName() throws Exception {
 		RedlineTask task = new RedlineTask();
 		task.setVersion("1.0");
@@ -53,6 +57,7 @@ public class RedlineTaskTest extends TestCase {
 		}
 	}
 
+    @Test
 	public void testBadVersion() throws Exception {
 		RedlineTask task = new RedlineTask();
 		task.setName("nameRequired");
@@ -85,6 +90,7 @@ public class RedlineTaskTest extends TestCase {
 		}
 	}
 
+    @Test
 	public void testBadRelease() throws Exception {
 		RedlineTask task = new RedlineTask();
 		task.setName("nameRequired");
@@ -119,6 +125,7 @@ public class RedlineTaskTest extends TestCase {
 		}
 	}
 
+    @Test
 	public void testRestrict() throws Exception {
 		Depends one = new Depends();
 		one.setName("one");
@@ -142,27 +149,14 @@ public class RedlineTaskTest extends TestCase {
 		assertEquals("two", task.depends.get(0).getName());
 	}
 
+    @Test
 	public void testScripts() throws Exception {
 
-		File dir = new File("target");
-		if (!dir.exists()) {
-			assertTrue(dir.mkdir());
-		}
+        File dir = ensureTargetDir();
 
 		File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
 
-		Project project = new Project();
-		project.setCoreLoader(getClass().getClassLoader());
-		project.init();
-
-		RedlineTask task = new RedlineTask();
-		task.setProject(project);
-
-		task.setDestination(dir);
-		task.setName("rpmtest");
-		task.setVersion("1.0");
-		task.setRelease("1");
-		task.setGroup("Application/Office");
+        RedlineTask task = createBasicTask( dir );
 		task.setPreInstallScript(new File("src/test/resources/prein.sh"));
 		task.setPostInstallScript(new File("src/test/resources/postin.sh"));
 		task.setPreUninstallScript(new File("src/test/resources/preun.sh"));
@@ -179,9 +173,7 @@ public class RedlineTaskTest extends TestCase {
 
 		task.execute();
 
-		Scanner scanner = new Scanner();
-		Format format = scanner.run(new ReadableChannelWrapper(Channels
-				.newChannel(new FileInputStream(filename))));
+        Format format = getFormat( filename );
 
 		assertHeaderEquals("#!/bin/sh\n\necho Hello Pre Install!\n", format,
 				Header.HeaderTag.PREINSCRIPT);
@@ -202,6 +194,56 @@ public class RedlineTaskTest extends TestCase {
 		assertInt32EntryHeaderEquals(new int[] { expectedFlags }, format,
 				Header.HeaderTag.FILEFLAGS);
 	}
+
+    @Test
+    public void testSigning() throws Exception {
+
+        File dir = ensureTargetDir();
+
+        File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
+
+        RedlineTask task = createBasicTask( dir);
+        task.setPrivateKeyRingFile( new File( getFileResource( "/pgp/secring.gpg")));
+        task.setPrivateKeyPassphrase( "redline");
+        task.execute();
+
+        Format format = getFormat( filename);
+        assertNotNull( format.getSignature().getEntry( RSAHEADER));
+        assertNotNull( format.getSignature().getEntry( LEGACY_PGP));
+    }
+
+    private Format getFormat( File filename ) throws IOException {
+        Scanner scanner = new Scanner();
+        return scanner.run(new ReadableChannelWrapper( Channels
+                .newChannel( new FileInputStream( filename ) )));
+    }
+
+    private RedlineTask createBasicTask( File dir ) {
+        RedlineTask task = new RedlineTask();
+        task.setProject( createProject() );
+
+        task.setDestination(dir);
+        task.setName("rpmtest");
+        task.setVersion("1.0");
+        task.setRelease("1");
+        task.setGroup("Application/Office");
+        return task;
+    }
+
+    private Project createProject() {
+        Project project = new Project();
+        project.setCoreLoader(getClass().getClassLoader());
+        project.init();
+        return project;
+    }
+
+    private File ensureTargetDir() {
+        File dir = new File("target");
+        if (!dir.exists()) {
+            assertTrue(dir.mkdir());
+        }
+        return dir;
+    }
 
 	private void assertHeaderEquals(String expected, Format format,
 			AbstractHeader.Tag tag) {
@@ -231,18 +273,12 @@ public class RedlineTaskTest extends TestCase {
 		assertArrayEquals("Entry value : " + tag.getName(), expected, values);
 	}
 
+    @Test
 	public void testPackageNameLength() throws RedlineException {
-		File dir = new File("target");
-		if (!dir.exists()) {
-			assertTrue(dir.mkdir());
-		}
+        File dir = ensureTargetDir();
 
-		Project project = new Project();
-		project.setCoreLoader(getClass().getClassLoader());
-		project.init();
-
-		RedlineTask task = new RedlineTask();
-		task.setProject(project);
+        RedlineTask task = new RedlineTask();
+		task.setProject( createProject() );
 
 		task.setDestination(dir);
 		task.setName("thisfilenameislongdddddddddddddddddfddddddddddddddddddddddddddddddd");
