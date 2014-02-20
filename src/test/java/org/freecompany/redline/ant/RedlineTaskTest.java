@@ -25,7 +25,10 @@ public class RedlineTaskTest extends TestBase {
 
     @Test
 	public void testBadName() throws Exception {
+        	File dir = ensureTargetDir();
+
 		RedlineTask task = new RedlineTask();
+		task.setDestination(dir);
 		task.setVersion("1.0");
 		task.setGroup("groupRequired");
 
