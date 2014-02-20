@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.Channels;
 
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.freecompany.redline.ReadableChannelWrapper;
 import org.freecompany.redline.RedlineException;
@@ -34,6 +35,14 @@ public class RedlineTaskTest extends TestBase {
 
 		task.setName("test");
 		task.execute();
+
+		task.setName("ToooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooLong");
+		try {
+			task.execute();
+			fail();
+		} catch (BuildException e) {
+			// Pass
+		}
 
 		task.setName("test/invalid");
 		try {
