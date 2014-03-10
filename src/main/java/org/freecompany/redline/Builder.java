@@ -1038,7 +1038,7 @@ public class Builder {
 			format.getHeader().createEntry(CONFLICTVERSION, RpmTuple3.getVersionArray(conflicts));
 			format.getHeader().createEntry(CONFLICTFLAGS, RpmTuple3.getOperatorsArray(conflicts));
 		}
-		if(conflicts.size() > 0){
+		if(provides.size() > 0){
 			format.getHeader().createEntry(PROVIDENAME, RpmTuple3.getNameArray(provides));
 			format.getHeader().createEntry(PROVIDEVERSION, RpmTuple3.getVersionArray(provides));
 			format.getHeader().createEntry(PROVIDEFLAGS, RpmTuple3.getOperatorsArray(provides));
