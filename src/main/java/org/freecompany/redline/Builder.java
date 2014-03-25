@@ -788,6 +788,7 @@ public class Builder {
      * @param path the absolute path at which this file will be installed.
      * @param source the file content to include in this rpm.
      * @param mode the mode of the target file in standard three octet notation
+     * @param directive directive indicating special handling for this file.
      * @param uname user owner for the given file
      * @param gname group owner for the given file
 
@@ -806,6 +807,7 @@ public class Builder {
      * @param source the file content to include in this rpm.
      * @param mode the mode of the target file in standard three octet notation, or -1 for default.
      * @param dirmode the mode of the parent directories in standard three octet notation, or -1 for default.
+     * @param directive directive indicating special handling for this file.
      * @param uname user owner for the given file, or null for default user.
      * @param gname group owner for the given file, or null for default group.
      * @param addParents whether to create parent directories for the file, defaults to true for other methods.
