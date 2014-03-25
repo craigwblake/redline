@@ -574,7 +574,7 @@ public class Builder {
     /**
 	 * Declares the interpretter to be used when invoking the RPM
 	 * post-installation script that can be set with the
-	 * {@link #setPreInstallScript(String)} method.
+	 * {@link #setPostInstallScript(String)} method.
 	 *
 	 * @param program Path to the interpretter
 	 */
