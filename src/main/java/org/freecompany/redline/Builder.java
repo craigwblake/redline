@@ -165,7 +165,7 @@ public class Builder {
 	}
 
 	/**
-	 * Adds a dependency to the RPM package. This dependecy version will be marked as the maximum
+	 * Adds a dependency to the RPM package. This dependency version will be marked as the maximum
 	 * allowed, and the package will require the named dependency with this version or lower at
 	 * install time.
 	 *
@@ -181,7 +181,7 @@ public class Builder {
 	}
 
 	/**
-	 * Adds a dependency to the RPM package. This dependecy version will be marked as the minimum
+	 * Adds a dependency to the RPM package. This dependency version will be marked as the minimum
 	 * allowed, and the package will require the named dependency with this version or higher at
 	 * install time.
 	 *
@@ -193,7 +193,7 @@ public class Builder {
 	}
 
 	/**
-	 * Adds a dependency to the RPM package. This dependecy version will be marked as the exact
+	 * Adds a dependency to the RPM package. This dependency version will be marked as the exact
 	 * requirement, and the package will require the named dependency with exactly this version at
 	 * install time.
 	 *
@@ -350,7 +350,7 @@ public class Builder {
 	}
 
 	/**
-	 * <b>Required Field</b>. Distribution tag listing the ditributable package.
+	 * <b>Required Field</b>. Distribution tag listing the distributable package.
 	 *
 	 * @param distribution the distribution.
 	 */
@@ -510,7 +510,7 @@ public class Builder {
     
 	/**
 	 * Declares a script to be run as part of the RPM pre-installation. The
-	 * script will be run using the interpretter declared with the
+	 * script will be run using the interpreter declared with the
 	 * {@link #setPreInstallProgram(String)} method.
 	 *
 	 * @param script Script contents to run (i.e. shell commands)
@@ -522,7 +522,7 @@ public class Builder {
 	
 	/**
 	 * Declares a script file to be run as part of the RPM pre-installation. The
-	 * script will be run using the interpretter declared with the
+	 * script will be run using the interpreter declared with the
 	 * {@link #setPreInstallProgram(String)} method.
 	 *
 	 * @param file Script to run (i.e. shell commands)
@@ -532,7 +532,7 @@ public class Builder {
 	}
 
     /**
-	 * Declares the interpretter to be used when invoking the RPM
+	 * Declares the interpreter to be used when invoking the RPM
 	 * pre-installation script that can be set with the
 	 * {@link #setPreInstallScript(String)} method.
 	 *
@@ -550,7 +550,7 @@ public class Builder {
 	
 	/**
 	 * Declares a script to be run as part of the RPM post-installation. The
-	 * script will be run using the interpretter declared with the
+	 * script will be run using the interpreter declared with the
 	 * {@link #setPostInstallProgram(String)} method.
 	 *
 	 * @param script Script contents to run (i.e. shell commands)
@@ -562,7 +562,7 @@ public class Builder {
 	
 	/**
 	 * Declares a script file to be run as part of the RPM post-installation. The
-	 * script will be run using the interpretter declared with the
+	 * script will be run using the interpreter declared with the
 	 * {@link #setPostInstallProgram(String)} method.
 	 *
 	 * @param file Script to run (i.e. shell commands)
@@ -572,11 +572,11 @@ public class Builder {
 	}
 
     /**
-	 * Declares the interpretter to be used when invoking the RPM
+	 * Declares the interpreter to be used when invoking the RPM
 	 * post-installation script that can be set with the
 	 * {@link #setPostInstallScript(String)} method.
 	 *
-	 * @param program Path to the interpretter
+	 * @param program Path to the interpreter
 	 */
 	public void setPostInstallProgram( final String program) {
 		if ( null == program) {
@@ -590,7 +590,7 @@ public class Builder {
 
 	/**
 	 * Declares a script to be run as part of the RPM pre-uninstallation. The
-	 * script will be run using the interpretter declared with the
+	 * script will be run using the interpreter declared with the
 	 * {@link #setPreUninstallProgram(String)} method.
 	 *
 	 * @param script Script contents to run (i.e. shell commands)
@@ -602,7 +602,7 @@ public class Builder {
 
 	/**
 	 * Declares a script file to be run as part of the RPM pre-uninstallation. The
-	 * script will be run using the interpretter declared with the
+	 * script will be run using the interpreter declared with the
 	 * {@link #setPreUninstallProgram(String)} method.
 	 *
 	 * @param file Script to run (i.e. shell commands)
@@ -612,11 +612,11 @@ public class Builder {
 	}
 
     /**
-	 * Declares the interpretter to be used when invoking the RPM
+	 * Declares the interpreter to be used when invoking the RPM
 	 * pre-uninstallation script that can be set with the
 	 * {@link #setPreUninstallScript(String)} method.
 	 *
-	 * @param program Path to the interpretter
+	 * @param program Path to the interpreter
 	 */
 	public void setPreUninstallProgram( final String program) {
 		if ( null == program) {
@@ -630,7 +630,7 @@ public class Builder {
 
 	/**
 	 * Declares a script to be run as part of the RPM post-uninstallation. The
-	 * script will be run using the interpretter declared with the
+	 * script will be run using the interpreter declared with the
 	 * {@link #setPostUninstallProgram(String)} method.
 	 *
 	 * @param script Script contents to run (i.e. shell commands)
@@ -642,7 +642,7 @@ public class Builder {
 
 	/**
 	 * Declares a script file to be run as part of the RPM post-uninstallation. The
-	 * script will be run using the interpretter declared with the
+	 * script will be run using the interpreter declared with the
 	 * {@link #setPostUninstallProgram(String)} method.
 	 *
 	 * @param file Script contents to run (i.e. shell commands)
@@ -652,11 +652,11 @@ public class Builder {
 	}
 
     /**
-	 * Declares the interpretter to be used when invoking the RPM
+	 * Declares the interpreter to be used when invoking the RPM
 	 * post-uninstallation script that can be set with the
 	 * {@link #setPostUninstallScript(String)} method.
 	 *
-	 * @param program Path to the interpretter
+	 * @param program Path to the interpreter
 	 */
 	public void setPostUninstallProgram( final String program) {
 		if ( null == program) {
@@ -988,7 +988,7 @@ public class Builder {
     }
 
     /**
-     * Selects a private key from the current {@link #setPrivateKeyRingFile(java.io.File) private ky ring file}.
+     * Selects a private key from the current {@link #setPrivateKeyRingFile(java.io.File) private key ring file}.
      * If no key is specified, the first signing key will be selected.
      * @param privateKeyId hex key id
      */
@@ -1017,7 +1017,7 @@ public class Builder {
 
     /**
 	 * Generates an RPM with a standard name consisting of the RPM package name, version, release,
-	 * and type in teh given directory.
+	 * and type in the given directory.
 	 *
 	 * @param directory the destination directory for the new RPM file.
 	 */
