@@ -1,0 +1,241 @@
+package org.redline_rpm.ant;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.DirectoryScanner;
+import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.ArchiveFileSet;
+import org.apache.tools.ant.types.TarFileSet;
+import org.apache.tools.ant.types.ZipFileSet;
+import org.redline_rpm.Builder;
+import org.redline_rpm.header.Architecture;
+import org.redline_rpm.header.Header;
+import org.redline_rpm.header.Os;
+import org.redline_rpm.header.RpmType;
+import org.redline_rpm.payload.Directive;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
+import static org.redline_rpm.Util.normalizePath;
+import static org.redline_rpm.header.Architecture.NOARCH;
+import static org.redline_rpm.header.Os.LINUX;
+import static org.redline_rpm.header.RpmType.BINARY;
+
+/**
+ * Ant task for creating an RPM file.
+ */
+public class RedlineTask extends Task {
+	public static final String NAMESPACE = "http://freecompany.org/namespace/redline";
+
+	protected String name;
+	protected String version;
+	protected String group;
+	protected String release = "1";
+	protected String host;
+	protected String summary = "";
+	protected String description = "";
+	protected String license = "";
+	protected String packager = System.getProperty( "user.name", "");
+	protected String distribution = "";
+	protected String vendor = "";
+	protected String url = "";
+	protected String sourcePackage = null;
+	protected String provides;
+	protected String prefixes;
+	protected RpmType type = BINARY;
+	protected Architecture architecture = NOARCH;
+	protected Os os = LINUX;
+	protected File destination;
+	protected List< ArchiveFileSet> filesets = new ArrayList< ArchiveFileSet>();
+	protected List< Ghost> ghosts = new ArrayList< Ghost>();
+	protected List< Link> links = new ArrayList< Link>();
+	protected List< Depends> depends = new ArrayList< Depends>();
+
+	protected List< TriggerPreIn> triggersPreIn = new ArrayList< TriggerPreIn>();
+	protected List< TriggerIn> triggersIn = new ArrayList< TriggerIn>();
+	protected List< TriggerUn> triggersUn = new ArrayList< TriggerUn>();
+	protected List< TriggerPostUn> triggersPostUn = new ArrayList< TriggerPostUn>();
+
+	protected File preTransScript;
+	protected File preInstallScript;
+	protected File postInstallScript;
+	protected File preUninstallScript;
+	protected File postUninstallScript;
+	protected File postTransScript;
+
+    protected File privateKeyRingFile;
+    protected String privateKeyId;
+    protected String privateKeyPassphrase;
+
+	public RedlineTask() {
+		try {
+			host = InetAddress.getLocalHost().getHostName();
+		} catch ( UnknownHostException e) {
+			host = "";
+		}
+	}
+
+	@Override
+	public void execute() {
+		if ( name == null) throw new BuildException( "Attribute 'name' is required.");
+		if ( version == null) throw new BuildException( "Attribute 'version' is required.");
+		if ( group == null) throw new BuildException( "Attribute 'group' is required.");
+
+		Builder builder = new Builder();
+		builder.setPackage( name, version, release);
+		builder.setType( type);
+		builder.setPlatform( architecture, os);
+		builder.setGroup( group);
+		builder.setBuildHost( host);
+		builder.setSummary( summary);
+		builder.setDescription( description);
+		builder.setLicense( license);
+		builder.setPackager( packager);
+		builder.setDistribution( distribution);
+		builder.setVendor( vendor);
+		builder.setUrl( url);
+		builder.setProvides( provides == null ? name : provides);
+		builder.setPrefixes( prefixes == null ? null : prefixes.split(","));
+        builder.setPrivateKeyRingFile( privateKeyRingFile);
+        builder.setPrivateKeyId( privateKeyId);
+        builder.setPrivateKeyPassphrase( privateKeyPassphrase);
+		if (sourcePackage != null) {
+			builder.addHeaderEntry(Header.HeaderTag.SOURCERPM, sourcePackage);
+		}
+
+		try {
+			if ( null != preTransScript) {
+				builder.setPreTransScript( preTransScript);
+				builder.setPreTransProgram( "");
+			}
+			if ( null != preInstallScript) {
+				builder.setPreInstallScript( preInstallScript);
+				builder.setPreInstallProgram( "");
+			}
+			if ( null != postInstallScript) {
+				builder.setPostInstallScript( postInstallScript);
+				builder.setPostInstallProgram( "");
+			}
+			if ( null != preUninstallScript) {
+				builder.setPreUninstallScript( preUninstallScript);
+				builder.setPreUninstallProgram( "");
+			}
+			if ( null != postUninstallScript) {
+				builder.setPostUninstallScript( postUninstallScript);
+				builder.setPostUninstallProgram( "");
+			}
+			if ( null != postTransScript) {
+				builder.setPostTransScript( postTransScript);
+				builder.setPostTransProgram( "");
+			}
+
+			for ( ArchiveFileSet fileset : filesets) {
+				File archive = fileset.getSrc( getProject());
+				String prefix = normalizePath( fileset.getPrefix( getProject()));
+				if ( !prefix.endsWith( "/")) prefix += "/";
+				DirectoryScanner scanner = fileset.getDirectoryScanner( getProject());
+
+                int filemode = fileset.getFileMode( getProject()) & 07777;
+				int dirmode = fileset.getDirMode( getProject()) & 07777;
+				String username = null;
+				String group = null;
+                Directive directive = null;
+
+				if (fileset instanceof TarFileSet) {
+					TarFileSet tarFileSet = (TarFileSet)fileset;
+					username = tarFileSet.getUserName();
+					group = tarFileSet.getGroup();
+                    if (fileset instanceof RpmFileSet) {
+                        RpmFileSet rpmFileSet = (RpmFileSet)fileset;
+                        directive = rpmFileSet.getDirective();
+                    }
+				}
+
+				// include any directories, including empty ones, duplicates will be ignored when we scan included files
+				for (String entry : scanner.getIncludedDirectories()) {
+					String dir = normalizePath(prefix + entry);
+					if (!"".equals(entry)) builder.addDirectory(dir, dirmode, directive, username, group, true);
+				}
+
+				for ( String entry : scanner.getIncludedFiles()) {
+					if ( archive != null) {
+						URL url = new URL( "jar:" + archive.toURL() + "!/" + entry);
+						builder.addURL( prefix + entry, url, filemode, dirmode, directive, username, group);
+					} else {
+						File file = new File( scanner.getBasedir(), entry);
+						builder.addFile(prefix + entry, file, filemode, dirmode, directive, username, group);
+					}
+				}
+			}
+			for ( Ghost ghost : ghosts) {
+				builder.addFile( ghost.getPath(), null, ghost.getFilemode(), ghost.getDirmode(), Directive.GHOST, ghost.getUsername(), ghost.getGroup());
+			}
+			for ( Link link : links) builder.addLink( link.getPath(), link.getTarget(), link.getPermissions());
+			for ( Depends dependency : depends) builder.addDependency( dependency.getName(), dependency.getComparison(), dependency.getVersion());
+
+			for ( TriggerPreIn triggerPreIn : triggersPreIn) builder.addTrigger( triggerPreIn.getScript(), "", triggerPreIn.getDepends(), triggerPreIn.getFlag());
+			for ( TriggerIn triggerIn : triggersIn) builder.addTrigger( triggerIn.getScript(), "", triggerIn.getDepends(), triggerIn.getFlag());
+			for ( TriggerUn triggerUn : triggersUn) builder.addTrigger( triggerUn.getScript(), "", triggerUn.getDepends(), triggerUn.getFlag());
+			for ( TriggerPostUn triggerPostUn : triggersPostUn) builder.addTrigger( triggerPostUn.getScript(), "", triggerPostUn.getDepends(), triggerPostUn.getFlag());
+
+			log( "Created rpm: " + builder.build( destination));
+		} catch ( IOException e) {
+			throw new BuildException( "Error packaging distribution files.", e);
+		} catch ( NoSuchAlgorithmException e) {
+			throw new BuildException( "This system does not support MD5 digests.", e);
+		}
+	}
+
+	public void restrict( String name) {
+		for ( Iterator< Depends> i = depends.iterator(); i.hasNext();) {
+			final Depends dependency = i.next();
+			if ( dependency.getName().equals( name)) i.remove();
+		}
+	}
+
+	public void setName( String name) { this.name = name; }
+	public void setType( String type) { this.type = RpmType.valueOf( type); }
+	public void setArchitecture( String architecture) { this.architecture = Architecture.valueOf( architecture); }
+	public void setOs( String os) { this.os = Os.valueOf( os); }
+	public void setVersion( String version) { this.version = version; }
+	public void setRelease( String release) { this.release = release; }
+	public void setGroup( String group) { this.group = group; }
+	public void setHost( String host) { this.host = host; }
+	public void setSummary( String summary) { this.summary = summary; }
+	public void setDescription( String description) { this.description = description; }
+	public void setLicense( String license) { this.license = license; }
+	public void setPackager( String packager) { this.packager = packager; }
+	public void setDistribution( String distribution) { this.distribution = distribution; }
+	public void setVendor( String vendor) { this.vendor = vendor; }
+	public void setUrl( String url) { this.url = url; }
+	public void setProvides( String provides) { this.provides = provides; }
+	public void setPrefixes( String prefixes) { this.prefixes = prefixes; }
+	public void setDestination( File destination) { this.destination = destination; }
+	public void addZipfileset( ZipFileSet fileset) { filesets.add( fileset); }
+	public void addTarfileset( TarFileSet fileset) { filesets.add( fileset); }
+    public void addRpmfileset( RpmFileSet fileset) { filesets.add( fileset); }
+	public void addGhost( Ghost ghost) { ghosts.add( ghost); }
+	public void addLink( Link link) { links.add( link); }
+	public void addDepends( Depends dependency) { depends.add( dependency); }
+	public void addTriggerPreIn( TriggerPreIn triggerPreIn) { triggersPreIn.add( triggerPreIn); }
+	public void addTriggerIn( TriggerIn triggerIn) { triggersIn.add( triggerIn); }
+	public void addTriggerUn( TriggerUn triggerUn) { triggersUn.add( triggerUn); }
+	public void addTriggerPostUn( TriggerPostUn triggerPostUn) { triggersPostUn.add( triggerPostUn); }
+	public void setPreTransScript( File preTransScript) { this.preTransScript = preTransScript; }
+	public void setPreInstallScript( File preInstallScript) { this.preInstallScript = preInstallScript; }
+	public void setPostInstallScript( File postInstallScript) { this.postInstallScript = postInstallScript; }
+	public void setPreUninstallScript( File preUninstallScript) { this.preUninstallScript = preUninstallScript; }
+	public void setPostUninstallScript( File postUninstallScript) { this.postUninstallScript = postUninstallScript; }
+	public void setPostTransScript( File postTransScript) { this.postTransScript = postTransScript; }
+	public void setSourcePackage( String sourcePackage) { this.sourcePackage = sourcePackage; }
+    public void setPrivateKeyRingFile( File privateKeyRingFile) { this.privateKeyRingFile = privateKeyRingFile; }
+    public void setPrivateKeyId( String privateKeyId ) { this.privateKeyId = privateKeyId; }
+    public void setPrivateKeyPassphrase( String privateKeyPassphrase ) { this.privateKeyPassphrase = privateKeyPassphrase; }
+}

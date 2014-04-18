@@ -17,12 +17,12 @@ can be imported and invoked from build scripts in order to package deployment fi
 <h2>Scanner</h2>
 
 <p>The scanner tool can be invoked from the command line using the main class <code>
-<a href="apidocs/org/freecompany/redline/Scanner.html">org.freecompany.redline.Scanner</a></code>. From the command line
+<a href="apidocs/org/redline_rpm/Scanner.html">org.redline_rpm.Scanner</a></code>. From the command line
 this class accepts as it's single argument a path to a valid RPM file. If the file specified by the providing path does
 not exist, or if the file in not a valid RPM archive an exception will be thrown. And example of invoking the scanner
 follows:</p>
 
-<pre>   java -cp redline.jar <a href="apidocs/org/freecompany/redline/Scanner.html">org.freecompany.redline.Scanner</a> test.rpm</pre>
+<pre>   java -cp redline.jar <a href="apidocs/org/redline_rpm/Scanner.html">org.redline_rpm.Scanner</a> test.rpm</pre>
 
 <p>The scanner is most useful for debugging RPM files and tools as it generates a significant amount of output.
 For more generalized RPM information the standard RPM tools are recommended.</p>
@@ -31,7 +31,7 @@ For more generalized RPM information the standard RPM tools are recommended.</p>
 <h2>Builder</h2>
 
 <p>The builder is the main entry point for constructing RPM files programmatically. The tool is used by
-constructing an instance of the <code><a href="apidocs/org/freecompany/redline/Builder.html">org.freecompany.redline.Builder</a></code>
+constructing an instance of the <code><a href="apidocs/org/redline_rpm/Builder.html">org.redline_rpm.Builder</a></code>
 class and adding files and headers to the archive. When the builder is configured a final call will generate the RPM
 file to a given <code>java.nio.channels.FileChannel</code>.</p>
 
