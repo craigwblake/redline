@@ -70,12 +70,49 @@ in Ant task follows:</p>
       &lt;rpmfileset prefix="/tmp/rpmtest/conf" config="true" file="conf/test2.conf"
                   filemode="644" username="none" group="none"/>
       &lt;depends name="test-lib" version="1.2.3"/>
-    &lt;redline></pre>
+    &lt;redline>
+</pre>
 
 <p>This build script creates a new RPM file named <code>test-1.2.3-1.noarch.rpm</code> in the <code>rpms</code> directory
 containing the local file <code>test-1.2.3.jar</code> to be installed into <code>/use/share/java</code> on the installation
 machine. In addition a symbolic link is included from the packaged file to <code>/usr/share/java/test.jar</code>.
 The resulting RPM has a dependency on an RPM named <code>test-lib</code>.</p>
+
+
+<h2>Maven</h2>
+
+<p>Redlone can also be used from within Maven using 'maven-antrun-plugin'.  This is a sample configuration for building an RPM from Maven using Redline instead of the native system RPM tools:</p>
+
+<pre class="brush: xml;">
+&lt;plugin>
+    &lt;groupId>org.apache.maven.plugins&lt;/groupId>
+    &lt;artifactId>maven-antrun-plugin&lt;/artifactId>
+    &lt;version>1.7&lt;/version>
+    &lt;executions>
+        &lt;execution>
+            &lt;id>generateSources&lt;/id>
+            &lt;phase>package&lt;/phase>
+            &lt;goals>
+                &lt;goal>run&lt;/goal>
+            &lt;/goals>
+            &lt;configuration>
+                &lt;tasks>
+                    &lt;ant antfile="${basedir}/src/main/scripts/buildrpm.xml">
+                        &lt;target name="rpm"/>
+                    &lt;/ant>
+                &lt;/tasks>
+            &lt;/configuration>
+        &lt;/execution>
+    &lt;/executions>
+    &lt;dependencies>
+        &lt;dependency>
+            &lt;groupId>org.redline-rpm&lt;/groupId>
+            &lt;artifactId>redline&lt;/artifactId>
+            &lt;version>1.1.15&lt;/version>
+        &lt;/dependency>
+    &lt;/dependencies>
+&lt;/plugin>
+</pre>
 
 <script type="text/javascript" src="js/shConfig.js"></script>
 
