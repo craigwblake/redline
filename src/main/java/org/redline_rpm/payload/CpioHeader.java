@@ -172,7 +172,7 @@ public class CpioHeader {
 
 	protected int skip( final ReadableByteChannel channel, final int total) throws IOException {
 		int skipped = Util.difference( total, 3);
-		LOGGER.info("Skipping '{}' bytes from stream at position '{}'.",skipped,total);
+		LOGGER.debug("Skipping '{}' bytes from stream at position '{}'.",skipped,total);
 		Util.fill( channel, skipped);
 		return skipped;
 	}
@@ -180,7 +180,7 @@ public class CpioHeader {
 	public int skip( final WritableByteChannel channel, int total) throws IOException {
 		int skipped = Util.difference( total, 3);
 		Util.empty( channel, ByteBuffer.allocate( skipped));
-        LOGGER.info("Skipping '{}' bytes from stream at position '{}'.",skipped,total);
+        	LOGGER.debug("Skipping '{}' bytes from stream at position '{}'.",skipped,total);
 		return skipped;
 	}
 
