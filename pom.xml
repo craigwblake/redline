@@ -9,7 +9,7 @@
 
 	<groupId>org.redline-rpm</groupId>
 	<artifactId>redline</artifactId>
-	<version>1.1.16-SNAPSHOT</version>
+	<version>1.1.16</version>
 	<packaging>jar</packaging>
 	<name>Redline</name>
 	<description>Redline is a pure Java library for manipulating RPM Package Manager packages.</description>
