@@ -94,6 +94,7 @@ public class Contents {
 	 * Adds a directory entry to the archive with the default permissions of 644.
 	 *
 	 * @param path the destination path for the installed file.
+	 * @param target the target string
 	 */
 	public synchronized void addLink( final String path, final String target) {
 		addLink( path, target, -1);
@@ -103,6 +104,7 @@ public class Contents {
 	 * Adds a directory entry to the archive with the specified permissions.
 	 *
 	 * @param path the destination path for the installed file.
+	 * @param target the target string
 	 * @param permissions the permissions flags.
 	 */
 	public synchronized void addLink( String path, final String target, int permissions) {
@@ -209,6 +211,7 @@ public class Contents {
 	 *
 	 * @param path the destination path for the installed file.
 	 * @param source the local file to be included in the package.
+	 * @throws java.io.FileNotFoundException file wasn't found
 	 */
 	public void addFile( final String path, final File source) throws FileNotFoundException {
 		addFile( path, source, -1);
@@ -220,6 +223,7 @@ public class Contents {
 	 * @param path the destination path for the installed file.
 	 * @param source the local file to be included in the package.
 	 * @param permissions the permissions flags.
+	 * @throws java.io.FileNotFoundException file wasn't found
 	 */
 	public void addFile( final String path, final File source, int permissions) throws FileNotFoundException {
 		addFile(path, source, permissions, null, null, null);
@@ -231,6 +235,8 @@ public class Contents {
 	 * @param path the destination path for the installed file.
 	 * @param source the local file to be included in the package.
 	 * @param permissions the permissions flags.
+	 * @param dirmode permission flags for parent directories, use -1 to leave as default.
+	 * @throws java.io.FileNotFoundException file wasn't found
 	 */
 	public void addFile( final String path, final File source, int permissions, int dirmode) throws FileNotFoundException {
 		addFile(path, source, permissions, null, null, null, dirmode);
@@ -243,6 +249,7 @@ public class Contents {
 	 * @param source the local file to be included in the package.
 	 * @param permissions the permissions flags.
 	 * @param directive directive indicating special handling for this file.
+	 * @throws java.io.FileNotFoundException file wasn't found
 	 */
 	public void addFile( final String path, final File source, int permissions, final Directive directive) throws FileNotFoundException {
 		addFile(path, source, permissions, directive, null, null);
@@ -257,6 +264,7 @@ public class Contents {
 	 * @param directive directive indicating special handling for this file.
 	 * @param uname user owner for the given file
 	 * @param gname group owner for the given file
+	 * @throws java.io.FileNotFoundException file wasn't found
 	 */
 	public void addFile( final String path, final File source, final int permissions, final Directive directive, final String uname, final String gname) throws FileNotFoundException {
 		addFile( path, source, permissions, directive, uname, gname, -1);
@@ -271,6 +279,8 @@ public class Contents {
 	 * @param directive directive indicating special handling for this file.
 	 * @param uname user owner for the given file
 	 * @param gname group owner for the given file
+	 * @param dirmode permission flags for parent directories, use -1 to leave as default.
+	 * @throws java.io.FileNotFoundException file wasn't found
 	 */
 	public synchronized void addFile( final String path, final File source, final int permissions, final Directive directive, final String uname, final String gname, final int dirmode) throws FileNotFoundException {
 		addFile( path, source, permissions, directive, uname, gname, -1, true);
@@ -287,6 +297,7 @@ public class Contents {
 	 * @param gname group owner for the given file, use null for default group.
 	 * @param dirmode permission flags for parent directories, use -1 to leave as default.
 	 * @param addParents whether to create parent directories for the file, defaults to true for other methods.
+	 * @throws java.io.FileNotFoundException file wasn't found
 	 */
 	public synchronized void addFile( final String path, final File source, final int permissions, final Directive directive, final String uname, final String gname, final int dirmode, final boolean addParents) throws FileNotFoundException {
 		if ( files.contains( path)) return;
@@ -335,6 +346,8 @@ public class Contents {
 	 * @param directive directive indicating special handling for this file.
 	 * @param uname user owner for the given file
 	 * @param gname group owner for the given file
+	 * @param dirmode permission flags for parent directories, use -1 to leave as default.
+	 * @throws java.io.FileNotFoundException file wasn't found
 	 */
 	public synchronized void addURL( final String path, final URL source, final int permissions, final Directive directive, final String uname, final String gname, final int dirmode) throws FileNotFoundException {
 		if ( files.contains( path)) return;
@@ -357,6 +370,10 @@ public class Contents {
 	/**
 	 * Adds entries for parent directories of this file, so that they may be cleaned up when 
 	 * removing the package.
+	 * @param file the file to add parent directories of
+	 * @param permissions the permissions flags
+	 * @param uname user owner for the given file
+	 * @param gname group owner for the given file
 	 */
 	protected synchronized void addParents( final File file, final int permissions, final String uname, final String gname ) {
 		final ArrayList< String> parents = new ArrayList< String>();
@@ -368,7 +385,7 @@ public class Contents {
 	 * Add additional directory that is assumed to already exist on system where the RPM will be installed
 	 * (e.g. /etc) and should not have an entry in the RPM.
 	 *
-	 * @param directory
+	 * @param directory the directory to add
 	 */
 	public synchronized static void addBuiltinDirectory( final String directory) {
 		BUILTIN.add(directory);
@@ -377,12 +394,14 @@ public class Contents {
 	/**
 	 * Retrieve the size of this archive in number of files. This count includes both directory entries and
 	 * soft links.
+	 * @return the number of files in this archive
 	 */
 	public int size() { return headers.size(); }
 
 	/**
 	 * Retrieve the archive headers. The returned {@link Iterable} will iterate in the correct order for
 	 * the final archive.
+	 * @return the headers
 	 */
 	public Iterable< CpioHeader> headers() { return headers; }
 
@@ -390,11 +409,14 @@ public class Contents {
 	 * Retrieves the content for this archive entry, which may be a {@link File} if the entry is a regular file or
 	 * a {@link CharSequence} containing the name of the target path if the entry is a link. This is the value to
 	 * be written to the archive as the body of the entry.
+	 * @param header the header to get the content from
+	 * @return the content
 	 */
 	public Object getSource( CpioHeader header) { return sources.get( header); }
 
 	/**
 	 * Accumulated size of all files included in the archive.
+	 * @return the size of all files included in the archive
 	 */
 	public int getTotalSize() {
 		int total = 0;
@@ -411,6 +433,7 @@ public class Contents {
 
 	/**
 	 * Gets the dirnames headers values.
+	 * @return the dirnames headers values
 	 */
 	public String[] getDirNames() {
 		final Set< String> set = new LinkedHashSet< String>();
@@ -427,6 +450,7 @@ public class Contents {
 
 	/**
 	 * Gets the dirindexes headers values.
+	 * @return the dirindexes
 	 */
 	// TODO: Fix this (as part of general refactoring) to be much better.
 	public int[] getDirIndexes() {
@@ -446,6 +470,7 @@ public class Contents {
 
 	/**
 	 * Gets the basenames header values.
+	 * @return the basename header values
 	 */
 	public String[] getBaseNames() {
 		String[] array = new String[ headers.size()];
@@ -456,6 +481,7 @@ public class Contents {
 
 	/**
 	 * Gets the sizes header values.
+	 * @return the sizes header values
 	 */
 	public int[] getSizes() {
 		int[] array = new int[ headers.size()];
@@ -476,6 +502,7 @@ public class Contents {
 
 	/**
 	 * Gets the modes header values.
+	 * @return the modes header values
 	 */
 	public short[] getModes() {
 		short[] array = new short[ headers.size()];
@@ -486,6 +513,7 @@ public class Contents {
 
 	/**
 	 * Gets the rdevs header values.
+	 * @return the rdevs header values
 	 */
 	public short[] getRdevs() {
 		short[] array = new short[ headers.size()];
@@ -496,6 +524,7 @@ public class Contents {
 
 	/**
 	 * Gets the mtimes header values.
+	 * @return the mtimes header values
 	 */
 	public int[] getMtimes() {
 		int[] array = new int[ headers.size()];
@@ -508,6 +537,9 @@ public class Contents {
 
 	/**
 	 * Caclulates an MD5 hash for each file in the archive.
+	 * @return the MD5 hashes
+	 * @throws NoSuchAlgorithmException if the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public String[] getMD5s() throws NoSuchAlgorithmException, IOException {
 		/**
@@ -541,6 +573,7 @@ public class Contents {
 
 	/**
 	 * Gets the linktos header values.
+	 * @return the linktos header values
 	 */
 	public String[] getLinkTos() {
 		String[] array = new String[ headers.size()];
@@ -556,6 +589,7 @@ public class Contents {
 
 	/**
 	 * Gets the flags header values.
+	 * @return the flags header values
 	 */
 	public int[] getFlags() {
 		int[] array = new int[ headers.size()];
@@ -566,6 +600,7 @@ public class Contents {
 
 	/**
 	 * Gets the users header values.
+	 * @return the users header values
 	 */
 	public String[] getUsers() {
 		String[] array = new String[ headers.size()];
@@ -578,6 +613,7 @@ public class Contents {
 
 	/**
 	 * Gets the groups header values.
+	 * @return the groups header values
 	 */
 	public String[] getGroups() {
 		String[] array = new String[ headers.size()];
@@ -590,6 +626,7 @@ public class Contents {
 
 	/**
 	 * Gets the colors header values.
+	 * @return the colors header values
 	 */
 	public int[] getColors() {
 		return new int[ headers.size()];
@@ -597,6 +634,7 @@ public class Contents {
 
 	/**
 	 * Gets the verifyflags header values.
+	 * @return the verifyflags header values
 	 */
 	public int[] getVerifyFlags() {
 		int[] array = new int[ headers.size()];
@@ -606,6 +644,7 @@ public class Contents {
 
 	/**
 	 * Gets the classes header values.
+	 * @return the classes header values
 	 */
 	public int[] getClasses() {
 		int[] array = new int[ headers.size()];
@@ -615,6 +654,7 @@ public class Contents {
 
 	/**
 	 * Gets the devices header values.
+	 * @return the devices header values
 	 */
 	public int[] getDevices() {
 		int[] array = new int[ headers.size()];
@@ -625,6 +665,7 @@ public class Contents {
 
 	/**
 	 * Gets the inodes header values.
+	 * @return the iNodes header values
 	 */
 	public int[] getInodes() {
 		int[] array = new int[ headers.size()];
@@ -635,6 +676,7 @@ public class Contents {
 
 	/**
 	 * Gets the langs header values.
+	 * @return the langs header values
 	 */
 	public String[] getLangs() {
 		String[] array = new String[ headers.size()];
@@ -644,6 +686,7 @@ public class Contents {
 
 	/**
 	 * Gets the dependsx header values.
+	 * @return the dependsx header values
 	 */
 	public int[] getDependsX() {
 		return new int[ headers.size()];
@@ -651,6 +694,7 @@ public class Contents {
 
 	/**
 	 * Gets the dependsn header values.
+	 * @return the dependsn header values
 	 */
 	public int[] getDependsN() {
 		return new int[ headers.size()];
@@ -658,6 +702,7 @@ public class Contents {
 
 	/**
 	 * Gets the contexts header values.
+	 * @return the contexts header values
 	 */
 	public String[] getContexts() {
 		String[] array = new String[ headers.size()];
@@ -667,6 +712,8 @@ public class Contents {
 
 	/**
 	 * Generates a list of parent paths given a starting path.
+	 * @param parents the list to add the parents to
+	 * @param file the file to search for parents of
 	 */
 	protected static void listParents( final List< String> parents, final File file) {
 		final File parent = file.getParentFile();

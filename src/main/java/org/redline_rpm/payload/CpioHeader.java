@@ -123,6 +123,7 @@ public class CpioHeader {
 	 * Test to see if this is the last header, and is therefore the end of the
 	 * archive. Uses the CPIO magic trailer value to denote the last header of
 	 * the stream.
+	 * @return true if last, false if not
 	 */
 	public boolean isLast() {
 		return TRAILER.equals(name);
@@ -172,7 +173,7 @@ public class CpioHeader {
 
 	protected int skip( final ReadableByteChannel channel, final int total) throws IOException {
 		int skipped = Util.difference( total, 3);
-		LOGGER.info("Skipping '{}' bytes from stream at position '{}'.",skipped,total);
+		LOGGER.debug("Skipping '{}' bytes from stream at position '{}'.",skipped,total);
 		Util.fill( channel, skipped);
 		return skipped;
 	}
@@ -180,7 +181,7 @@ public class CpioHeader {
 	public int skip( final WritableByteChannel channel, int total) throws IOException {
 		int skipped = Util.difference( total, 3);
 		Util.empty( channel, ByteBuffer.allocate( skipped));
-        LOGGER.info("Skipping '{}' bytes from stream at position '{}'.",skipped,total);
+        	LOGGER.debug("Skipping '{}' bytes from stream at position '{}'.",skipped,total);
 		return skipped;
 	}
 
@@ -218,8 +219,12 @@ public class CpioHeader {
 	}
 
 	/**
-	 * Writed the content for the CPIO header, including the name immediately following. The name data is rounded
+	 * Write the content for the CPIO header, including the name immediately following. The name data is rounded
 	 * to the nearest 2 byte boundary as CPIO requires by appending a null when needed.
+	 * @param channel which channel to write on
+	 * @param total current size of header?
+	 * @return total written and skipped
+	 * @throws IOException there was an IO error
 	 */
 	public int write( final WritableByteChannel channel, int total) throws IOException {
 		final ByteBuffer buffer = charset.encode( CharBuffer.wrap( name));

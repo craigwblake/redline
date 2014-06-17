@@ -199,6 +199,7 @@ public class Builder {
 	 *
 	 * @param name the name of the dependency.
 	 * @param version the version identifier.
+	 * @param flag the file flags
 	 */
 	protected void addDependency( final CharSequence name, final CharSequence version, final int flag) {
 		dependencies.put( name.toString(), version);
@@ -378,7 +379,7 @@ public class Builder {
 	/**
 	 * <b>Required Field</b>. Website URL for this package, usually a project site.
 	 *
-	 * @param url 
+	 * @param url the URL
 	 */
 	public void setUrl( CharSequence url) {
 		if ( url != null) format.getHeader().createEntry( URL, url);
@@ -486,6 +487,7 @@ public class Builder {
 	 * {@link #setPreTransProgram(String)} method.
 	 *
 	 * @param file Script to run (i.e. shell commands)
+	 * @throws IOException there was an IO error
 	 */
 	public void setPreTransScript( final File file) throws IOException {
 		setPreTransScript(readScript(file));
@@ -526,6 +528,7 @@ public class Builder {
 	 * {@link #setPreInstallProgram(String)} method.
 	 *
 	 * @param file Script to run (i.e. shell commands)
+	 * @throws IOException there was an IO error
 	 */
 	public void setPreInstallScript( final File file) throws IOException {
 		setPreInstallScript(readScript(file));
@@ -566,6 +569,7 @@ public class Builder {
 	 * {@link #setPostInstallProgram(String)} method.
 	 *
 	 * @param file Script to run (i.e. shell commands)
+	 * @throws IOException there was an IO error
 	 */
 	public void setPostInstallScript( final File file) throws IOException {
         setPostInstallScript(readScript(file));
@@ -606,6 +610,7 @@ public class Builder {
 	 * {@link #setPreUninstallProgram(String)} method.
 	 *
 	 * @param file Script to run (i.e. shell commands)
+	 * @throws IOException there was an IO error
 	 */
 	public void setPreUninstallScript( final File file) throws IOException {
         setPreUninstallScript(readScript(file));
@@ -646,6 +651,7 @@ public class Builder {
 	 * {@link #setPostUninstallProgram(String)} method.
 	 *
 	 * @param file Script contents to run (i.e. shell commands)
+	 * @throws IOException there was an IO error
 	 */
 	public void setPostUninstallScript( final File file) throws IOException {
         setPostUninstallScript(readScript(file));
@@ -686,6 +692,7 @@ public class Builder {
 	 * {@link #setPostTransProgram(String)} method.
 	 *
 	 * @param file Script contents to run (i.e. shell commands)
+	 * @throws IOException there was an IO error
 	 */
 	public void setPostTransScript( final File file) throws IOException {
 		setPostTransScript(readScript(file));
@@ -715,6 +722,7 @@ public class Builder {
 	 * @param prog the interpreter with which to run the script.
 	 * @param depends the map of rpms and versions that will trigger the script
 	 * @param flag the trigger type (SCRIPT_TRIGGERPREIN, SCRIPT_TRIGGERIN, SCRIPT_TRIGGERUN, or SCRIPT_TRIGGERPOSTUN)
+	 * @throws IOException there was an IO error
 	 */
 	public void addTrigger( final File script, final String prog, final Map< String, IntString> depends, final int flag) throws IOException {
 		triggerscripts.add(readScript(script));
@@ -743,6 +751,8 @@ public class Builder {
 	 * @param path the absolute path at which this file will be installed.
 	 * @param source the file content to include in this rpm.
 	 * @param mode the mode of the target file in standard three octet notation
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public void addFile( final String path, final File source, final int mode) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source, mode);
@@ -757,6 +767,9 @@ public class Builder {
 	 * @param path the absolute path at which this file will be installed.
 	 * @param source the file content to include in this rpm.
 	 * @param mode the mode of the target file in standard three octet notation
+	 * @param dirmode the mode of the parent directories in standard three octet notation, or -1 for default.
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public void addFile( final String path, final File source, final int mode, final int dirmode) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source, mode, dirmode);
@@ -771,9 +784,11 @@ public class Builder {
      * @param path the absolute path at which this file will be installed.
      * @param source the file content to include in this rpm.
      * @param mode the mode of the target file in standard three octet notation
+     * @param dirmode the mode of the parent directories in standard three octet notation, or -1 for default.
      * @param uname user owner for the given file
      * @param gname group owner for the given file
-
+     * @throws NoSuchAlgorithmException the algorithm isn't supported
+     * @throws IOException there was an IO error
      */
     public void addFile( final String path, final File source, final int mode, final int dirmode, final String uname, final String gname) throws NoSuchAlgorithmException, IOException {
         contents.addFile( path, source, mode, null, uname, gname, dirmode);
@@ -788,10 +803,12 @@ public class Builder {
      * @param path the absolute path at which this file will be installed.
      * @param source the file content to include in this rpm.
      * @param mode the mode of the target file in standard three octet notation
+     * @param dirmode the mode of the parent directories in standard three octet notation, or -1 for default.
      * @param directive directive indicating special handling for this file.
      * @param uname user owner for the given file
      * @param gname group owner for the given file
-
+     * @throws NoSuchAlgorithmException the algorithm isn't supported
+     * @throws IOException there was an IO error
      */
     public void addFile( final String path, final File source, final int mode, final int dirmode, final Directive directive, final String uname, final String gname) throws NoSuchAlgorithmException, IOException {
         contents.addFile( path, source, mode, directive, uname, gname, dirmode);
@@ -811,6 +828,8 @@ public class Builder {
      * @param uname user owner for the given file, or null for default user.
      * @param gname group owner for the given file, or null for default group.
      * @param addParents whether to create parent directories for the file, defaults to true for other methods.
+     * @throws NoSuchAlgorithmException the algorithm isn't supported
+     * @throws IOException there was an IO error
      */
     public void addFile( final String path, final File source, final int mode, final int dirmode, final Directive directive, final String uname, final String gname, final boolean addParents) throws NoSuchAlgorithmException, IOException {
         contents.addFile( path, source, mode, directive, uname, gname, dirmode, addParents);
@@ -828,6 +847,8 @@ public class Builder {
 	 * @param directive directive indicating special handling for this file.
 	 * @param uname user owner for the given file
 	 * @param gname group owner for the given file
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public void addFile( final String path, final File source, final int mode, final Directive directive, final String uname, final String gname) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source, mode, directive, uname, gname);
@@ -843,6 +864,8 @@ public class Builder {
 	 * @param source the file content to include in this rpm.
 	 * @param mode the mode of the target file in standard three octet notation
 	 * @param directive directive indicating special handling for this file.
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public void addFile( final String path, final File source, final int mode, final Directive directive) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source, mode, directive);
@@ -853,6 +876,8 @@ public class Builder {
 	 *
 	 * @param path the absolute path at which this file will be installed.
 	 * @param source the file content to include in this rpm.
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public void addFile( final String path, final File source) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source);
@@ -867,6 +892,9 @@ public class Builder {
 	 * @param path the absolute path at which this file will be installed.
 	 * @param source the file content to include in this rpm.
 	 * @param mode the mode of the target file in standard three octet notation
+	 *  @param dirmode the mode of the parent directories in standard three octet notation, or -1 for default.
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public void addURL( final String path, final URL source, final int mode, final int dirmode) throws NoSuchAlgorithmException, IOException {
 		contents.addURL( path, source, mode, null, null, null, dirmode);
@@ -881,8 +909,11 @@ public class Builder {
      * @param path the absolute path at which this file will be installed.
      * @param source the file content to include in this rpm.
      * @param mode the mode of the target file in standard three octet notation
+     * @param dirmode the mode of the parent directories in standard three octet notation, or -1 for default.
      * @param username ownership of added file
      * @param group ownership of added file
+     * @throws NoSuchAlgorithmException the algorithm isn't supported
+     * @throws IOException there was an IO error
      */
     public void addURL( final String path, final URL source, final int mode, final int dirmode, final String username, final String group) throws NoSuchAlgorithmException, IOException {
         contents.addURL( path, source, mode, null, username, group, dirmode);
@@ -897,8 +928,12 @@ public class Builder {
      * @param path the absolute path at which this file will be installed.
      * @param source the file content to include in this rpm.
      * @param mode the mode of the target file in standard three octet notation
+     * @param dirmode the mode of the parent directories in standard three octet notation, or -1 for default.
+     * @param directive directive indicating special handling for this file.
      * @param username ownership of added file
      * @param group ownership of added file
+     * @throws NoSuchAlgorithmException the algorithm isn't supported
+     * @throws IOException there was an IO error
      */
     public void addURL( final String path, final URL source, final int mode, final int dirmode, final Directive directive, final String username, final String group) throws NoSuchAlgorithmException, IOException {
         contents.addURL( path, source, mode, directive, username, group, dirmode);
@@ -908,6 +943,8 @@ public class Builder {
 	 * Adds the directory to the repository with the default mode of <code>644</code>.
 	 *
 	 * @param path the absolute path to add as a directory.
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public void addDirectory( final String path) throws NoSuchAlgorithmException, IOException {
 		contents.addDirectory( path);
@@ -921,6 +958,8 @@ public class Builder {
 	 * @param directive directive indicating special handling for this file.
 	 * @param uname user owner of the directory
 	 * @param gname group owner of the directory
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public void addDirectory( final String path, final int permissions, final Directive directive, final String uname, final String gname) throws NoSuchAlgorithmException, IOException {
 		contents.addDirectory( path, permissions, directive, uname, gname);
@@ -935,6 +974,8 @@ public class Builder {
 	 * @param uname user owner of the directory
 	 * @param gname group owner of the directory
 	 * @param addParents whether to add parent directories to the rpm 
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public void addDirectory( final String path, final int permissions, final Directive directive, final String uname, final String gname, final boolean addParents) throws NoSuchAlgorithmException, IOException {
 		contents.addDirectory( path, permissions, directive, uname, gname, addParents);
@@ -945,6 +986,8 @@ public class Builder {
 	 *
 	 * @param path the absolute path to add as a directory.
 	 * @param directive directive indicating special handling for this file.
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public void addDirectory( final String path, final Directive directive) throws NoSuchAlgorithmException, IOException {
 		contents.addDirectory( path, directive);
@@ -955,6 +998,8 @@ public class Builder {
 	 *
 	 * @param path the absolute path at which this link will be installed.
 	 * @param target the path of the file this link will point to.
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public void addLink( final String path, final String target) throws NoSuchAlgorithmException, IOException {
 		contents.addLink( path, target);
@@ -965,6 +1010,9 @@ public class Builder {
 	 *
 	 * @param path the absolute path at which this link will be installed.
 	 * @param target the path of the file this link will point to.
+	 * @param permissions the permissions flags
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public void addLink( final String path, final String target, int permissions) throws NoSuchAlgorithmException, IOException {
 		contents.addLink( path, target, permissions);
@@ -983,7 +1031,7 @@ public class Builder {
     /**
      * Sets the PGP key ring file used for header and header + payload signature.
      * Alternatively you can set the private key directly with {@link #setPrivateKey(org.bouncycastle.openpgp.PGPPrivateKey)}
-     * @param privateKeyRingFile
+     * @param privateKeyRingFile the private key ring file
      */
     public void setPrivateKeyRingFile( File privateKeyRingFile ) {
         this.privateKeyRingFile = privateKeyRingFile;
@@ -1000,7 +1048,7 @@ public class Builder {
 
     /**
      * Passphrase for the private key
-     * @param privateKeyPassphrase
+     * @param privateKeyPassphrase the private key pass phrase
      */
     public void setPrivateKeyPassphrase( String privateKeyPassphrase ) {
         this.privateKeyPassphrase = privateKeyPassphrase;
@@ -1011,7 +1059,7 @@ public class Builder {
      * {@link #setPrivateKeyRingFile(java.io.File) key ring file}, {@link #setPrivateKeyId(String) key id}
      * and {@link #setPrivateKeyPassphrase(String) passphrase} directly. Setting the private key has more
      * priorisation than providing key ring file.
-     * @param privateKey
+     * @param privateKey the PGP private key
      */
     public void setPrivateKey( PGPPrivateKey privateKey ) {
         this.privateKey = privateKey;
@@ -1022,6 +1070,9 @@ public class Builder {
 	 * and type in the given directory.
 	 *
 	 * @param directory the destination directory for the new RPM file.
+	 * @return the name of the rpm
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	public String build( final File directory) throws NoSuchAlgorithmException, IOException {
 		final String rpm = format.getLead().getName() + "." + format.getLead().getArch().toString().toLowerCase() + ".rpm";
@@ -1037,6 +1088,8 @@ public class Builder {
 	 * generated.
 	 *
 	 * @param original the {@link FileChannel} to which the resulting RPM will be written.
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
 	 */
 	@SuppressWarnings( "unchecked")
 	public void build( final FileChannel original) throws NoSuchAlgorithmException, IOException {
@@ -1193,6 +1246,9 @@ public class Builder {
 	/**
 	 * Returns the special header expected by RPM for
 	 * a particular header.
+	 * @param tag the tag to get
+	 * @param count the number to get
+	 * @return the header bytes
 	 */
 	protected byte[] getSpecial( final int tag, final int count) {
 		final ByteBuffer buffer = ByteBuffer.allocate( 16);
@@ -1206,6 +1262,8 @@ public class Builder {
 	/**
 	 * Converts an array of Integer objects into an equivalent
 	 * array of int primitives.
+	 * @param ints the array of Integer objects
+	 * @return the primitive ints array
 	 */
 	protected int[] convert( final Integer[] ints) {
 		int[] array = new int[ ints.length];

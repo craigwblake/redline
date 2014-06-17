@@ -42,6 +42,9 @@ public abstract class AbstractHeader {
 	/**
 	 * Reads the entire header contents for this channel and returns the number of entries
 	 * found.
+	 * @param in the ReadableByteChannel to read
+	 * @return the number read
+	 * @throws IOException there was an IO error
 	 */
 	public int read( ReadableByteChannel in) throws IOException {
 		ByteBuffer header = Util.fill( in, HEADER_HEADER_SIZE);
@@ -75,6 +78,9 @@ public abstract class AbstractHeader {
 	 * Writes this header section to the provided file at the current position and returns the
 	 * required padding.  The caller is responsible for adding the padding immediately after
 	 * this data.
+	 * @param out the WritableByteChannel to output to
+	 * @return the number written
+	 * @throws IOException there was an IO error
 	 */
 	public int write( WritableByteChannel out) throws IOException {
 		final ByteBuffer header = getHeader();
@@ -99,8 +105,9 @@ public abstract class AbstractHeader {
 	 * header and advances the file channels position.  The resulting buffer will be prefilled with
 	 * the necesssary magic data and the correct index count, but will require an integer value to
 	 * be written with the total data section size once data writing is complete.
-	 * <p/>
 	 * This method must be invoked before mapping the index or data sections.
+	 * @return a buffer containing the header
+	 * @throws IOException there was an IO error
 	 */
 	protected ByteBuffer getHeader() throws IOException {
 		ByteBuffer buffer = ByteBuffer.allocate( HEADER_HEADER_SIZE);
@@ -114,8 +121,9 @@ public abstract class AbstractHeader {
 	 * Memory maps the portion of the destination file that will contain the index structure
 	 * header and advances the file channels position.  The resulting buffer will be ready for
 	 * writing of the entry indexes.
-	 * <p/>
 	 * This method must be invoked before mapping the data section, but after mapping the header.
+	 * @return a buffer containing the header
+	 * @throws IOException there was an IO error
 	 */
 	protected ByteBuffer getIndex() throws IOException {
 		return ByteBuffer.allocate( count() * ENTRY_SIZE);
@@ -125,8 +133,9 @@ public abstract class AbstractHeader {
 	 * Writes the data section of the file, starting at the current position which must be immediately
 	 * after the header section.  Each entry writes its corresponding index into the provided index buffer
 	 * and then writes its data to the file channel.
-	 * <p/>
+	 * @param index ByteBuffer of the index
 	 * @return the total number of bytes written to the data section of the file.
+	 * @throws IOException there was an IO error
 	 */
 	protected ByteBuffer getData( final ByteBuffer index) throws IOException {
 		int offset = 0;
@@ -239,6 +248,9 @@ public abstract class AbstractHeader {
 	 * Adds a pending entry to this header.  This entry will have the correctly sized buffer allocated, but
 	 * will not be written until the caller writes a value and then invokes {@link #writePending} on this
 	 * object.
+	 * @param tag the tag
+	 * @param count the count
+	 * @return the entry added
 	 */
 	@SuppressWarnings( "unchecked")
 	public Entry< ?> addEntry( Tag tag, int count) {
@@ -344,6 +356,7 @@ public abstract class AbstractHeader {
 		/**
 		 * Returns true if this entry is ready to write, indicated by the presence of
 		 * a set of values.
+		 * @return true if ready
 		 */
 		public boolean ready() { return values != null; }
 
