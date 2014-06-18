@@ -51,7 +51,6 @@ public class RpmFileSet extends TarFileSet {
      * Supports RPM's {@code %ghost} directive, used to flag the specified file as being a ghost file.
      * By adding this directive to the line containing a file, RPM will know about the ghosted file, but will
      * not add it to the package.
-     * <p/>
      * Permitted values for this directive are:
      * <ul>
      * <li> {@code true}    (equivalent to specifying {@code %ghost}
@@ -76,7 +75,6 @@ public class RpmFileSet extends TarFileSet {
      * Supports RPM's {@code %config} directive, used to flag the specified file as being a configuration file.
      * RPM performs additional processing for config files when packages are erased, and during installations
      * and upgrades.
-     * <p/>
      * Permitted values for this directive are:
      * <ul>
      * <li> {@code true}    (equivalent to specifying {@code %config}
@@ -100,7 +98,6 @@ public class RpmFileSet extends TarFileSet {
     /**
      * Supports RPM's {@code %config(noreplace)} directive. This directive modifies how RPM manages edited config
      * files.
-     * <p/>
      * Permitted values for this directive are:
      * <ul>
      * <li> {@code true}    (equivalent to specifying {@code %noreplace}
@@ -124,7 +121,6 @@ public class RpmFileSet extends TarFileSet {
     /**
      * Supports RPM's {@code %doc} directive, which flags the files as being documentation.  RPM keeps track of
      * documentation files in its database, so that a user can easily find information about an installed package.
-     * <p/>
      * Permitted values for this directive are:
      * <ul>
      * <li> {@code true}    (equivalent to specifying {@code %doc}

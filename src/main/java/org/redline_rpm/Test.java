@@ -21,6 +21,7 @@ public final class Test {
 	 * RPM, and the second argument is the path to the actual file
 	 * content.
 	 *
+	 * @param args command line arguments
 	 * @throws Exception if an error occurrs generating the test
 	 * RPM file
 	 */

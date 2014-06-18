@@ -41,12 +41,14 @@ public abstract class ChannelWrapper {
 
 		/**
 		 * Consume some input from the given buffer.
+		 * @param buffer the buffer to consume
 		 */
 		void consume( ByteBuffer buffer);
 
 		/**
 		 * Complete operationds and optionally return
 		 * a value to the holder of the key.
+		 * @return reference to the object
 		 */
 		T finish();
 	}
@@ -71,6 +73,7 @@ public abstract class ChannelWrapper {
 
 	/**
 	 * Initializes a byte counter on this channel.
+	 * @return reference to the new key added to the consumers
 	 */
 	public Key< Integer> start() {
 		final Key< Integer> object = new Key< Integer>();
@@ -86,6 +89,7 @@ public abstract class ChannelWrapper {
 	 * Initialize a signature on this channel.
 	 *
 	 * @param key the private key to use in signing this data stream.
+	 * @return reference to the new key added to the consumers
 	 * @throws NoSuchAlgorithmException if the key algorithm is not supported
 	 * @throws InvalidKeyException if the key provided is invalid for signing
 	 */
@@ -117,7 +121,7 @@ public abstract class ChannelWrapper {
      *
      * @param key       the private key to use in signing this data stream.
      * @param algorithm the algorithm to use. Can be extracted from public key.
-     * @throws PGPException if something with PGP got wrong
+     * @return reference to the new key added to the consumers
      */
     public Key<byte[]> start( final PGPPrivateKey key, int algorithm ) {
         BcPGPContentSignerBuilder contentSignerBuilder = new BcPGPContentSignerBuilder( algorithm, SHA1 );
@@ -177,6 +181,7 @@ public abstract class ChannelWrapper {
 	 * Initialize a digest on this channel.
 	 *
 	 * @param algorithm the digest algorithm to use in computing the hash
+	 * @return reference to the new key added to the consumers
 	 * @throws NoSuchAlgorithmException if the given algorithm does not exist
 	 */
 	public Key< byte[]> start( final String algorithm) throws NoSuchAlgorithmException {

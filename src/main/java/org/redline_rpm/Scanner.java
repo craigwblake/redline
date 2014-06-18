@@ -46,6 +46,7 @@ public class Scanner {
 	 * This utility reads from standard input, and parses
 	 * the binary contents of the RPM file.
 	 *
+	 * @param args command line arguements
 	 * @throws Exception if an error occurs while
 	 * reading the RPM file or it's contents
 	 */
@@ -77,7 +78,7 @@ public class Scanner {
 	 *
 	 * @param in the channel wrapper to read input from
 	 * @return information describing the RPM file
-	 * @throws Exception if an error occurs reading the file
+	 * @throws IOException if an error occurs reading the file
 	 */
 	public Format run( ReadableChannelWrapper in) throws IOException {
 		Format format = new Format();

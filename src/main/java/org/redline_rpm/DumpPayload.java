@@ -18,6 +18,8 @@ public final class DumpPayload {
 	 * the provided file.  This method accepts an RPM file from
 	 * standard input and dumps it's payload out to the file
 	 * name provided as the first argument.
+	 * @param args command line arguements
+	 * @throws Exception an exception occurred
 	 */
 	public static void main( String[] args) throws Exception {
 		ReadableByteChannel in = Channels.newChannel( System.in);

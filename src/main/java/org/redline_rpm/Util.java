@@ -33,6 +33,8 @@ public class Util {
 	 * Converts path characters from their native
 	 * format to the "forward-slash" format expected
 	 * within RPM files.
+	 * @param path the path to the file
+	 * @return the normalized path
 	 */
 	public static String normalizePath( final String path) {
 		return path.replace( '\\', '/');
@@ -189,9 +191,10 @@ public class Util {
     * Create the proper stream wrapper to handling the rpmIS payload section based on the
     * payload compression header tag.
     *
-    * @param header
-    * @param rpmIS
-    * @return
+    * @param header the header
+    * @param rpmIS raw input stream of the rpm
+    * @return the "proper" input stream
+    * @throws IOException an IO error occurred
     */
    public static InputStream openPayloadStream(Header header, InputStream rpmIS) throws IOException {
       Entry pcEntry = header.getEntry(HeaderTag.PAYLOADCOMPRESSOR);
