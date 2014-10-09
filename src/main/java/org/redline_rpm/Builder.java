@@ -108,6 +108,10 @@ public class Builder {
 		addDependencyLess( "rpmlib(CompressedFileNames)", "3.0.4-1");
 		addDependencyLess( "rpmlib(PayloadFilesHavePrefix)", "4.0-1");
 	}
+	
+	public void addBuiltinDirectory(String builtinDirectory) {
+		contents.addBuiltinDirectory(builtinDirectory);
+	}
 
 	public void addObsoletes(final String name, final int comparison, final String version) {
 		obsoletes.put(name, version);

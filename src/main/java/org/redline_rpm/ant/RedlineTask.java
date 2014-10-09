@@ -62,6 +62,8 @@ public class RedlineTask extends Task {
 	protected List< TriggerIn> triggersIn = new ArrayList< TriggerIn>();
 	protected List< TriggerUn> triggersUn = new ArrayList< TriggerUn>();
 	protected List< TriggerPostUn> triggersPostUn = new ArrayList< TriggerPostUn>();
+	
+	protected List< BuiltIn> builtIns = new ArrayList< BuiltIn>();
 
 	protected File preTransScript;
 	protected File preInstallScript;
@@ -108,6 +110,14 @@ public class RedlineTask extends Task {
         builder.setPrivateKeyPassphrase( privateKeyPassphrase);
 		if (sourcePackage != null) {
 			builder.addHeaderEntry(Header.HeaderTag.SOURCERPM, sourcePackage);
+		}
+		
+		// add built-ins
+		for ( BuiltIn builtIn : builtIns) {
+			String text = builtIn.getText();
+			if (text != null && !text.trim().equals("")) {
+				builder.addBuiltinDirectory( builtIn.getText());
+			}
 		}
 
 		try {
@@ -238,4 +248,5 @@ public class RedlineTask extends Task {
     public void setPrivateKeyRingFile( File privateKeyRingFile) { this.privateKeyRingFile = privateKeyRingFile; }
     public void setPrivateKeyId( String privateKeyId ) { this.privateKeyId = privateKeyId; }
     public void setPrivateKeyPassphrase( String privateKeyPassphrase ) { this.privateKeyPassphrase = privateKeyPassphrase; }
+    public void addBuiltin( BuiltIn builtIn) { builtIns.add(builtIn); }
 }
