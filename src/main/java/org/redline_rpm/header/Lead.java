@@ -95,8 +95,8 @@ public class Lead {
 
 		byte[] data = new byte[ 66];
 		byte[] encoded = name.getBytes( "UTF-8");
-		if( encoded.length > data.length) throw new RedlineException( "Package name " + name + " exceeds maximum supported length");
-		System.arraycopy( encoded, 0, data, 0, encoded.length);
+//		if( encoded.length > data.length) throw new RedlineException( "Package name " + name + " exceeds maximum supported length");
+//		System.arraycopy( encoded, 0, data, 0, encoded.length);
 		buffer.put( data);
 
 		// Unknown rpm tag defaults to 0xFF (see rpmtag.h)		
