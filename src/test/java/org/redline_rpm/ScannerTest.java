@@ -36,6 +36,7 @@ public class ScannerTest extends TestBase
         assertEquals(280, format.getHeader().getStartPos());
         assertEquals(4760, format.getHeader().getEndPos());
     }
+
     @Test
     public void fileModesHeaderIsCorrect() throws Exception {
         Format format = new Scanner().run(channelWrapper(getTestResourcesDirectory ( ) + File.separator + "rpm-1-1.0-1.noarch.rpm"));
@@ -43,7 +44,6 @@ public class ScannerTest extends TestBase
         Matcher matcher = Pattern.compile(".*filemodes\\[[^\\]]*\\]\\n[^0-9-]*([^\\n]*).*", Pattern.DOTALL).matcher(rpmDescription);
         matcher.matches();
         String [] fileModesFromString = matcher.group(1).split(", ");
-        //String [] actual = {"-32348", "-24065", "16877", "-32275", "-32275", "-32275", "-32275", "-24083", "-32275", "16877", "-32348", "-32348", "16877", "-32348", "-24065,"};
         String [] expectedFileModes = {"33188", "41471", "16877", "33261", "33261", "33261", "33261", "41453", "33261", "16877", "33188", "33188", "16877", "33188", "41471"};
         assertArrayEquals(expectedFileModes, fileModesFromString);
     }
