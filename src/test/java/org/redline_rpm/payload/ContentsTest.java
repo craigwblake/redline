@@ -8,7 +8,7 @@ public class ContentsTest extends TestCase {
 
 	public void testListParents() throws Exception {
 		ArrayList< String> list = new ArrayList< String>();
-		Contents.listParents( list, new File( "/one/two/three/four"));
+		new Contents().listParents( list, new File( "/one/two/three/four"));
 
 		assertEquals( 3, list.size());
 		assertEquals( "/one/two/three", list.get( 0));
@@ -18,7 +18,7 @@ public class ContentsTest extends TestCase {
 
 	public void testListParentsBuiltin() throws Exception {
 		ArrayList< String> list = new ArrayList< String>();
-		Contents.listParents( list, new File( "/bin/one/two/three/four"));
+		new Contents().listParents( list, new File( "/bin/one/two/three/four"));
 
 		assertEquals( 3, list.size());
 		assertEquals( "/bin/one/two/three", list.get( 0));
@@ -28,8 +28,9 @@ public class ContentsTest extends TestCase {
 
 	public void testListParentsNewBuiltin() throws Exception {
 		ArrayList< String> list = new ArrayList< String>();
-		Contents.addBuiltinDirectory("/home");
-		Contents.listParents( list, new File( "/home/one/two/three/four"));
+		Contents contents = new Contents();
+		contents.addBuiltinDirectory("/home");
+		contents.listParents( list, new File( "/home/one/two/three/four"));
 
 		assertEquals( 3, list.size());
 		assertEquals( "/home/one/two/three", list.get( 0));
