@@ -463,7 +463,7 @@ public abstract class AbstractHeader {
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
 			builder.append( "\n\t");
-			for ( short s : values) builder.append( s).append( ", ");
+			for ( short s : values) builder.append( s & 0xFFFF).append( ", ");
 			return builder.toString();
 		}
 	}
