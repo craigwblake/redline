@@ -12,22 +12,21 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
 
-public class ScannerTest extends TestBase
-{
+public class ScannerTest extends TestBase {
 
     @Test
     public void scanNoArchRPMTest() throws Exception {
-        Scanner.main ( new String[]{ getTestResourcesDirectory ( ) + File.separator + "rpm-1-1.0-1.noarch.rpm" } );
+        Scanner.main ( new String[] { getTestResourcesDirectory ( ) + File.separator + "rpm-1-1.0-1.noarch.rpm" } );
     }
 
     @Test
     public void scanSomeArchTest() throws Exception {
-        Scanner.main ( new String[]{ getTestResourcesDirectory ( ) + File.separator + "rpm-3-1.0-1.somearch.rpm" } );
+        Scanner.main ( new String[] { getTestResourcesDirectory ( ) + File.separator + "rpm-3-1.0-1.somearch.rpm" } );
     }
 
    @Test
    public void scanXZArchTest() throws Exception {
-       Scanner.main ( new String[]{ getTestResourcesDirectory ( ) + File.separator + "rpmtest-3-0.1.XZ.fc19.noarch.rpm" } );
+       Scanner.main ( new String[] { getTestResourcesDirectory ( ) + File.separator + "rpmtest-3-0.1.XZ.fc19.noarch.rpm" } );
    }
 
     @Test
@@ -48,7 +47,7 @@ public class ScannerTest extends TestBase
         assertArrayEquals(expectedFileModes, fileModesFromString);
     }
 
-    private ReadableChannelWrapper channelWrapper(String filename) throws Exception {
+    protected static ReadableChannelWrapper channelWrapper(String filename) throws Exception {
         return new ReadableChannelWrapper( Channels.newChannel(new FileInputStream(filename)));
     }
 }

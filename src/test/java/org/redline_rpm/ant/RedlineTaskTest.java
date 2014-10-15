@@ -24,9 +24,9 @@ import static org.junit.Assert.assertNotNull;
 
 public class RedlineTaskTest extends TestBase {
 
-    @Test
+	@Test
 	public void testBadName() throws Exception {
-        	File dir = ensureTargetDir();
+			File dir = ensureTargetDir();
 
 		RedlineTask task = new RedlineTask();
 		task.setDestination(dir);
@@ -36,12 +36,12 @@ public class RedlineTaskTest extends TestBase {
 		task.setName("test");
 		task.execute();
 
+		// NB: This is no longer a bad name, long names are truncated in the header
 		task.setName("ToooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooLong");
 		try {
 			task.execute();
-			fail();
 		} catch (BuildException e) {
-			// Pass
+			fail();
 		}
 
 		task.setName("test/invalid");
@@ -69,7 +69,7 @@ public class RedlineTaskTest extends TestBase {
 		}
 	}
 
-    @Test
+	@Test
 	public void testBadVersion() throws Exception {
 		RedlineTask task = new RedlineTask();
 		task.setName("nameRequired");
@@ -102,7 +102,7 @@ public class RedlineTaskTest extends TestBase {
 		}
 	}
 
-    @Test
+	@Test
 	public void testBadRelease() throws Exception {
 		RedlineTask task = new RedlineTask();
 		task.setName("nameRequired");
@@ -137,7 +137,7 @@ public class RedlineTaskTest extends TestBase {
 		}
 	}
 
-    @Test
+	@Test
 	public void testRestrict() throws Exception {
 		Depends one = new Depends();
 		one.setName("one");
@@ -161,14 +161,14 @@ public class RedlineTaskTest extends TestBase {
 		assertEquals("two", task.depends.get(0).getName());
 	}
 
-    @Test
+	@Test
 	public void testScripts() throws Exception {
 
-        File dir = ensureTargetDir();
+		File dir = ensureTargetDir();
 
 		File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
 
-        RedlineTask task = createBasicTask( dir );
+		RedlineTask task = createBasicTask( dir );
 		task.setPreInstallScript(new File("src/test/resources/prein.sh"));
 		task.setPostInstallScript(new File("src/test/resources/postin.sh"));
 		task.setPreUninstallScript(new File("src/test/resources/preun.sh"));
@@ -185,7 +185,7 @@ public class RedlineTaskTest extends TestBase {
 
 		task.execute();
 
-        Format format = getFormat( filename );
+		Format format = getFormat( filename );
 
 		assertHeaderEquals("#!/bin/sh\n\necho Hello Pre Install!\n", format,
 				Header.HeaderTag.PREINSCRIPT);
@@ -207,58 +207,57 @@ public class RedlineTaskTest extends TestBase {
 				Header.HeaderTag.FILEFLAGS);
 	}
 
-    @Test
-    public void testSigning() throws Exception {
+	@Test
+	public void testSigning() throws Exception {
 
-        File dir = ensureTargetDir();
+		File dir = ensureTargetDir();
 
-        File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
+		File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
 
-        RedlineTask task = createBasicTask( dir);
-        task.setPrivateKeyRingFile( new File( getFileResource( "/pgp/secring.gpg")));
-        task.setPrivateKeyPassphrase( "redline");
-        task.execute();
+		RedlineTask task = createBasicTask( dir);
+		task.setPrivateKeyRingFile( new File( getFileResource( "/pgp/secring.gpg")));
+		task.setPrivateKeyPassphrase( "redline");
+		task.execute();
 
-        Format format = getFormat( filename);
-        assertNotNull( format.getSignature().getEntry( RSAHEADER));
-        assertNotNull( format.getSignature().getEntry( LEGACY_PGP));
-    }
+		Format format = getFormat( filename);
+		assertNotNull( format.getSignature().getEntry( RSAHEADER));
+		assertNotNull( format.getSignature().getEntry( LEGACY_PGP));
+	}
 
-    private Format getFormat( File filename ) throws IOException {
-        Scanner scanner = new Scanner();
-        return scanner.run(new ReadableChannelWrapper( Channels
-                .newChannel( new FileInputStream( filename ) )));
-    }
+	private Format getFormat( File filename ) throws IOException {
+		Scanner scanner = new Scanner();
+		return scanner.run(new ReadableChannelWrapper( Channels
+				.newChannel( new FileInputStream( filename ) )));
+	}
 
-    private RedlineTask createBasicTask( File dir ) {
-        RedlineTask task = new RedlineTask();
-        task.setProject( createProject() );
+	private RedlineTask createBasicTask( File dir ) {
+		RedlineTask task = new RedlineTask();
+		task.setProject( createProject() );
 
-        task.setDestination(dir);
-        task.setName("rpmtest");
-        task.setVersion("1.0");
-        task.setRelease("1");
-        task.setGroup("Application/Office");
-        return task;
-    }
+		task.setDestination(dir);
+		task.setName("rpmtest");
+		task.setVersion("1.0");
+		task.setRelease("1");
+		task.setGroup("Application/Office");
+		return task;
+	}
 
-    private Project createProject() {
-        Project project = new Project();
-        project.setCoreLoader(getClass().getClassLoader());
-        project.init();
-        return project;
-    }
+	private Project createProject() {
+		Project project = new Project();
+		project.setCoreLoader(getClass().getClassLoader());
+		project.init();
+		return project;
+	}
 
-    private File ensureTargetDir() {
-        File dir = new File("target");
-        if (!dir.exists()) {
-            assertTrue(dir.mkdir());
-        }
-        return dir;
-    }
+	private File ensureTargetDir() {
+		File dir = new File("target");
+		if (!dir.exists()) {
+			assertTrue(dir.mkdir());
+		}
+		return dir;
+	}
 
-	private void assertHeaderEquals(String expected, Format format,
-			AbstractHeader.Tag tag) {
+	private void assertHeaderEquals(String expected, Format format, AbstractHeader.Tag tag) {
 		assertNotNull("null format", format);
 		AbstractHeader.Entry entry = format.getHeader().getEntry(tag);
 		assertNotNull("Entry not found : " + tag.getName(), entry);
@@ -271,8 +270,7 @@ public class RedlineTaskTest extends TestBase {
 		assertEquals("Entry value : " + tag.getName(), expected, values[0]);
 	}
 
-	private void assertInt32EntryHeaderEquals(int[] expected, Format format,
-			AbstractHeader.Tag tag) {
+	private void assertInt32EntryHeaderEquals(int[] expected, Format format, AbstractHeader.Tag tag) {
 		assertNotNull("null format", format);
 		AbstractHeader.Entry entry = format.getHeader().getEntry(tag);
 		assertNotNull("Entry not found : " + tag.getName(), entry);
@@ -285,11 +283,11 @@ public class RedlineTaskTest extends TestBase {
 		assertArrayEquals("Entry value : " + tag.getName(), expected, values);
 	}
 
-    @Test
+	@Test
 	public void testPackageNameLength() throws RedlineException {
-        File dir = ensureTargetDir();
+		File dir = ensureTargetDir();
 
-        RedlineTask task = new RedlineTask();
+		RedlineTask task = new RedlineTask();
 		task.setProject( createProject() );
 
 		task.setDestination(dir);
@@ -313,17 +311,16 @@ public class RedlineTaskTest extends TestBase {
 
 		try {
 			task.execute();
-			fail("Test failed: Expected RedlineException not thrown.");
 		} catch (Exception e) {
+			fail("Test failed: RedlineException should not be thrown.");
 		}
 
 		task.setName("shortpackagename");
 		try {
 			task.execute();
 		} catch (Exception e) {
-			fail("Test failed: RedlineException should not thrown.");
+			fail("Test failed: RedlineException should not be thrown.");
 		}
 
 	}
-
 }
