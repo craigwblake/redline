@@ -43,9 +43,38 @@ import static org.redline_rpm.payload.CpioHeader.SYMLINK;
  */
 public class Contents {
 
-	private final Set< String> builtins = new HashSet< String>();
+	private static final Set< String> BUILTIN = new HashSet< String>();
 	private static final Set< String> DOC_DIRS = new HashSet< String>();
 	static {
+		BUILTIN.add( "/");
+		BUILTIN.add( "/bin");
+		BUILTIN.add( "/dev");
+		BUILTIN.add( "/etc");
+		BUILTIN.add( "/etc/bash_completion.d");
+		BUILTIN.add( "/etc/cron.d");
+		BUILTIN.add( "/etc/cron.daily");
+		BUILTIN.add( "/etc/cron.hourly");
+		BUILTIN.add( "/etc/cron.monthly");
+		BUILTIN.add( "/etc/cron.weekly");
+		BUILTIN.add( "/etc/default");
+		BUILTIN.add( "/etc/init.d");
+		BUILTIN.add( "/etc/logrotate.d");
+		BUILTIN.add( "/lib");
+		BUILTIN.add( "/usr");
+		BUILTIN.add( "/usr/bin");
+		BUILTIN.add( "/usr/lib");
+		BUILTIN.add( "/usr/local");
+		BUILTIN.add( "/usr/local/bin");
+		BUILTIN.add( "/usr/local/lib");
+		BUILTIN.add( "/usr/sbin");
+		BUILTIN.add( "/usr/share");
+		BUILTIN.add( "/usr/share/applications");
+		BUILTIN.add( "/root");
+		BUILTIN.add( "/sbin");
+		BUILTIN.add( "/opt");
+		BUILTIN.add( "/tmp");
+		BUILTIN.add( "/var");
+		BUILTIN.add( "/var/log");
 		DOC_DIRS.add("/usr/doc");
 		DOC_DIRS.add("/usr/man");
 		DOC_DIRS.add("/usr/X11R6/man");
@@ -60,38 +89,11 @@ public class Contents {
 	protected final Set< CpioHeader> headers = new TreeSet< CpioHeader>( new HeaderComparator());
 	protected final Set< String> files = new HashSet< String>();
 	protected final Map< CpioHeader, Object> sources = new HashMap< CpioHeader, Object>();
+	protected final Set< String> builtins = new HashSet< String>();
 	
 	public Contents()
 	{
-		builtins.add( "/");
-		builtins.add( "/bin");
-		builtins.add( "/dev");
-		builtins.add( "/etc");
-		builtins.add( "/etc/bash_completion.d");
-		builtins.add( "/etc/cron.d");
-		builtins.add( "/etc/cron.daily");
-		builtins.add( "/etc/cron.hourly");
-		builtins.add( "/etc/cron.monthly");
-		builtins.add( "/etc/cron.weekly");
-		builtins.add( "/etc/default");
-		builtins.add( "/etc/init.d");
-		builtins.add( "/etc/logrotate.d");
-		builtins.add( "/lib");
-		builtins.add( "/usr");
-		builtins.add( "/usr/bin");
-		builtins.add( "/usr/lib");
-		builtins.add( "/usr/local");
-		builtins.add( "/usr/local/bin");
-		builtins.add( "/usr/local/lib");
-		builtins.add( "/usr/sbin");
-		builtins.add( "/usr/share");
-		builtins.add( "/usr/share/applications");
-		builtins.add( "/root");
-		builtins.add( "/sbin");
-		builtins.add( "/opt");
-		builtins.add( "/tmp");
-		builtins.add( "/var");
-		builtins.add( "/var/log");
+		builtins.addAll(BUILTIN);
 	}
 
 	/**
@@ -388,10 +390,24 @@ public class Contents {
 	/**
 	 * Add additional directory that is assumed to already exist on system where the RPM will be installed
 	 * (e.g. /etc) and should not have an entry in the RPM.
+	 * 
+	 * The directory will be added to all instance of Contents created after this method is called.
 	 *
 	 * @param directory the directory to add
 	 */
-	public synchronized void addBuiltinDirectory( final String directory) {
+	public static synchronized void addBuiltinDirectory( final String directory) {
+		BUILTIN.add(directory);
+	}
+	
+	/**
+	 * Add additional directory that is assumed to already exist on system where the RPM will be installed
+	 * (e.g. /etc) and should not have an entry in the RPM.
+	 * 
+	 * The builtin will only be added to this instance of Contents.
+	 *
+	 * @param directory the directory to add
+	 */
+	public synchronized void addLocalBuiltinDirectory( final String directory) {
 		builtins.add(directory);
 	}
 
