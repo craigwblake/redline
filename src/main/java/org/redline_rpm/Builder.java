@@ -110,7 +110,7 @@ public class Builder {
 	}
 	
 	public void addBuiltinDirectory(String builtinDirectory) {
-		contents.addBuiltinDirectory(builtinDirectory);
+		contents.addLocalBuiltinDirectory(builtinDirectory);
 	}
 
 	public void addObsoletes(final String name, final int comparison, final String version) {
