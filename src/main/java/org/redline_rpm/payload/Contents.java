@@ -74,6 +74,7 @@ public class Contents {
 		BUILTIN.add( "/opt");
 		BUILTIN.add( "/tmp");
 		BUILTIN.add( "/var");
+		BUILTIN.add( "/var/lib");
 		BUILTIN.add( "/var/log");
 		DOC_DIRS.add("/usr/doc");
 		DOC_DIRS.add("/usr/man");
