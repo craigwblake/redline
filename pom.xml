@@ -96,6 +96,10 @@
 
 						&lt;/script&gt;
 					</header>
+					<links>
+						<link>http://docs.oracle.com/javase/6/docs/api</link>
+						<link>http://ant-api.herokuapp.com</link>
+					</links>
 				</configuration>
 				<executions>
 					<execution>
@@ -232,6 +236,7 @@
 					<linksource>true</linksource>
 					<links>
 						<link>http://docs.oracle.com/javase/6/docs/api</link>
+						<link>http://ant-api.herokuapp.com</link>
 					</links>
 					<quiet>true</quiet>
 				</configuration>
