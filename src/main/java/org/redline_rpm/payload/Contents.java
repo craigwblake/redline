@@ -290,7 +290,7 @@ public class Contents {
 	 * @throws java.io.FileNotFoundException file wasn't found
 	 */
 	public synchronized void addFile( final String path, final File source, final int permissions, final Directive directive, final String uname, final String gname, final int dirmode) throws FileNotFoundException {
-		addFile( path, source, permissions, directive, uname, gname, -1, true);
+		addFile( path, source, permissions, directive, uname, gname, dirmode, true);
 	}
 
 	/**
