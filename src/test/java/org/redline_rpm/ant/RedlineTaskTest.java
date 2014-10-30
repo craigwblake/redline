@@ -224,6 +224,23 @@ public class RedlineTaskTest extends TestBase {
 		assertNotNull( format.getSignature().getEntry( LEGACY_PGP));
 	}
 
+	@Test
+	public void testSigningBiggerRSAHeader() throws Exception {
+	    
+	    File dir = ensureTargetDir();
+	    
+	    File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
+	    
+	    RedlineTask task = createBasicTask( dir);
+	    task.setPrivateKeyRingFile( new File( getFileResource( "/pgp/secringBiggerRSAHeader.gpg")));
+	    task.setPrivateKeyPassphrase( "test");
+	    task.execute();
+	    
+	    Format format = getFormat( filename);
+	    assertNotNull( format.getSignature().getEntry( RSAHEADER));
+	    assertNotNull( format.getSignature().getEntry( LEGACY_PGP));
+	}
+	
 	private Format getFormat( File filename ) throws IOException {
 		Scanner scanner = new Scanner();
 		return scanner.run(new ReadableChannelWrapper( Channels

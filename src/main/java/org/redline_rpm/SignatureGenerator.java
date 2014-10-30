@@ -28,7 +28,7 @@ import static org.redline_rpm.header.Signature.SignatureTag.RSAHEADER;
  */
 public class SignatureGenerator {
 
-    protected static final int SIGNATURE_SIZE = 287;
+    protected static final int SIGNATURE_SIZE = 543;
     protected final boolean enabled;
     protected Entry< byte[]> headerOnlyRSAEntry;
     protected Entry< byte[]> headerAndPayloadPGPEntry;
