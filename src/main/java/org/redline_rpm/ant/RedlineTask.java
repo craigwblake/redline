@@ -75,6 +75,7 @@ public class RedlineTask extends Task {
     protected File privateKeyRingFile;
     protected String privateKeyId;
     protected String privateKeyPassphrase;
+    protected boolean useV3Signature;
 
 	public RedlineTask() {
 		try {
@@ -108,6 +109,7 @@ public class RedlineTask extends Task {
         builder.setPrivateKeyRingFile( privateKeyRingFile);
         builder.setPrivateKeyId( privateKeyId);
         builder.setPrivateKeyPassphrase( privateKeyPassphrase);
+        builder.setUseV3Signature(useV3Signature);
 		if (sourcePackage != null) {
 			builder.addHeaderEntry(Header.HeaderTag.SOURCERPM, sourcePackage);
 		}
@@ -248,5 +250,6 @@ public class RedlineTask extends Task {
     public void setPrivateKeyRingFile( File privateKeyRingFile) { this.privateKeyRingFile = privateKeyRingFile; }
     public void setPrivateKeyId( String privateKeyId ) { this.privateKeyId = privateKeyId; }
     public void setPrivateKeyPassphrase( String privateKeyPassphrase ) { this.privateKeyPassphrase = privateKeyPassphrase; }
+    public void setUseV3Signature( boolean v3 ) { this.useV3Signature = v3; }
     public void addBuiltin( BuiltIn builtIn) { builtIns.add(builtIn); }
 }

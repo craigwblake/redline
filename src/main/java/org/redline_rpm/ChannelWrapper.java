@@ -3,7 +3,9 @@ package org.redline_rpm;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPSignatureGenerator;
+import org.bouncycastle.openpgp.PGPV3SignatureGenerator;
 import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
+
 import sun.security.jca.JCAUtil;
 
 import java.io.IOException;
@@ -85,36 +87,52 @@ public abstract class ChannelWrapper {
 		return object;
 	}
 
-	/**
-	 * Initialize a signature on this channel.
-	 *
-	 * @param key the private key to use in signing this data stream.
-	 * @return reference to the new key added to the consumers
-	 * @throws NoSuchAlgorithmException if the key algorithm is not supported
-	 * @throws InvalidKeyException if the key provided is invalid for signing
-	 */
-	public Key< byte[]> start( final PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException {
-		final Signature signature = Signature.getInstance( key.getAlgorithm());
-		signature.initSign( key);
-		final Key< byte[]> object = new Key< byte[]>();
-		consumers.put( object, new Consumer< byte[]>() {
-			public void consume( final ByteBuffer buffer) {
-				try {
-					signature.update( buffer);
-				} catch ( Exception e) {
-					throw new RuntimeException( e);
-				}
-			}
-			public byte[] finish() {
-				try {
-					return signature.sign();
-				} catch ( Exception e) {
-					throw new RuntimeException( e);
-				}
-			}
-		});
-		return object;
-	}
+    /**
+     * Initialize a PGP signatue on the channel
+     *
+     * @param key       the private key to use in signing this data stream.
+     * @param algorithm the algorithm to use. Can be extracted from public key.
+     * @param v3 use the old PGPV3 signature format
+     * @return reference to the new key added to the consumers
+     */
+    public Key<byte[]> start( final PGPPrivateKey key, int algorithm, boolean v3) {
+        if(v3) {
+            return startV3(key,algorithm);
+        } else {
+            return start(key,algorithm);
+        }
+    }
+
+    /**
+     * Initialize a signature on this channel.
+     *
+     * @param key the private key to use in signing this data stream.
+     * @return reference to the new key added to the consumers
+     * @throws NoSuchAlgorithmException if the key algorithm is not supported
+     * @throws InvalidKeyException if the key provided is invalid for signing
+     */
+    public Key< byte[]> start( final PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException {
+        final Signature signature = Signature.getInstance( key.getAlgorithm());
+        signature.initSign( key);
+        final Key< byte[]> object = new Key< byte[]>();
+        consumers.put( object, new Consumer< byte[]>() {
+            public void consume( final ByteBuffer buffer) {
+                try {
+                    signature.update( buffer);
+                } catch ( Exception e) {
+                    throw new RuntimeException( e);
+                }
+            }
+            public byte[] finish() {
+                try {
+                    return signature.sign();
+                } catch ( Exception e) {
+                    throw new RuntimeException( e);
+                }
+            }
+        });
+        return object;
+    }
 
     /**
      * Initialize a PGP signatue on the channel
@@ -178,40 +196,101 @@ public abstract class ChannelWrapper {
     }
 
     /**
-	 * Initialize a digest on this channel.
-	 *
-	 * @param algorithm the digest algorithm to use in computing the hash
-	 * @return reference to the new key added to the consumers
-	 * @throws NoSuchAlgorithmException if the given algorithm does not exist
-	 */
-	public Key< byte[]> start( final String algorithm) throws NoSuchAlgorithmException {
-		final MessageDigest digest = MessageDigest.getInstance( algorithm);
-		final Key< byte[]> object = new Key< byte[]>();
-		consumers.put( object, new Consumer() {
-			public void consume( final ByteBuffer buffer) {
-				try {
-					digest.update( buffer);
-				} catch ( Exception e) {
-					throw new RuntimeException( e);
-				}
-			}
-			public byte[] finish() {
-				try {
-					return digest.digest();
-				} catch ( Exception e) {
-					throw new RuntimeException( e);
-				}
-			}
-		});
-		return object;
-	}
+     * Initialize a PGPV3 signatue on the channel
+     *
+     * @param key       the private key to use in signing this data stream.
+     * @param algorithm the algorithm to use. Can be extracted from public key.
+     * @return reference to the new key added to the consumers
+     */
+    public Key<byte[]> startV3( final PGPPrivateKey key, int algorithm ) {
+        BcPGPContentSignerBuilder contentSignerBuilder = new BcPGPContentSignerBuilder( algorithm, SHA1 );
+        final PGPV3SignatureGenerator signatureGenerator = new PGPV3SignatureGenerator( contentSignerBuilder );
+        try {
+            signatureGenerator.init( BINARY_DOCUMENT, key );
+        } catch ( PGPException e ) {
+            throw new RuntimeException( "Could not initialize PGP signature generator", e );
+        }
+        
+        final Key<byte[]> object = new Key<byte[]>();
+        consumers.put( object, new Consumer<byte[]>() {
+            
+            public void consume( final ByteBuffer buffer ) {
+                if ( !buffer.hasRemaining() ) {
+                    return;
+                }
+                try {
+                    write( buffer );
+                } catch ( SignatureException e ) {
+                    throw new RuntimeException( "Could not write buffer to PGP signature generator.", e );
+                }
+            }
+            
+            private void write( ByteBuffer buffer ) throws SignatureException {
+                if ( buffer.hasArray() ) {
+                    byte[] bufferBytes = buffer.array();
+                    int offset = buffer.arrayOffset();
+                    int position = buffer.position();
+                    int limit = buffer.limit();
+                    signatureGenerator.update( bufferBytes, offset + position, limit - position );
+                    buffer.position( limit );
+                } else {
+                    int length = buffer.remaining();
+                    byte[] bytes = new byte[JCAUtil.getTempArraySize( length )];
+                    while ( length > 0 ) {
+                        int chunk = Math.min( length, bytes.length );
+                        buffer.get( bytes, 0, chunk );
+                        signatureGenerator.update( bytes, 0, chunk );
+                        length -= chunk;
+                    }
+                }
+            }
+            
+            public byte[] finish() {
+                try {
+                    return signatureGenerator.generate().getEncoded();
+                } catch ( Exception e ) {
+                    throw new RuntimeException( "Could not generate signature.", e );
+                }
+            }
+        });
+        return object;
+    }
 
-	@SuppressWarnings( "unchecked")
-	public < T> T finish( final Key< T> object) {
-		return ( T) consumers.remove( object).finish();
-	}
+    /**
+     * Initialize a digest on this channel.
+     *
+     * @param algorithm the digest algorithm to use in computing the hash
+     * @return reference to the new key added to the consumers
+     * @throws NoSuchAlgorithmException if the given algorithm does not exist
+     */
+    public Key< byte[]> start( final String algorithm) throws NoSuchAlgorithmException {
+        final MessageDigest digest = MessageDigest.getInstance( algorithm);
+        final Key< byte[]> object = new Key< byte[]>();
+        consumers.put( object, new Consumer() {
+            public void consume( final ByteBuffer buffer) {
+                try {
+                    digest.update( buffer);
+                } catch ( Exception e) {
+                    throw new RuntimeException( e);
+                }
+            }
+            public byte[] finish() {
+                try {
+                    return digest.digest();
+                } catch ( Exception e) {
+                    throw new RuntimeException( e);
+                }
+            }
+        });
+        return object;
+    }
 
-	public void close() throws IOException {
-		if ( !consumers.isEmpty()) throw new IOException( "There are '" + consumers.size() + "' unfinished operations.");
-	}
+    @SuppressWarnings( "unchecked")
+    public < T> T finish( final Key< T> object) {
+        return ( T) consumers.remove( object).finish();
+    }
+
+    public void close() throws IOException {
+        if ( !consumers.isEmpty()) throw new IOException( "There are '" + consumers.size() + "' unfinished operations.");
+    }
 }

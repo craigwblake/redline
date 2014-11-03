@@ -28,43 +28,57 @@ import static org.redline_rpm.header.Signature.SignatureTag.RSAHEADER;
  */
 public class SignatureGenerator {
 
-    protected static final int SIGNATURE_SIZE = 543;
+    protected int signatureSize;
     protected final boolean enabled;
+    protected final boolean useV3sig;
     protected Entry< byte[]> headerOnlyRSAEntry;
     protected Entry< byte[]> headerAndPayloadPGPEntry;
     protected final PGPPrivateKey privateKey;
     protected Key< byte[]> headerOnlyKey = null;
     protected Key< byte[]> headerAndPayloadKey = null;
 
-    public SignatureGenerator( PGPPrivateKey privateKey ) {
+    public SignatureGenerator( PGPPrivateKey privateKey, boolean v3 ) {
         this.privateKey = privateKey;
         this.enabled = privateKey != null;
+        this.useV3sig = v3;
     }
 
-    public SignatureGenerator( File privateKeyRingFile, String privateKeyId, String privateKeyPassphrase ) {
+    public SignatureGenerator( File privateKeyRingFile, String privateKeyId, String privateKeyPassphrase, boolean v3 ) {
         if ( privateKeyRingFile != null ) {
             PGPSecretKeyRingCollection keyRings = readKeyRings( privateKeyRingFile );
             PGPSecretKey secretKey = findMatchingSecretKey( keyRings, privateKeyId );
-            privateKey = extractPrivateKey( secretKey, privateKeyPassphrase );
+            if(v3) {
+                signatureSize = 280; // why not 255+31(287)? maybe cuz it's old. wish we didn't need the size ahead of time.
+            } else {
+                signatureSize = (int) (secretKey.getPublicKey().getBitStrength()*0.125)+31; // 2048== 255+31 = 287 /4096==512 +31 = 543 (31 is buff?)
+            }
+            privateKey = extractPrivateKey( secretKey, privateKeyPassphrase );            
             enabled = true;
+            useV3sig = v3;
         } else {
             privateKey = null;
+            useV3sig = v3;
             this.enabled = false;
         }
     }
 
     public void prepare( Signature signature ) {
         if ( enabled ) {
-            headerOnlyRSAEntry = ( Entry< byte[]> ) signature.addEntry( RSAHEADER, SIGNATURE_SIZE );
-            headerAndPayloadPGPEntry = ( Entry< byte[]> ) signature.addEntry( LEGACY_PGP, SIGNATURE_SIZE );
+            if(useV3sig) {
+//                headerOnlyRSAEntry = ( Entry< byte[]> ) signature.addEntry( LEGACY_RSAHEADER, signatureSize );
+                headerOnlyRSAEntry = ( Entry< byte[]> ) signature.addEntry( RSAHEADER, signatureSize );
+            } else {
+                headerOnlyRSAEntry = ( Entry< byte[]> ) signature.addEntry( RSAHEADER, signatureSize );
+            }
+            headerAndPayloadPGPEntry = ( Entry< byte[]> ) signature.addEntry( LEGACY_PGP, signatureSize );
         }
     }
 
 
     public void startBeforeHeader( WritableChannelWrapper output ) {
         if ( enabled ) {
-            headerOnlyKey = output.start( privateKey, getAlgorithm());
-            headerAndPayloadKey = output.start( privateKey, getAlgorithm());
+            headerOnlyKey = output.start( privateKey, getAlgorithm(), useV3sig);
+            headerAndPayloadKey = output.start( privateKey, getAlgorithm(), useV3sig);
         }
     }
 
@@ -137,7 +151,10 @@ public class SignatureGenerator {
         if ( enabled ) {
             checkKey( key );
             checkEntry( entry );
-            entry.setValues( output.finish( key ) );
+            byte[]signed = output.finish( key );
+            System.out.println(signed.length);
+            entry.setSize(signed.length);
+            entry.setValues( signed );
         }
     }
 

@@ -93,6 +93,7 @@ public class Builder {
     protected String privateKeyId;
     protected String privateKeyPassphrase;
     protected PGPPrivateKey privateKey;
+    private Boolean useV3Signature = false;
 
 	/**
 	 * Initializes the builder and sets some required fields to known values.
@@ -107,6 +108,10 @@ public class Builder {
 		addDependencyLess( "rpmlib(VersionedDependencies)", "3.0.3-1");
 		addDependencyLess( "rpmlib(CompressedFileNames)", "3.0.4-1");
 		addDependencyLess( "rpmlib(PayloadFilesHavePrefix)", "4.0-1");
+	}
+	
+	public void setUseV3Signature(Boolean v3) {
+	    useV3Signature  = v3;
 	}
 	
 	public void addBuiltinDirectory(String builtinDirectory) {
@@ -1234,9 +1239,9 @@ public class Builder {
 
     protected SignatureGenerator createSignatureGenerator() {
         if (privateKey != null) {
-           return new SignatureGenerator( privateKey );
+           return new SignatureGenerator( privateKey ,useV3Signature);
         }
-        return new SignatureGenerator( privateKeyRingFile, privateKeyId, privateKeyPassphrase);
+        return new SignatureGenerator( privateKeyRingFile, privateKeyId, privateKeyPassphrase, useV3Signature);
     }
 
     protected byte[] getSignature( final int count) {

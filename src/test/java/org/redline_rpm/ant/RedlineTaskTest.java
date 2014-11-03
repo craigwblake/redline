@@ -12,6 +12,7 @@ import org.redline_rpm.RedlineException;
 import org.redline_rpm.Scanner;
 import org.redline_rpm.TestBase;
 import org.redline_rpm.header.AbstractHeader;
+import org.redline_rpm.header.AbstractHeader.Entry;
 import org.redline_rpm.header.Format;
 import org.redline_rpm.header.Header;
 import org.redline_rpm.payload.Directive;
@@ -19,8 +20,8 @@ import org.junit.Test;
 
 import static org.redline_rpm.header.Signature.SignatureTag.LEGACY_PGP;
 import static org.redline_rpm.header.Signature.SignatureTag.RSAHEADER;
+import static org.redline_rpm.header.Signature.SignatureTag.LEGACY_RSAHEADER;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
 
 public class RedlineTaskTest extends TestBase {
 
@@ -207,22 +208,36 @@ public class RedlineTaskTest extends TestBase {
 				Header.HeaderTag.FILEFLAGS);
 	}
 
-	@Test
-	public void testSigning() throws Exception {
+    @Test
+    public void testSigning() throws Exception {
+        File dir = ensureTargetDir();
+        File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
 
-		File dir = ensureTargetDir();
+        RedlineTask task = createBasicTaskWithFiles( dir);
+        task.setPrivateKeyRingFile( new File( getFileResource( "/pgp/secring.gpg")));
+        task.setPrivateKeyPassphrase( "redline");
+        task.execute();
 
-		File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
-
-		RedlineTask task = createBasicTask( dir);
-		task.setPrivateKeyRingFile( new File( getFileResource( "/pgp/secring.gpg")));
-		task.setPrivateKeyPassphrase( "redline");
-		task.execute();
-
-		Format format = getFormat( filename);
-		assertNotNull( format.getSignature().getEntry( RSAHEADER));
-		assertNotNull( format.getSignature().getEntry( LEGACY_PGP));
-	}
+        Format format = getFormat( filename);
+        Entry<?> rsaHeader = format.getSignature().getEntry( RSAHEADER);
+        assertTrue(((byte[])rsaHeader.getValues()).length == 287);
+    }
+    
+    @Test
+    public void testSigningWithV3Signature() throws Exception {
+        File dir = ensureTargetDir();
+        File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
+        
+        RedlineTask task = createBasicTaskWithFiles( dir);
+        task.setPrivateKeyRingFile( new File( getFileResource( "/pgp/secring.gpg")));
+        task.setPrivateKeyPassphrase( "redline");
+        task.setUseV3Signature(true);
+        task.execute();
+        
+        Format format = getFormat( filename);
+        Entry<?> rsaHeader = format.getSignature().getEntry( RSAHEADER);
+        assertTrue(((byte[])rsaHeader.getValues()).length == 280);
+    }
 
 	@Test
 	public void testSigningBiggerRSAHeader() throws Exception {
@@ -237,17 +252,20 @@ public class RedlineTaskTest extends TestBase {
 	    task.execute();
 	    
 	    Format format = getFormat( filename);
-	    assertNotNull( format.getSignature().getEntry( RSAHEADER));
+        Entry<?> rsaHeader = format.getSignature().getEntry( RSAHEADER);
+	    assertNotNull( rsaHeader);
+	    System.out.println(((byte[])rsaHeader.getValues()).length);
+	    assertTrue(((byte[])rsaHeader.getValues()).length == 543);
 	    assertNotNull( format.getSignature().getEntry( LEGACY_PGP));
 	}
-	
-	private Format getFormat( File filename ) throws IOException {
+	    
+	protected Format getFormat( File filename ) throws IOException {
 		Scanner scanner = new Scanner();
 		return scanner.run(new ReadableChannelWrapper( Channels
 				.newChannel( new FileInputStream( filename ) )));
 	}
 
-	private RedlineTask createBasicTask( File dir ) {
+	protected RedlineTask createBasicTask( File dir ) {
 		RedlineTask task = new RedlineTask();
 		task.setProject( createProject() );
 
@@ -259,6 +277,32 @@ public class RedlineTaskTest extends TestBase {
 		return task;
 	}
 
+	protected RedlineTask createBasicTaskWithFiles( File dir ) {
+	    RedlineTask task = new RedlineTask();
+	    task.setProject( createProject() );
+	    
+	    task.setDestination(dir);
+	    task.setName("rpmtest");
+        task.setVersion("1.0");
+        task.setRelease("1");
+        task.setGroup("Application/Office");
+        task.setPreInstallScript(new File("src/test/resources/prein.sh"));
+        task.setPostInstallScript(new File("src/test/resources/postin.sh"));
+        task.setPreUninstallScript(new File("src/test/resources/preun.sh"));
+        task.setPostUninstallScript(new File("src/test/resources/postun.sh"));
+
+        RpmFileSet fs = new RpmFileSet();
+        fs.setPrefix("/etc");
+        fs.setFile(new File("src/test/resources/prein.sh"));
+        fs.setConfig(true);
+        fs.setNoReplace(true);
+        fs.setDoc(true);
+
+        task.addRpmfileset(fs);
+
+	    return task;
+	}
+	
 	private Project createProject() {
 		Project project = new Project();
 		project.setCoreLoader(getClass().getClassLoader());
@@ -266,7 +310,7 @@ public class RedlineTaskTest extends TestBase {
 		return project;
 	}
 
-	private File ensureTargetDir() {
+	protected File ensureTargetDir() {
 		File dir = new File("target");
 		if (!dir.exists()) {
 			assertTrue(dir.mkdir());
