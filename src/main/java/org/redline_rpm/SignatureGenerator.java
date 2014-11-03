@@ -151,10 +151,7 @@ public class SignatureGenerator {
         if ( enabled ) {
             checkKey( key );
             checkEntry( entry );
-            byte[]signed = output.finish( key );
-            System.out.println(signed.length);
-            entry.setSize(signed.length);
-            entry.setValues( signed );
+            entry.setValues( output.finish( key ) );
         }
     }
 
