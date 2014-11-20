@@ -147,7 +147,7 @@ public class RedlineTask extends Task {
 				builder.setPostTransProgram( "");
 			}
 
-			for ( EmptyDirs emptyDir : emptyDirs) {
+			for ( EmptyDir emptyDir : emptyDirs) {
 				builder.addDirectory(emptyDir.getPath(), emptyDir.getDirmode(), Directive.NONE, emptyDir.getUsername(), emptyDir.getGroup(), true);
 			}
 
