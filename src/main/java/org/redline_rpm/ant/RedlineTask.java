@@ -54,6 +54,7 @@ public class RedlineTask extends Task {
 	protected Os os = LINUX;
 	protected File destination;
 	protected List< ArchiveFileSet> filesets = new ArrayList< ArchiveFileSet>();
+	protected List< EmptyDir> emptyDirs = new ArrayList< EmptyDir>();
 	protected List< Ghost> ghosts = new ArrayList< Ghost>();
 	protected List< Link> links = new ArrayList< Link>();
 	protected List< Depends> depends = new ArrayList< Depends>();
@@ -146,6 +147,10 @@ public class RedlineTask extends Task {
 				builder.setPostTransProgram( "");
 			}
 
+			for ( EmptyDirs emptyDir : emptyDirs) {
+				builder.addDirectory(emptyDir.getPath(), emptyDir.getDirmode(), Directive.NONE, emptyDir.getUsername(), emptyDir.getGroup(), true);
+			}
+
 			for ( ArchiveFileSet fileset : filesets) {
 				File archive = fileset.getSrc( getProject());
 				String prefix = normalizePath( fileset.getPrefix( getProject()));
@@ -232,6 +237,7 @@ public class RedlineTask extends Task {
 	public void addTarfileset( TarFileSet fileset) { filesets.add( fileset); }
     public void addRpmfileset( RpmFileSet fileset) { filesets.add( fileset); }
 	public void addGhost( Ghost ghost) { ghosts.add( ghost); }
+	public void addEmptyDir( EmptyDir emptyDir) { emptyDirs.add( emptyDir); }
 	public void addLink( Link link) { links.add( link); }
 	public void addDepends( Depends dependency) { depends.add( dependency); }
 	public void addTriggerPreIn( TriggerPreIn triggerPreIn) { triggersPreIn.add( triggerPreIn); }
