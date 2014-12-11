@@ -72,10 +72,13 @@ public class Contents {
 		BUILTIN.add( "/root");
 		BUILTIN.add( "/sbin");
 		BUILTIN.add( "/opt");
+		BUILTIN.add( "/srv");
 		BUILTIN.add( "/tmp");
 		BUILTIN.add( "/var");
+		BUILTIN.add( "/var/cache");
 		BUILTIN.add( "/var/lib");
 		BUILTIN.add( "/var/log");
+		BUILTIN.add( "/var/spool");
 		DOC_DIRS.add("/usr/doc");
 		DOC_DIRS.add("/usr/man");
 		DOC_DIRS.add("/usr/X11R6/man");
