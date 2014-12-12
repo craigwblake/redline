@@ -63,6 +63,7 @@ public class Contents {
 		BUILTIN.add( "/usr");
 		BUILTIN.add( "/usr/bin");
 		BUILTIN.add( "/usr/lib");
+		BUILTIN.add( "/usr/lib64");
 		BUILTIN.add( "/usr/local");
 		BUILTIN.add( "/usr/local/bin");
 		BUILTIN.add( "/usr/local/lib");
