@@ -243,10 +243,11 @@ public class Builder {
 	 * @param name the name of the RPM package.
 	 * @param version the version of the new package.
 	 * @param release the release number, specified after the version, of the new RPM.
+	 * @param epoch the epoch number of the new RPM
 	 * @throws IllegalArgumentException if version or release contain
 	 *         dashes, as they are explicitly disallowed by RPM file format.
 	 */
-	public void setPackage( final CharSequence name, final CharSequence version, final CharSequence release) {
+	public void setPackage( final CharSequence name, final CharSequence version, final CharSequence release, final int epoch) {
 		checkVariableContainsIllegalChars(ILLEGAL_CHARS_NAME, name, "name");
 		checkVariableContainsIllegalChars(ILLEGAL_CHARS_VARIABLE, version, "version");
 		checkVariableContainsIllegalChars(ILLEGAL_CHARS_VARIABLE, release, "release");
@@ -254,9 +255,14 @@ public class Builder {
 		format.getHeader().createEntry( NAME, name);
 		format.getHeader().createEntry( VERSION, version);
 		format.getHeader().createEntry( RELEASE, release);
+		format.getHeader().createEntry( EPOCH, epoch);
 		format.getHeader().createEntry( PROVIDENAME, new String[] { String.valueOf(name) });
-		format.getHeader().createEntry( PROVIDEVERSION, 8, new String[] { "0:" + version + "-" + release});
+		format.getHeader().createEntry( PROVIDEVERSION, 8, new String[] { "" + epoch + ":" + version + "-" + release});
 		format.getHeader().createEntry( PROVIDEFLAGS, new int[] { 8});
+	}
+
+	public void setPackage( final CharSequence name, final CharSequence version, final CharSequence release) {
+		setPackage(name, version, release, 0);
 	}
 	
 	/**
@@ -1100,7 +1106,6 @@ public class Builder {
 		final WritableChannelWrapper output = new WritableChannelWrapper( original);
 
 
-		format.getHeader().createEntry( EPOCH, 0);
 		format.getHeader().createEntry( REQUIRENAME, dependencies.keySet().toArray( new String[ dependencies.size()]));
 		format.getHeader().createEntry( REQUIREVERSION, dependencies.values().toArray( new String[ dependencies.size()]));
 		format.getHeader().createEntry( REQUIREFLAGS, convert( flags.values().toArray( new Integer[ flags.size()])));

@@ -32,7 +32,7 @@ public class BuilderTest extends TestBase {
     @Test
     public void testBuildWithoutSignature() throws Exception {
         Builder builder = new Builder();
-        builder.setPackage( "test", "1.0", "1" );
+        builder.setPackage("test", "1.0", "1");
         builder.setBuildHost( "localhost" );
         builder.setLicense( "GPL" );
         builder.setPlatform( NOARCH, LINUX );
@@ -50,6 +50,17 @@ public class BuilderTest extends TestBase {
         builder.setType( BINARY );
         builder.setPrivateKeyRingFile( new File( getFileResource( "/pgp/secring.gpg" ) ) );
         builder.setPrivateKeyPassphrase( "redline" );
+        builder.build( new File( getTargetDir()));
+    }
+
+    @Test
+    public void testBuildWithEpoch() throws Exception {
+        Builder builder = new Builder();
+        builder.setPackage( "testEpoch", "1.0", "1", 1 );
+        builder.setBuildHost( "localhost" );
+        builder.setLicense( "GPL" );
+        builder.setPlatform( NOARCH, LINUX );
+        builder.setType( BINARY );
         builder.build( new File( getTargetDir()));
     }
 }
