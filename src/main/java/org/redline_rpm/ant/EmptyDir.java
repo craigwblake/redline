@@ -1,5 +1,6 @@
 package org.redline_rpm.ant;
 
+import org.apache.tools.zip.UnixStat;
 /**
  * Object describing an ampty dir
  * to be added to the rpm without the
@@ -35,12 +36,12 @@ public class EmptyDir {
         return this.filemode;
     }
     public void setFilemode( String filemode) {
-        this.filemode = Integer.parseInt(filemode, 8);
+        this.filemode = UnixStat.FILE_FLAG | Integer.parseInt(filemode, 8);
     }
     public int getDirmode() {
         return this.dirmode;
     }
     public void setDirmode( String dirmode) {
-        this.dirmode = Integer.parseInt(dirmode, 8);
+        this.dirmode = UnixStat.DIR_FLAG | Integer.parseInt(dirmode, 8);
     }
 }
