@@ -34,13 +34,13 @@ public class Ghost {
     public int getFilemode() {
         return this.filemode;
     }
-    public void setFilemode( int filemode) {
-        this.filemode = filemode;
+    public void setFilemode( String filemode) {
+        this.filemode = Integer.parseInt(filemode, 8);
     }
     public int getDirmode() {
         return this.dirmode;
     }
-    public void setDirmode( int dirmode) {
-        this.dirmode = dirmode;
+    public void setDirmode( String dirmode) {
+        this.dirmode = Integer.parseInt(dirmode, 8);
     }
 }
