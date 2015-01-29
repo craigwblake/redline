@@ -1,5 +1,7 @@
 package org.redline_rpm.ant;
 
+import org.apache.tools.zip.UnixStat;
+
 /**
  * Object describing a %ghost file
  * to be added to the rpm without the
@@ -34,13 +36,13 @@ public class Ghost {
     public int getFilemode() {
         return this.filemode;
     }
-    public void setFilemode( int filemode) {
-        this.filemode = filemode;
+    public void setFilemode( String filemode) {
+        this.filemode = UnixStat.FILE_FLAG | Integer.parseInt(filemode, 8);
     }
     public int getDirmode() {
         return this.dirmode;
     }
-    public void setDirmode( int dirmode) {
-        this.dirmode = dirmode;
+    public void setDirmode( String dirmode) {
+        this.dirmode = UnixStat.DIR_FLAG | Integer.parseInt(dirmode, 8);
     }
 }
