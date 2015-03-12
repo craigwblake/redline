@@ -13,3 +13,6 @@ To use Redline include it as a Maven dependency:
 ```
 
 Redline can also be downloaded directly from [GitHub](https://github.com/craigwblake/redline/releases/download/redline-1.2.1/redline-1.2.1-jar-with-dependencies.jar)
+
+
+[![Join the chat at https://gitter.im/craigwblake/redline](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/craigwblake/redline?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
