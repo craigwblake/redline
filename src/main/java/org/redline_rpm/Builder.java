@@ -1109,26 +1109,29 @@ public class Builder {
 		format.getHeader().createEntry( REQUIRENAME, dependencies.keySet().toArray( new String[ dependencies.size()]));
 		format.getHeader().createEntry( REQUIREVERSION, dependencies.values().toArray( new String[ dependencies.size()]));
 		format.getHeader().createEntry( REQUIREFLAGS, convert( flags.values().toArray( new Integer[ flags.size()])));
-		
+
 		if (0 < obsoletes.size())
 		{
 			format.getHeader().createEntry( OBSOLETENAME, obsoletes.keySet().toArray(new String[ obsoletes.size() ]));
 			format.getHeader().createEntry( OBSOLETEVERSION, obsoletes.values().toArray(new String[ obsoletes.size() ]));
 			format.getHeader().createEntry( OBSOLETEFLAGS, convert(obsoletesFlags.values().toArray(new Integer[ obsoletesFlags.size() ])));
 		}
-		
+
 		if (0 < conflicts.size())
 		{
 			format.getHeader().createEntry( CONFLICTNAME, conflicts.keySet().toArray(new String[ conflicts.size() ]));
 			format.getHeader().createEntry(CONFLICTVERSION, conflicts.values().toArray(new String[ conflicts.size() ]));
 			format.getHeader().createEntry( CONFLICTFLAGS, convert( conflictsFlags.values().toArray( new Integer [ conflictsFlags.size()])));
 		}
-		
+
 		format.getHeader().createEntry( SIZE, contents.getTotalSize());
-		format.getHeader().createEntry( DIRNAMES, contents.getDirNames());
-		format.getHeader().createEntry( DIRINDEXES, contents.getDirIndexes());
-		format.getHeader().createEntry( BASENAMES, contents.getBaseNames());
-		
+
+		if (0 < contents.size()) {
+			format.getHeader().createEntry(DIRNAMES, contents.getDirNames());
+			format.getHeader().createEntry(DIRINDEXES, contents.getDirIndexes());
+			format.getHeader().createEntry(BASENAMES, contents.getBaseNames());
+		}
+
 
 		if ( 0 < triggerCounter) {
 			format.getHeader().createEntry( TRIGGERSCRIPTS, triggerscripts.toArray( new String[ triggerscripts.size()]));
@@ -1139,20 +1142,22 @@ public class Builder {
 			format.getHeader().createEntry( TRIGGERSCRIPTPROG, triggerscriptprogs.toArray( new String[ triggerscriptprogs.size()]));
 		}
 
-		format.getHeader().createEntry( FILEMD5S, contents.getMD5s());
-		format.getHeader().createEntry( FILESIZES, contents.getSizes());
-		format.getHeader().createEntry( FILEMODES, contents.getModes());
-		format.getHeader().createEntry( FILERDEVS, contents.getRdevs());
-		format.getHeader().createEntry( FILEMTIMES, contents.getMtimes());
-		format.getHeader().createEntry( FILELINKTOS, contents.getLinkTos());
-		format.getHeader().createEntry( FILEFLAGS, contents.getFlags());
-		format.getHeader().createEntry( FILEUSERNAME, contents.getUsers());
-		format.getHeader().createEntry( FILEGROUPNAME, contents.getGroups());
-		format.getHeader().createEntry( FILEVERIFYFLAGS, contents.getVerifyFlags());
-		format.getHeader().createEntry( FILEDEVICES, contents.getDevices());
-		format.getHeader().createEntry( FILEINODES, contents.getInodes());
-		format.getHeader().createEntry( FILELANGS, contents.getLangs());
-		format.getHeader().createEntry( FILECONTEXTS, contents.getContexts());
+		if (0 < contents.size()) {
+			format.getHeader().createEntry(FILEMD5S, contents.getMD5s());
+			format.getHeader().createEntry(FILESIZES, contents.getSizes());
+			format.getHeader().createEntry(FILEMODES, contents.getModes());
+			format.getHeader().createEntry(FILERDEVS, contents.getRdevs());
+			format.getHeader().createEntry(FILEMTIMES, contents.getMtimes());
+			format.getHeader().createEntry(FILELINKTOS, contents.getLinkTos());
+			format.getHeader().createEntry(FILEFLAGS, contents.getFlags());
+			format.getHeader().createEntry(FILEUSERNAME, contents.getUsers());
+			format.getHeader().createEntry(FILEGROUPNAME, contents.getGroups());
+			format.getHeader().createEntry(FILEVERIFYFLAGS, contents.getVerifyFlags());
+			format.getHeader().createEntry(FILEDEVICES, contents.getDevices());
+			format.getHeader().createEntry(FILEINODES, contents.getInodes());
+			format.getHeader().createEntry(FILELANGS, contents.getLangs());
+			format.getHeader().createEntry(FILECONTEXTS, contents.getContexts());
+		}
 
 		format.getHeader().createEntry( PAYLOADFLAGS, new String[] { "9"});
 
