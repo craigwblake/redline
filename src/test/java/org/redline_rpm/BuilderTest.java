@@ -63,4 +63,16 @@ public class BuilderTest extends TestBase {
         builder.setType( BINARY );
         builder.build( new File( getTargetDir()));
     }
+
+    @Test
+    public void testBuildMetapackage() throws Exception {
+        Builder builder = new Builder();
+        builder.setPackage( "testMetapkg", "1.0", "1", 1 );
+        builder.setBuildHost( "localhost" );
+        builder.setLicense( "GPL" );
+        builder.setPlatform( NOARCH, LINUX );
+        builder.setType( BINARY );
+        builder.addDependencyMore("glibc", "2.17");
+        builder.build( new File( getTargetDir()));
+    }
 }
