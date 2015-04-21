@@ -311,6 +311,24 @@ public class Contents {
 	 * @throws java.io.FileNotFoundException file wasn't found
 	 */
 	public synchronized void addFile( final String path, final File source, final int permissions, final Directive directive, final String uname, final String gname, final int dirmode, final boolean addParents) throws FileNotFoundException {
+		addFile( path, source, permissions, directive, uname, gname, dirmode, addParents, -1);
+	}
+
+	/**
+	 * Adds a file entry to the archive with the specified permissions.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param source the local file to be included in the package.
+	 * @param permissions the permissions flags, use -1 to leave as default.
+	 * @param directive directive indicating special handling for this file, use null to ignore.
+	 * @param uname user owner for the given file, use null for default user.
+	 * @param gname group owner for the given file, use null for default group.
+	 * @param dirmode permission flags for parent directories, use -1 to leave as default.
+	 * @param addParents whether to create parent directories for the file, defaults to true for other methods.
+	 * @param verifyFlags verify flags
+	 * @throws java.io.FileNotFoundException file wasn't found
+	 */
+	public synchronized void addFile( final String path, final File source, final int permissions, final Directive directive, final String uname, final String gname, final int dirmode, final boolean addParents, final int verifyFlags) throws FileNotFoundException {
 		if ( files.contains( path)) return;
 
 		if ( addParents) addParents( new File( path), dirmode, uname, gname);
@@ -342,9 +360,10 @@ public class Contents {
 		} else {
 			header.setPermissions( permissions);
 		}
+		header.setVerifyFlags(verifyFlags);
 		headers.add( header);
 		sources.put( header, source);
-		
+
 		if ( directive != null) header.setFlags( directive.flag());
 	}
 
@@ -663,7 +682,10 @@ public class Contents {
 	 */
 	public int[] getVerifyFlags() {
 		int[] array = new int[ headers.size()];
-		Arrays.fill( array, -1);
+		int x = 0;
+		for (CpioHeader header : headers) {
+			array[ x++] = header.getVerifyFlags();
+		}
 		return array;
 	}
 

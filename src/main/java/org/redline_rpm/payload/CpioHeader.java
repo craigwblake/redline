@@ -62,6 +62,7 @@ public class CpioHeader {
 	protected int checksum;
 	protected String name;
 	protected int flags;
+	protected int verifyFlags = -1;
 
 	public CpioHeader() {
 	}
@@ -104,6 +105,7 @@ public class CpioHeader {
 	public int getInode() { return inode; }
 	public String getName() { return name; }
 	public int getFlags() { return flags; }
+	public int getVerifyFlags() { return verifyFlags; }
 
 	public int getMode() { return ( type << 12) | ( permissions & 07777); }
 
@@ -113,6 +115,7 @@ public class CpioHeader {
 	public void setMtime( long mtime) { this.mtime = mtime; }
 	public void setInode( int inode) { this.inode = inode; }
 	public void setFlags( int flags) { this.flags = flags; }
+	public void setVerifyFlags( int verifyFlags) { this.verifyFlags = verifyFlags; }
 
 	public String getUname() { return this.uname; }
 	public String getGname() { return this.gname; }
