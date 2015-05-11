@@ -113,7 +113,7 @@ public class CpioHeader {
 	public void setType( int type) { this.type = type; }
 	public void setFileSize( int filesize) { this.filesize = filesize; }
 	public void setMtime( long mtime) { this.mtime = mtime; }
-	public void setInode( int inode) { this.inode = inode; }
+	public void setInode( long inode) { this.inode = inode; }
 	public void setFlags( int flags) { this.flags = flags; }
 	public void setVerifyFlags( int verifyFlags) { this.verifyFlags = verifyFlags; }
 
@@ -160,7 +160,7 @@ public class CpioHeader {
 		return readChars( buffer, 6);
 	}
 
-	protected int readEight( CharBuffer buffer) {
+	protected Long readEight( CharBuffer buffer) {
 		return Long.parseLong( readChars( buffer, 8).toString(), 16);
 	}
 

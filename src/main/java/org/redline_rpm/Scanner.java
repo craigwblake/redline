@@ -91,7 +91,7 @@ public class Scanner {
 
 		Key< Integer> signature = in.start();
 		int count = format.getSignature().read( in);
-		Entry<?> sigEntry = format.getSignatur().getEntry(SIGNATURES);
+		Entry<?> sigEntry = format.getSignature().getEntry(SIGNATURES);
 		int expected = sigEntry == null ? 0:  ByteBuffer.wrap(( byte[]) sigEntry.getValues(), 8, 4).getInt() / -16;
 		log( "Signature ended at '" + in.finish( signature) + "' and contained '" + count + "' headers (expected '" + expected + "').");
 
