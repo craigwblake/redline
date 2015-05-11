@@ -85,7 +85,7 @@ public class Header extends AbstractHeader {
 		FILEUSERNAME( 1039, 8, "fileusername"),
 		FILEGROUPNAME( 1040, 8, "filegroupname"),
 		FILEDEVICES( 1095, 4, "filedevices"),
-		FILEINODES( 1096, 4, "fileinodes"),
+		FILEINODES( 1096, 5, "fileinodes"),
 		FILELANGS( 1097, 8, "filelangs"),
 		PREFIXES( 1098, 8, "prefixes"),
 		DIRINDEXES( 1116, 4, "dirindexes"),

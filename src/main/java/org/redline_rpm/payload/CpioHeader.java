@@ -45,7 +45,7 @@ public class CpioHeader {
 
 	protected Charset charset = Charset.forName( "ASCII");
 
-	protected int inode;
+	protected long inode;
 	protected int type;
 	protected int permissions = DEFAULT_FILE_PERMISSION;
 	protected int uid;
@@ -102,7 +102,7 @@ public class CpioHeader {
 	public int getDevMajor() { return devMajor; }
 	public int getDevMinor() { return devMinor; }
 	public int getMtime() { return ( int) ( mtime / 1000L) ; }
-	public int getInode() { return inode; }
+	public long getInode() { return inode; }
 	public String getName() { return name; }
 	public int getFlags() { return flags; }
 	public int getVerifyFlags() { return verifyFlags; }
@@ -148,6 +148,10 @@ public class CpioHeader {
 		return charset.encode( pad( data, 6));
 	}
 
+	protected ByteBuffer writeEight( long data) {
+		return charset.encode( pad( Long.toHexString( data), 8));
+	}
+
 	protected ByteBuffer writeEight( int data) {
 		return charset.encode( pad( Integer.toHexString( data), 8));
 	}
@@ -157,7 +161,7 @@ public class CpioHeader {
 	}
 
 	protected int readEight( CharBuffer buffer) {
-		return Integer.parseInt( readChars( buffer, 8).toString(), 16);
+		return Long.parseLong( readChars( buffer, 8).toString(), 16);
 	}
 
 	protected CharSequence readChars( CharBuffer buffer, int length) {
@@ -197,21 +201,21 @@ public class CpioHeader {
 		if ( !MAGIC.equals(magic.toString())) throw new IllegalStateException( "Invalid magic number '" + magic + "' of length '" + magic.length() + "'.");
 		inode = readEight( buffer);
 		
-		final int mode = readEight( buffer);
+		final int mode = readEight( buffer).intValue();
 		permissions = mode & 07777;
 		type = mode >>> 12;
 		
-		uid = readEight( buffer);
-		gid = readEight( buffer);
-		nlink = readEight( buffer);
-		mtime = 1000L * readEight( buffer);
-		filesize = readEight( buffer);
-		devMajor = readEight( buffer);
-		devMinor = readEight( buffer);
-		rdevMajor = readEight( buffer);
-		rdevMinor = readEight( buffer);
-		int namesize = readEight( buffer);
-		checksum = readEight( buffer);
+		uid = readEight( buffer).intValue();
+		gid = readEight( buffer).intValue();
+		nlink = readEight( buffer).intValue();
+		mtime = 1000L * readEight( buffer).intValue();
+		filesize = readEight( buffer).intValue();
+		devMajor = readEight( buffer).intValue();
+		devMinor = readEight( buffer).intValue();
+		rdevMajor = readEight( buffer).intValue();
+		rdevMinor = readEight( buffer).intValue();
+		int namesize = readEight( buffer).intValue();
+		checksum = readEight( buffer).intValue();
 		total += CPIO_HEADER;
 
 		name = charset.decode( Util.fill( channel, namesize - 1)).toString();
