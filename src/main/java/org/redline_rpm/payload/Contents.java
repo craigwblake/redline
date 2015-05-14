@@ -734,8 +734,8 @@ public class Contents {
 	 * Gets the inodes header values.
 	 * @return the iNodes header values
 	 */
-	public int[] getInodes() {
-		int[] array = new int[ headers.size()];
+	public long[] getInodes() {
+		long[] array = new long[ headers.size()];
 		int x = 0;
 		for ( CpioHeader header : headers) array[ x++] = header.getInode();
 		return array;

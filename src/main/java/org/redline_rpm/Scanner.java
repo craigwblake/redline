@@ -1,5 +1,6 @@
 package org.redline_rpm;
 
+import org.redline_rpm.header.AbstractHeader.Entry;
 import org.redline_rpm.header.Format;
 import org.redline_rpm.header.Header;
 import org.redline_rpm.header.Header.HeaderTag;
@@ -82,7 +83,7 @@ public class Scanner {
 	 */
 	public Format run( ReadableChannelWrapper in) throws IOException {
 		Format format = new Format();
-        Key< Integer> headerStartKey = in.start();
+        	Key< Integer> headerStartKey = in.start();
 		
 		Key< Integer> lead = in.start();
 		format.getLead().read( in);
@@ -90,17 +91,19 @@ public class Scanner {
 
 		Key< Integer> signature = in.start();
 		int count = format.getSignature().read( in);
-		int expected = ByteBuffer.wrap(( byte[]) format.getSignature().getEntry( SIGNATURES).getValues(), 8, 4).getInt() / -16;
+		Entry<?> sigEntry = format.getSignature().getEntry(SIGNATURES);
+		int expected = sigEntry == null ? 0:  ByteBuffer.wrap(( byte[]) sigEntry.getValues(), 8, 4).getInt() / -16;
 		log( "Signature ended at '" + in.finish( signature) + "' and contained '" + count + "' headers (expected '" + expected + "').");
 
-        Integer headerStartPos = in.finish(headerStartKey);
-        format.getHeader().setStartPos(headerStartPos);
+        	Integer headerStartPos = in.finish(headerStartKey);
+        	format.getHeader().setStartPos(headerStartPos);
 		Key< Integer> headerKey = in.start();
 		count = format.getHeader().read( in);
-		expected = ByteBuffer.wrap(( byte[]) format.getHeader().getEntry( HEADERIMMUTABLE).getValues(), 8, 4).getInt() / -16;
-        Integer headerLength = in.finish(headerKey);
-        format.getHeader().setEndPos(headerStartPos + headerLength);
-        log( "Header ended at '" + headerLength + " and contained '" + count + "' headers (expected '" + expected + "').");
+		Entry<?> immutableEntry = format.getHeader().getEntry( HEADERIMMUTABLE);
+		expected = immutableEntry == null ? 0 : ByteBuffer.wrap(( byte[]) immutableEntry.getValues(), 8, 4).getInt() / -16;
+        	Integer headerLength = in.finish(headerKey);
+        	format.getHeader().setEndPos(headerStartPos + headerLength);
+        	log( "Header ended at '" + headerLength + " and contained '" + count + "' headers (expected '" + expected + "').");
 
 		return format;
 	}
