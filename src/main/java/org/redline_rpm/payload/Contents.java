@@ -119,6 +119,19 @@ public class Contents {
 	 * @param permissions the permissions flags.
 	 */
 	public synchronized void addLink( String path, final String target, int permissions) {
+		addLink( path, target, permissions, null, null);
+	}
+
+	/**
+	 * Adds a directory entry to the archive with the specified permissions.
+	 *
+	 * @param path the destination path for the installed file.
+	 * @param target the target string
+	 * @param permissions the permissions flags.
+   	 * @param uname user owner for the given link
+	 * @param gname group owner for the given link
+	 */
+	public synchronized void addLink( String path, final String target, int permissions, final String uname, final String gname) {
 		if ( files.contains( path)) return;
 		files.add( path);
 		logger.log( FINE, "Adding link ''{0}''.", path);
@@ -126,10 +139,17 @@ public class Contents {
 		header.setType( SYMLINK);
 		header.setFileSize( target.length());
 		header.setMtime( System.currentTimeMillis());
+		header.setUname( getDefaultIfMissing( uname, DEFAULT_USERNAME));
+		header.setGname( getDefaultIfMissing( gname, DEFAULT_GROUP));
 		if ( permissions != -1) header.setPermissions( permissions);
 		headers.add( header);
 		sources.put( header, target);
 	}
+
+	private String getDefaultIfMissing( String value, String defaultValue) {
+		return value == null || value.isEmpty() ? defaultValue : value;
+	}
+
 
 	/**
 	 * Adds a directory entry to the archive with the default permissions of 644.
