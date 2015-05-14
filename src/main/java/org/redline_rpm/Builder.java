@@ -1051,6 +1051,21 @@ public class Builder {
 	}
 
 	/**
+	 * Adds a symbolic link to the repository.
+	 *
+	 * @param path the absolute path at which this link will be installed.
+	 * @param target the path of the file this link will point to.
+	 * @param permissions the permissions flags
+	 * @param username user owner of the link
+	 * @param groupname group owner of the link
+	 * @throws NoSuchAlgorithmException the algorithm isn't supported
+	 * @throws IOException there was an IO error
+	 */
+	public void addLink( final String path, final String target, int permissions, String username, String groupname) throws NoSuchAlgorithmException, IOException {
+		contents.addLink( path, target, permissions, username, groupname);
+	}
+
+	/**
 	 * Add a key to generate a new signature for the header and payload portions of the
 	 * rpm file. Supported algorithms are "MD5withRSA" and "SHAwithDSA".
 	 *
