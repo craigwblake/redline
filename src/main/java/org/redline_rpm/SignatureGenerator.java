@@ -10,6 +10,7 @@ import org.bouncycastle.openpgp.operator.PBESecretKeyDecryptor;
 import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyDecryptorBuilder;
 import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
 import org.redline_rpm.header.Signature;
+import org.redline_rpm.payload.Contents;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -17,7 +18,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
+import static java.util.logging.Logger.getLogger;
 import static org.redline_rpm.ChannelWrapper.Key;
 import static org.redline_rpm.header.AbstractHeader.Entry;
 import static org.redline_rpm.header.Signature.SignatureTag.LEGACY_PGP;
@@ -35,6 +38,7 @@ public class SignatureGenerator {
     protected final PGPPrivateKey privateKey;
     protected Key< byte[]> headerOnlyKey = null;
     protected Key< byte[]> headerAndPayloadKey = null;
+    private Logger logger = getLogger( Contents.class.getName());
 
     public SignatureGenerator( PGPPrivateKey privateKey ) {
         this.privateKey = privateKey;
@@ -45,8 +49,12 @@ public class SignatureGenerator {
         if ( privateKeyRingFile != null ) {
             PGPSecretKeyRingCollection keyRings = readKeyRings( privateKeyRingFile );
             PGPSecretKey secretKey = findMatchingSecretKey( keyRings, privateKeyId );
-            privateKey = extractPrivateKey( secretKey, privateKeyPassphrase );
-            enabled = true;
+            PGPPrivateKey key = null;
+            try { key = extractPrivateKey( secretKey, privateKeyPassphrase ); }catch( IllegalArgumentException e){
+                logger.warning("Private Key could not be extracted and therefore a signature wil not be generated! "+e.getLocalizedMessage());
+            }
+            privateKey=key; 
+            this.enabled = key!=null?true:false;
         } else {
             privateKey = null;
             this.enabled = false;
