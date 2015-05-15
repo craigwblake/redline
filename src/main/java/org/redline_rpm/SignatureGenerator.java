@@ -50,7 +50,7 @@ public class SignatureGenerator {
             PGPSecretKey secretKey = findMatchingSecretKey( keyRings, privateKeyId );
             PGPPrivateKey key = null;
             try { key = extractPrivateKey( secretKey, privateKeyPassphrase ); }catch( IllegalArgumentException e){
-                logger.warning("Private Key could not be extracted and therefore a signature wil not be generated! "+e.getLocalizedMessage());
+                logger.warning("Private Key could not be extracted and therefore a signature will not be generated! "+e.getLocalizedMessage());
             }
             privateKey=key; 
             this.enabled = key!=null?true:false;
