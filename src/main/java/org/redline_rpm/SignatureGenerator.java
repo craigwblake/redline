@@ -10,7 +10,6 @@ import org.bouncycastle.openpgp.operator.PBESecretKeyDecryptor;
 import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyDecryptorBuilder;
 import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
 import org.redline_rpm.header.Signature;
-import org.redline_rpm.payload.Contents;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -38,7 +37,7 @@ public class SignatureGenerator {
     protected final PGPPrivateKey privateKey;
     protected Key< byte[]> headerOnlyKey = null;
     protected Key< byte[]> headerAndPayloadKey = null;
-    private Logger logger = getLogger( Contents.class.getName());
+    private Logger logger = getLogger( SignatureGenerator.class.getName());
 
     public SignatureGenerator( PGPPrivateKey privateKey ) {
         this.privateKey = privateKey;
