@@ -488,7 +488,6 @@ public class Contents {
 			for ( Object object : sources.values()) {
 				if ( object instanceof File) total += (( File) object).length();
 				else if ( object instanceof URL) total += (( URL) object).openConnection().getContentLength();
-				else if ( object instanceof String) total += (( String) object).length();
 			}
 		} catch ( IOException e) {
 			throw new RuntimeException( e);
