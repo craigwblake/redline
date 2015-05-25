@@ -488,6 +488,7 @@ public class Contents {
 			for ( Object object : sources.values()) {
 				if ( object instanceof File) total += (( File) object).length();
 				else if ( object instanceof URL) total += (( URL) object).openConnection().getContentLength();
+				else if ( object instanceof String) total += (( String) object).length();
 			}
 		} catch ( IOException e) {
 			throw new RuntimeException( e);
@@ -556,6 +557,7 @@ public class Contents {
 				if ( object instanceof File) array[ x] = ( int) (( File) object).length();
 				else if ( object instanceof URL) array[ x] = (( URL) object).openConnection().getContentLength();
 				else if ( header.getType() == DIR) array[ x] = 4096;
+				else if ( object instanceof String) array[ x] = (( String) object).length();
 				++x;
 			}
 		} catch ( IOException e) {
