@@ -17,7 +17,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
+import static java.util.logging.Logger.getLogger;
 import static org.redline_rpm.ChannelWrapper.Key;
 import static org.redline_rpm.header.AbstractHeader.Entry;
 import static org.redline_rpm.header.Signature.SignatureTag.LEGACY_PGP;
@@ -35,6 +37,7 @@ public class SignatureGenerator {
     protected final PGPPrivateKey privateKey;
     protected Key< byte[]> headerOnlyKey = null;
     protected Key< byte[]> headerAndPayloadKey = null;
+    private Logger logger = getLogger( SignatureGenerator.class.getName());
 
     public SignatureGenerator( PGPPrivateKey privateKey ) {
         this.privateKey = privateKey;
@@ -45,8 +48,12 @@ public class SignatureGenerator {
         if ( privateKeyRingFile != null ) {
             PGPSecretKeyRingCollection keyRings = readKeyRings( privateKeyRingFile );
             PGPSecretKey secretKey = findMatchingSecretKey( keyRings, privateKeyId );
-            privateKey = extractPrivateKey( secretKey, privateKeyPassphrase );
-            enabled = true;
+            PGPPrivateKey key = null;
+            try { key = extractPrivateKey( secretKey, privateKeyPassphrase ); }catch( IllegalArgumentException e){
+                logger.warning("Private Key could not be extracted and therefore a signature will not be generated! "+e.getLocalizedMessage());
+            }
+            privateKey=key; 
+            this.enabled = key!=null?true:false;
         } else {
             privateKey = null;
             this.enabled = false;
