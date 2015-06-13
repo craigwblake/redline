@@ -21,6 +21,19 @@ import java.util.TreeMap;
 public abstract class AbstractHeader {
 
 	public interface Tag {
+		int NULL_ENTRY = 0;
+		int CHAR_ENTRY = 1;
+		int INT8_ENTRY = 2;
+		int INT16_ENTRY = 3;
+		int INT32_ENTRY = 4;
+		int INT64_ENTRY = 5;
+		int STRING_ENTRY = 6;
+		int BIN_ENTRY = 7;
+		int STRING_ARRAY_ENTRY = 8;
+		int I18NSTRING_ENTRY = 9;
+		int ASN1_ENTRY = 10;
+		int OPENPGP_ENTRY = 11;
+		
 		int getCode();
 		int getType();
 		String getName();
@@ -276,25 +289,25 @@ public abstract class AbstractHeader {
 
 	protected Entry< ?> createEntry( int type) {
 		switch ( type) {
-			case 0:
+			case Tag.NULL_ENTRY:
 				return new NullEntry();
-			case 1:
+			case Tag.CHAR_ENTRY:
 				return new CharEntry();
-			case 2:
+			case Tag.INT8_ENTRY:
 				return new Int8Entry();
-			case 3:
+			case Tag.INT16_ENTRY:
 				return new Int16Entry();
-			case 4:
+			case Tag.INT32_ENTRY:
 				return new Int32Entry();
-			case 5:
+			case Tag.INT64_ENTRY:
 				return new Int64Entry();
-			case 6:
+			case Tag.STRING_ENTRY:
 				return new StringEntry();
-			case 7:
+			case Tag.BIN_ENTRY:
 				return new BinEntry();
-			case 8:
+			case Tag.STRING_ARRAY_ENTRY:
 				return new StringArrayEntry();
-			case 9:
+			case Tag.I18NSTRING_ENTRY:
 				return new I18NStringEntry();
             default:
                 throw new IllegalStateException( "Unknown entry type '" + type + "'.");
@@ -411,7 +424,7 @@ public abstract class AbstractHeader {
 	}
 
 	class CharEntry extends AbstractEntry< byte[]> {
-		public int getType() { return 1; }
+		public int getType() { return Tag.CHAR_ENTRY; }
 		public int size() { return count ; }
 		public void read( final ByteBuffer buffer) {
 			byte[] values = new byte[ count];
@@ -430,7 +443,7 @@ public abstract class AbstractHeader {
 	}
 
 	class Int8Entry extends AbstractEntry< byte[]> {
-		public int getType() { return 2; }
+		public int getType() { return Tag.INT8_ENTRY; }
 		public int size() { return count; }
 		public void read( final ByteBuffer buffer) {
 			byte[] values = new byte[ count];
@@ -450,7 +463,7 @@ public abstract class AbstractHeader {
 
 	class Int16Entry extends AbstractEntry< short[]> {
 		public int getOffset( int offset) { return Util.round( offset, 1); }
-		public int getType() { return 3; }
+		public int getType() { return Tag.INT16_ENTRY; }
 		public int size() { return count * ( Short.SIZE / 8); }
 		public void read( final ByteBuffer buffer) {
 			short[] values = new short[ count];
@@ -470,7 +483,7 @@ public abstract class AbstractHeader {
 
 	class Int32Entry extends AbstractEntry< int[]> {
 		public int getOffset( int offset) { return Util.round( offset, 3); }
-		public int getType() { return 4; }
+		public int getType() { return Tag.INT32_ENTRY; }
 		public int size() { return count * ( Integer.SIZE / 8); }
 		public void read( final ByteBuffer buffer) {
 			int[] values = new int[ count];
@@ -490,7 +503,7 @@ public abstract class AbstractHeader {
 
 	class Int64Entry extends AbstractEntry< long[]> {
 		public int getOffset( int offset) { return Util.round( offset, 7); }
-		public int getType() { return 5; }
+		public int getType() { return Tag.INT64_ENTRY; }
 		public int size() { return count * ( Long.SIZE / 8); }
 		public void read( final ByteBuffer buffer) {
 			long[] values = new long[ count];
@@ -514,7 +527,7 @@ public abstract class AbstractHeader {
 	 * indicate that this may not longer be the case.
 	 */
 	class StringEntry extends AbstractEntry< String[]> {
-		public int getType() { return 6; }
+		public int getType() { return Tag.STRING_ENTRY; }
 		public int size() {
 			if ( size != 0) return size;
 			for ( String s : values) size += Charset.forName( "UTF-8").encode( s).remaining() + 1;
@@ -549,7 +562,7 @@ public abstract class AbstractHeader {
 	}
 
 	class BinEntry extends AbstractEntry< byte[]> {
-		public int getType() { return 7; }
+		public int getType() { return Tag.BIN_ENTRY; }
 		public int size() { return count; }
 		public void read( final ByteBuffer buffer) {
 			byte[] values = new byte[ count];
@@ -570,11 +583,11 @@ public abstract class AbstractHeader {
 	}
 
 	class StringArrayEntry extends StringEntry {
-		public int getType() { return 8; }
+		public int getType() { return Tag.STRING_ARRAY_ENTRY; }
 	}
 
 	class I18NStringEntry extends StringEntry {
-		public int getType() { return 9; }
+		public int getType() { return Tag.I18NSTRING_ENTRY; }
 	}
 
 	public String toString() {
