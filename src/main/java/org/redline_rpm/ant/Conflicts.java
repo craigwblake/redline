@@ -7,10 +7,10 @@ import static org.redline_rpm.header.Flags.GREATER;
 import static org.redline_rpm.header.Flags.LESS;
 
 /**
- * Object describing a dependency on a
+ * Object describing a conflict with a
  * particular version of an RPM package.
  */
-public class Depends {
+public class Conflicts {
 
 	protected String name;
 	protected String version = "";

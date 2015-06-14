@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.Channels;
+import java.util.Arrays;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.types.EnumeratedAttribute;
 import org.redline_rpm.ReadableChannelWrapper;
 import org.redline_rpm.RedlineException;
 import org.redline_rpm.Scanner;
@@ -14,13 +16,16 @@ import org.redline_rpm.TestBase;
 import org.redline_rpm.header.AbstractHeader;
 import org.redline_rpm.header.Format;
 import org.redline_rpm.header.Header;
+import org.redline_rpm.header.Header.HeaderTag;
 import org.redline_rpm.payload.Directive;
 import org.junit.Test;
 
+import static org.redline_rpm.header.Flags.EQUAL;
+import static org.redline_rpm.header.Flags.GREATER;
+import static org.redline_rpm.header.Flags.LESS;
 import static org.redline_rpm.header.Signature.SignatureTag.LEGACY_PGP;
 import static org.redline_rpm.header.Signature.SignatureTag.RSAHEADER;
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertNotNull;
 
 public class RedlineTaskTest extends TestBase {
 
@@ -159,6 +164,102 @@ public class RedlineTaskTest extends TestBase {
 
 		assertEquals(1, task.depends.size());
 		assertEquals("two", task.depends.get(0).getName());
+	}
+
+	@Test
+	public void testCapabilities() throws Exception {
+
+		File dir = ensureTargetDir();
+
+		File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
+
+		RedlineTask task = createBasicTask( dir);
+
+		for(String[] def : new String[][]{
+			{"depone",   "",     "1.0"},
+			{"deptwo",   "less", "2.0"},
+			{"depthree", "",     ""   },
+		}) {
+			Depends dep = new Depends();
+			dep.setName(def[0]);
+			if(0 < def[1].length())
+				dep.setComparison((Depends.ComparisonEnum)EnumeratedAttribute.getInstance(Depends.ComparisonEnum.class, def[1]));
+			if(0 < def[2].length())
+				dep.setVersion(def[2]);
+			task.addDepends(dep);
+		}
+
+		for(String[] def : new String[][]{
+			{"provone",   "1.1"},
+			{"provtwo",   "2.1"},
+			{"provthree", ""   },
+		}) {
+			Provides prov = new Provides();
+			prov.setName(def[0]);
+			if(0 < def[1].length())
+				prov.setVersion(def[1]);
+			task.addProvides(prov);
+		}
+
+		for(String[] def : new String[][]{
+			{"conone",   "",      "1.2"},
+			{"contwo",   "less",  "2.2"},
+			{"conthree", "",      ""   },
+		}) {
+			Conflicts con = new Conflicts();
+			con.setName(def[0]);
+			if(0 < def[1].length())
+				con.setComparison((Conflicts.ComparisonEnum)EnumeratedAttribute.getInstance(Conflicts.ComparisonEnum.class, def[1]));
+			if(0 < def[2].length())
+				con.setVersion(def[2]);
+			task.addConflicts(con);
+		}
+
+		for(String[] def : new String[][]{
+			{"obsone",   "",      "1.3"},
+			{"obstwo",   "less",  "2.3"},
+			{"obsthree", "",      ""   },
+		}) {
+			Obsoletes obs = new Obsoletes();
+			obs.setName(def[0]);
+			if(0 < def[1].length())
+				obs.setComparison((Obsoletes.ComparisonEnum)EnumeratedAttribute.getInstance(Obsoletes.ComparisonEnum.class, def[1]));
+			if(0 < def[2].length())
+				obs.setVersion(def[2]);
+			task.addObseletes(obs);
+		}
+
+		task.execute();
+
+		Format format = getFormat( filename );
+
+		String[] require = (String[])format.getHeader().getEntry(HeaderTag.REQUIRENAME).getValues();
+		int[] requireflags = (int[])format.getHeader().getEntry(HeaderTag.REQUIREFLAGS).getValues();
+		String[] requireversion = (String[])format.getHeader().getEntry(HeaderTag.REQUIREVERSION).getValues();
+		assertArrayEquals(new String[] { "depone",      "deptwo", "depthree" }, Arrays.copyOfRange(require, require.length - 3, require.length));
+		assertArrayEquals(new    int[] { EQUAL|GREATER, LESS,      0         }, Arrays.copyOfRange(requireflags, requireflags.length - 3, require.length));
+		assertArrayEquals(new String[] { "1.0",         "2.0",     ""        }, Arrays.copyOfRange(requireversion, requireversion.length - 3, require.length));
+
+		String[] provide = (String[])format.getHeader().getEntry(HeaderTag.PROVIDENAME).getValues();
+		int[] provideflags = (int[])format.getHeader().getEntry(HeaderTag.PROVIDEFLAGS).getValues();
+		String[] provideversion = (String[])format.getHeader().getEntry(HeaderTag.PROVIDEVERSION).getValues();
+		assertArrayEquals(new String[] { "rpmtest", "provone", "provtwo", "provthree" }, provide);
+		assertArrayEquals(new    int[] { EQUAL,     EQUAL,     EQUAL,     0           }, provideflags);
+		assertArrayEquals(new String[] { "0:1.0-1", "1.1",     "2.1",     ""          }, provideversion);
+
+		String[] conflict = (String[])format.getHeader().getEntry(HeaderTag.CONFLICTNAME).getValues();
+		int[] conflictflags = (int[])format.getHeader().getEntry(HeaderTag.CONFLICTFLAGS).getValues();
+		String[] conflictversion = (String[])format.getHeader().getEntry(HeaderTag.CONFLICTVERSION).getValues();
+		assertArrayEquals(new String[] { "conone",      "contwo", "conthree" }, conflict);
+		assertArrayEquals(new    int[] { EQUAL|GREATER, LESS,     0          }, conflictflags);
+		assertArrayEquals(new String[] { "1.2",         "2.2",    ""         }, conflictversion);
+
+		String[] obsolete = (String[])format.getHeader().getEntry(HeaderTag.OBSOLETENAME).getValues();
+		int[] obsoleteflags = (int[])format.getHeader().getEntry(HeaderTag.OBSOLETEFLAGS).getValues();
+		String[] obsoleteversion = (String[])format.getHeader().getEntry(HeaderTag.OBSOLETEVERSION).getValues();
+		assertArrayEquals(new String[] { "obsone",      "obstwo", "obsthree" }, obsolete);
+		assertArrayEquals(new    int[] { EQUAL|GREATER, LESS,     0          }, obsoleteflags);
+		assertArrayEquals(new String[] { "1.3",         "2.3",    ""         }, obsoleteversion);
 	}
 
 	@Test
