@@ -72,6 +72,9 @@ public class Builder {
 	protected final Map<String, CharSequence> conflicts = new LinkedHashMap<String, CharSequence>();
 	protected final Map<String, Integer> conflictsFlags = new LinkedHashMap<String, Integer>();
 	
+	protected final Map<String, CharSequence> provides = new LinkedHashMap<String, CharSequence>();
+	protected final Map<String, Integer> providesFlags = new LinkedHashMap<String, Integer>();
+
 	protected final List< String> triggerscripts = new LinkedList< String>();
 	protected final List< String> triggerscriptprogs = new LinkedList< String>();
 
@@ -152,6 +155,16 @@ public class Builder {
 	protected void addConflicts(final CharSequence name, final CharSequence version, final int flag) {
 		conflicts.put(name.toString(), version);
 		conflictsFlags.put(name.toString(), flag);
+	}
+	
+	public void addProvides(final String name, final String version) {
+		provides.put(name, version);
+		providesFlags.put(name, version.length() > 0 ? EQUAL : 0);
+	}
+
+	protected void addProvides(final CharSequence name, final CharSequence version, final int flag) {
+		provides.put(name.toString(), version);
+		providesFlags.put(name.toString(), flag);
 	}
 	
 	/**
@@ -256,9 +269,8 @@ public class Builder {
 		format.getHeader().createEntry( VERSION, version);
 		format.getHeader().createEntry( RELEASE, release);
 		format.getHeader().createEntry( EPOCH, epoch);
-		format.getHeader().createEntry( PROVIDENAME, new String[] { String.valueOf(name) });
-		format.getHeader().createEntry( PROVIDEVERSION, 8, new String[] { "" + epoch + ":" + version + "-" + release});
-		format.getHeader().createEntry( PROVIDEFLAGS, new int[] { 8});
+		this.provides.clear();
+		addProvides(String.valueOf(name), "" + epoch + ":" + version + "-" + release);
 	}
 
 	public void setPackage( final CharSequence name, final CharSequence version, final CharSequence release) {
@@ -397,12 +409,19 @@ public class Builder {
 
 	/**
 	 * Declares a dependency that this package exports, and that other packages can use to
-	 * provide library functions.
+	 * provide library functions.  Note that this method causes the existing provides set to be
+	 * overwritten and therefore should be called before adding any other contents via
+	 * the <code>addProvides()</code> methods.
+	 * 
+	 * You should use <code>addProvides()</code> instead.
 	 *
 	 * @param provides dependency provided by this package.
 	 */
 	public void setProvides( final CharSequence provides) {
-		if ( provides != null) format.getHeader().createEntry( PROVIDENAME, provides);
+		if ( provides != null) {
+			this.provides.clear();
+			addProvides( provides, "", EQUAL);
+		}
 	}
 
 	/**
@@ -1159,6 +1178,13 @@ public class Builder {
 			format.getHeader().createEntry( CONFLICTNAME, conflicts.keySet().toArray(new String[ conflicts.size() ]));
 			format.getHeader().createEntry(CONFLICTVERSION, conflicts.values().toArray(new String[ conflicts.size() ]));
 			format.getHeader().createEntry( CONFLICTFLAGS, convert( conflictsFlags.values().toArray( new Integer [ conflictsFlags.size()])));
+		}
+
+		if (0 < provides.size())
+		{
+			format.getHeader().createEntry( PROVIDENAME, provides.keySet().toArray(new String[ provides.size() ]));
+			format.getHeader().createEntry(PROVIDEVERSION, provides.values().toArray(new String[ provides.size() ]));
+			format.getHeader().createEntry( PROVIDEFLAGS, convert( providesFlags.values().toArray( new Integer [ providesFlags.size()])));
 		}
 
 		format.getHeader().createEntry( SIZE, contents.getTotalSize());
