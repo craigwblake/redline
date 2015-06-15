@@ -1,3 +1,3 @@
-#!/bin/sh
+#!/usr/bin/perl
 
-echo Hello Post Uninstall!
+print "Hello Post Uninstall!\n";
