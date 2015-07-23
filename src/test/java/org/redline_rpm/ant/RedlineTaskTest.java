@@ -189,17 +189,17 @@ public class RedlineTaskTest extends TestBase {
 
 		assertHeaderEquals("#!/bin/sh\n\necho Hello Pre Install!\n", format,
 				Header.HeaderTag.PREINSCRIPT);
-		assertHeaderEquals("#!/bin/sh\n\necho Hello Post Install!\n", format,
+		assertHeaderEquals("\n\necho Hello Post Install!\n", format,
 				Header.HeaderTag.POSTINSCRIPT);
-		assertHeaderEquals("#!/bin/sh\n\necho Hello Pre Uninstall!\n", format,
+		assertHeaderEquals("# comment\n\necho Hello Pre Uninstall!\n", format,
 				Header.HeaderTag.PREUNSCRIPT);
-		assertHeaderEquals("#!/bin/sh\n\necho Hello Post Uninstall!\n", format,
+		assertHeaderEquals("#!/usr/bin/perl\n\nprint \"Hello Post Uninstall!\\n\";\n", format,
 				Header.HeaderTag.POSTUNSCRIPT);
 
 		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.PREINPROG);
 		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.POSTINPROG);
 		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.PREUNPROG);
-		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.POSTUNPROG);
+		assertHeaderEquals("/usr/bin/perl", format, Header.HeaderTag.POSTUNPROG);
 
 		int expectedFlags = Directive.RPMFILE_CONFIG | Directive.RPMFILE_DOC
 				| Directive.RPMFILE_NOREPLACE;
