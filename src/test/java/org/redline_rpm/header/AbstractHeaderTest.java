@@ -15,7 +15,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< byte[]> entry = ( Entry< byte[]>) header.createEntry( 1);
+		Entry< byte[]> entry = ( Entry< byte[]>) header.createEntry( Tag.CHAR_ENTRY);
 		entry.setCount( 1);
 		entry.read( buffer);
 		assertEquals( 1, entry.getValues()[ 0]);
@@ -36,7 +36,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< byte[]> entry = ( Entry< byte[]>) header.createEntry( 1);
+		Entry< byte[]> entry = ( Entry< byte[]>) header.createEntry( Tag.CHAR_ENTRY);
 		entry.setCount( 2);
 		entry.read( buffer);
 		assertEquals( 1, entry.getValues()[ 0]);
@@ -57,7 +57,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< byte[]> entry = ( Entry< byte[]>) header.createEntry( 2);
+		Entry< byte[]> entry = ( Entry< byte[]>) header.createEntry( Tag.INT8_ENTRY);
 		entry.setCount( 1);
 		entry.read( buffer);
 		assertEquals( 1, entry.getValues()[ 0]);
@@ -78,7 +78,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< byte[]> entry = ( Entry< byte[]>) header.createEntry( 2);
+		Entry< byte[]> entry = ( Entry< byte[]>) header.createEntry( Tag.INT8_ENTRY);
 		entry.setCount( 2);
 		entry.read( buffer);
 		assertEquals( 1, entry.getValues()[ 0]);
@@ -99,7 +99,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< short[]> entry = ( Entry< short[]>) header.createEntry( 3);
+		Entry< short[]> entry = ( Entry< short[]>) header.createEntry( Tag.INT16_ENTRY);
 		entry.setCount( 1);
 		entry.read( buffer);
 		assertEquals( 1, entry.getValues()[ 0]);
@@ -120,7 +120,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< short[]> entry = ( Entry< short[]>) header.createEntry( 3);
+		Entry< short[]> entry = ( Entry< short[]>) header.createEntry( Tag.INT16_ENTRY);
 		entry.setCount( 2);
 		entry.read( buffer);
 		assertEquals( 1, entry.getValues()[ 0]);
@@ -141,7 +141,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< int[]> entry = ( Entry< int[]>) header.createEntry( 4);
+		Entry< int[]> entry = ( Entry< int[]>) header.createEntry( Tag.INT32_ENTRY);
 		entry.setCount( 1);
 		entry.read( buffer);
 		assertEquals( 1, entry.getValues()[ 0]);
@@ -162,7 +162,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< int[]> entry = ( Entry< int[]>) header.createEntry( 4);
+		Entry< int[]> entry = ( Entry< int[]>) header.createEntry( Tag.INT32_ENTRY);
 		entry.setCount( 2);
 		entry.read( buffer);
 		assertEquals( 1, entry.getValues()[ 0]);
@@ -183,7 +183,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< long[]> entry = ( Entry< long[]>) header.createEntry( 5);
+		Entry< long[]> entry = ( Entry< long[]>) header.createEntry( Tag.INT64_ENTRY);
 		entry.setCount( 1);
 		entry.read( buffer);
 		assertEquals( 1, entry.getValues()[ 0]);
@@ -204,7 +204,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< long[]> entry = ( Entry< long[]>) header.createEntry( 5);
+		Entry< long[]> entry = ( Entry< long[]>) header.createEntry( Tag.INT64_ENTRY);
 		entry.setCount( 2);
 		entry.read( buffer);
 		assertEquals( 1, entry.getValues()[ 0]);
@@ -225,7 +225,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< String[]> entry = ( Entry< String[]>) header.createEntry( 6);
+		Entry< String[]> entry = ( Entry< String[]>) header.createEntry( Tag.STRING_ENTRY);
 		entry.setCount( 1);
 		entry.read( buffer);
 		assertEquals( "1234567", entry.getValues()[ 0]);
@@ -245,7 +245,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< String[]> entry = ( Entry< String[]>) header.createEntry( 6);
+		Entry< String[]> entry = ( Entry< String[]>) header.createEntry( Tag.STRING_ENTRY);
 		entry.setCount( 2);
 		entry.read( buffer);
 		assertEquals( "1234567", entry.getValues()[ 0]);
@@ -266,7 +266,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< byte[]> entry = ( Entry< byte[]>) header.createEntry( 7);
+		Entry< byte[]> entry = ( Entry< byte[]>) header.createEntry( Tag.BIN_ENTRY);
 		entry.setCount( 8);
 		entry.read( buffer);
 		assertTrue( ByteBuffer.wrap( "12345678".getBytes()).equals( ByteBuffer.wrap( entry.getValues())));
@@ -286,7 +286,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< String[]> entry = ( Entry< String[]>) header.createEntry( 8);
+		Entry< String[]> entry = ( Entry< String[]>) header.createEntry( Tag.STRING_ARRAY_ENTRY);
 		entry.setCount( 1);
 		entry.read( buffer);
 		assertEquals( "1234567", entry.getValues()[ 0]);
@@ -307,7 +307,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< String[]> entry = ( Entry< String[]>) header.createEntry( 8);
+		Entry< String[]> entry = ( Entry< String[]>) header.createEntry( Tag.STRING_ARRAY_ENTRY);
 		entry.setCount( 2);
 		entry.read( buffer);
 		assertEquals( "1234567", entry.getValues()[ 0]);
@@ -328,7 +328,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< String[]> entry = ( Entry< String[]>) header.createEntry( 9);
+		Entry< String[]> entry = ( Entry< String[]>) header.createEntry( Tag.I18NSTRING_ENTRY);
 		entry.setCount( 1);
 		entry.read( buffer);
 		assertEquals( "1234567", entry.getValues()[ 0]);
@@ -349,7 +349,7 @@ public class AbstractHeaderTest extends TestCase {
 		buffer.flip();
 		
 		TestHeader header = new TestHeader();
-		Entry< String[]> entry = ( Entry< String[]>) header.createEntry( 9);
+		Entry< String[]> entry = ( Entry< String[]>) header.createEntry( Tag.I18NSTRING_ENTRY);
 		entry.setCount( 2);
 		entry.read( buffer);
 		assertEquals( "1234567", entry.getValues()[ 0]);

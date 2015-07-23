@@ -58,6 +58,9 @@ public class RedlineTask extends Task {
 	protected List< Ghost> ghosts = new ArrayList< Ghost>();
 	protected List< Link> links = new ArrayList< Link>();
 	protected List< Depends> depends = new ArrayList< Depends>();
+	protected List< Provides> moreProvides = new ArrayList< Provides>();
+	protected List< Conflicts> conflicts = new ArrayList< Conflicts>();
+	protected List< Obsoletes> obsoletes = new ArrayList< Obsoletes>();
 
 	protected List< TriggerPreIn> triggersPreIn = new ArrayList< TriggerPreIn>();
 	protected List< TriggerIn> triggersIn = new ArrayList< TriggerIn>();
@@ -104,7 +107,9 @@ public class RedlineTask extends Task {
 		builder.setDistribution( distribution);
 		builder.setVendor( vendor);
 		builder.setUrl( url);
-		builder.setProvides( provides == null ? name : provides);
+		if(provides != null) {
+			builder.setProvides( provides);
+		}
 		builder.setPrefixes( prefixes == null ? null : prefixes.split(","));
         builder.setPrivateKeyRingFile( privateKeyRingFile);
         builder.setPrivateKeyId( privateKeyId);
@@ -188,6 +193,9 @@ public class RedlineTask extends Task {
 			}
 			for ( Link link : links) builder.addLink( link.getPath(), link.getTarget(), link.getPermissions());
 			for ( Depends dependency : depends) builder.addDependency( dependency.getName(), dependency.getComparison(), dependency.getVersion());
+			for ( Provides provision : moreProvides) builder.addProvides( provision.getName(), provision.getVersion());
+			for ( Conflicts conflict : conflicts) builder.addConflicts( conflict.getName(), conflict.getComparison(), conflict.getVersion());
+			for ( Obsoletes obsoletion : obsoletes) builder.addObsoletes( obsoletion.getName(), obsoletion.getComparison(), obsoletion.getVersion());
 
 			for ( TriggerPreIn triggerPreIn : triggersPreIn) builder.addTrigger( triggerPreIn.getScript(), "", triggerPreIn.getDepends(), triggerPreIn.getFlag());
 			for ( TriggerIn triggerIn : triggersIn) builder.addTrigger( triggerIn.getScript(), "", triggerIn.getDepends(), triggerIn.getFlag());
@@ -234,6 +242,9 @@ public class RedlineTask extends Task {
 	public void addEmptyDir( EmptyDir emptyDir) { emptyDirs.add( emptyDir); }
 	public void addLink( Link link) { links.add( link); }
 	public void addDepends( Depends dependency) { depends.add( dependency); }
+	public void addProvides( Provides provision) { moreProvides.add( provision); }
+	public void addConflicts( Conflicts conflict) { conflicts.add( conflict); }
+	public void addObseletes( Obsoletes obsoletion) { obsoletes.add( obsoletion); }
 	public void addTriggerPreIn( TriggerPreIn triggerPreIn) { triggersPreIn.add( triggerPreIn); }
 	public void addTriggerIn( TriggerIn triggerIn) { triggersIn.add( triggerIn); }
 	public void addTriggerUn( TriggerUn triggerUn) { triggersUn.add( triggerUn); }
