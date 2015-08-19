@@ -141,6 +141,50 @@ public class RedlineTaskTest extends TestBase {
 			// Pass
 		}
 	}
+	
+	@Test
+	public void testBadEpoch() throws Exception {
+		RedlineTask task = new RedlineTask();
+		task.setName("nameRequired");
+		task.setVersion("versionRequired");
+		task.setGroup("groupRequired");
+
+		// test epoch with illegal char -
+		task.setEpoch("2-3");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+
+		// test epoch with illegal char ~
+		task.setEpoch("2~3");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+
+		// test epoch with illegal char /
+		task.setEpoch("2/3");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+		
+		// test epoch with illegal chars abc
+		task.setEpoch("abc");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+	}
 
 	@Test
 	public void testRestrict() throws Exception {
