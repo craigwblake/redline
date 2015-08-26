@@ -60,7 +60,8 @@ public class SignatureGenerator {
         }
     }
 
-    public void prepare( Signature signature ) {
+    @SuppressWarnings("unchecked")
+	public void prepare( Signature signature ) {
         if ( enabled ) {
             headerOnlyRSAEntry = ( Entry< byte[]> ) signature.addEntry( RSAHEADER, SIGNATURE_SIZE );
             headerAndPayloadPGPEntry = ( Entry< byte[]> ) signature.addEntry( LEGACY_PGP, SIGNATURE_SIZE );

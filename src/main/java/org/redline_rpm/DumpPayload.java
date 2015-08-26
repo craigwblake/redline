@@ -24,10 +24,12 @@ public final class DumpPayload {
 	public static void main( String[] args) throws Exception {
 		ReadableByteChannel in = Channels.newChannel( System.in);
 		new Scanner().run( new ReadableChannelWrapper( in));
-		FileChannel out = new FileOutputStream( args[ 0]).getChannel();
+		FileOutputStream fout = new FileOutputStream( args[ 0]);
+		FileChannel out = fout.getChannel();
 		
 		long position = 0;
 		long read;
 		while (( read = out.transferFrom( in, position, 1024)) > 0) position += read;
+		fout.close();
 	}
 }

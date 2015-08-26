@@ -27,7 +27,7 @@ public class ReadableChannelWrapper extends ChannelWrapper implements ReadableBy
 	 */
 	public int read( final ByteBuffer buffer) throws IOException {
 		final int read = channel.read( buffer);
-		for ( Consumer consumer : consumers.values()) consumer.consume(( ByteBuffer) buffer.duplicate().flip());
+		for ( Consumer< ?> consumer : consumers.values()) consumer.consume(( ByteBuffer) buffer.duplicate().flip());
 		return read;
 	}
 

@@ -188,7 +188,7 @@ public class RedlineTask extends Task {
 
 				for ( String entry : scanner.getIncludedFiles()) {
 					if ( archive != null) {
-						URL url = new URL( "jar:" + archive.toURL() + "!/" + entry);
+						URL url = new URL( "jar:" + archive.toURI().toURL() + "!/" + entry);
 						builder.addURL( prefix + entry, url, filemode, dirmode, directive, username, group);
 					} else {
 						File file = new File( scanner.getBasedir(), entry);
