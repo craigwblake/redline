@@ -619,11 +619,13 @@ public class Contents {
 			Object object = sources.get( header);
 			String value = "";
 			if ( object instanceof File) {
-				final ReadableChannelWrapper input = new ReadableChannelWrapper( new FileInputStream(( File) object).getChannel());
+				FileInputStream fileInput = new FileInputStream(( File) object);
+				final ReadableChannelWrapper input = new ReadableChannelWrapper( fileInput.getChannel());
 				final Key< byte[]> key = input.start( "MD5");
 				while ( input.read( buffer) != -1) buffer.rewind();
 				value = Util.hex(input.finish(key));
 				input.close();
+				fileInput.close();
 			} else if ( object instanceof URL) {
 				final ReadableChannelWrapper input = new ReadableChannelWrapper( Channels.newChannel((( URL) object).openConnection().getInputStream()));
 				final Key< byte[]> key = input.start( "MD5");
