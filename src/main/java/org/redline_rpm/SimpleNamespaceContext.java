@@ -45,8 +45,8 @@ public class SimpleNamespaceContext implements NamespaceContext {
 	public String getPrefix( String namespaceURI) {
 		String result = commonPrefixCheck( namespaceURI, true);
 		if ( result == null) {
-			Iterator i = prefixIterator( namespaceURI);
-			if ( i.hasNext()) return ( String) i.next();
+			Iterator<String> i = prefixIterator( namespaceURI);
+			if ( i.hasNext()) return i.next();
 		}
 		return null;
 	}
