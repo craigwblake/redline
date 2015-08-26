@@ -176,6 +176,7 @@ public class Util {
 				builder.setLength( 0);
 			}
 		}
+		fmt.close();
 		buf.position( pos);
 	}
 
