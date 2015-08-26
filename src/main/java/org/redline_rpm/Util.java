@@ -198,7 +198,7 @@ public class Util {
     * @throws IOException an IO error occurred
     */
    public static InputStream openPayloadStream(Header header, InputStream rpmIS) throws IOException {
-      Entry pcEntry = header.getEntry(HeaderTag.PAYLOADCOMPRESSOR);
+      Entry< ?> pcEntry = header.getEntry(HeaderTag.PAYLOADCOMPRESSOR);
       String[] pc = (String[]) pcEntry.getValues();
       PayloadCompressionType pcType = PayloadCompressionType.valueOf(pc[0]);
       InputStream payloadIS = rpmIS;
