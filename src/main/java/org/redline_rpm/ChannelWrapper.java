@@ -187,7 +187,7 @@ public abstract class ChannelWrapper {
 	public Key< byte[]> start( final String algorithm) throws NoSuchAlgorithmException {
 		final MessageDigest digest = MessageDigest.getInstance( algorithm);
 		final Key< byte[]> object = new Key< byte[]>();
-		consumers.put( object, new Consumer() {
+		consumers.put( object, new Consumer< byte[]>() {
 			public void consume( final ByteBuffer buffer) {
 				try {
 					digest.update( buffer);
