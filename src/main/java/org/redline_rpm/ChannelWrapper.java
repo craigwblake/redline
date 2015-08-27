@@ -4,7 +4,6 @@ import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPSignatureGenerator;
 import org.bouncycastle.openpgp.operator.bc.BcPGPContentSignerBuilder;
-import sun.security.jca.JCAUtil;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -156,7 +155,7 @@ public abstract class ChannelWrapper {
                     buffer.position( limit );
                 } else {
                     int length = buffer.remaining();
-                    byte[] bytes = new byte[JCAUtil.getTempArraySize( length )];
+                    byte[] bytes = new byte[Util.getTempArraySize( length )];
                     while ( length > 0 ) {
                         int chunk = Math.min( length, bytes.length );
                         buffer.get( bytes, 0, chunk );

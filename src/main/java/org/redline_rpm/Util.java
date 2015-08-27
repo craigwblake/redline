@@ -26,8 +26,14 @@ import java.util.zip.GZIPInputStream;
  * dependencies.
  */
 public class Util {
+	
+	private static final int ARRAY_SIZE = 4096;
 
 	private Util() {}
+	
+	public static int getTempArraySize(int totalSize) {
+		return Math.min(ARRAY_SIZE, totalSize);
+	}
 
 	/**
 	 * Converts path characters from their native
