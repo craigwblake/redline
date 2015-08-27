@@ -404,7 +404,7 @@ public class RedlineTaskTest extends TestBase {
 
 	private void assertHeaderEquals(String expected, Format format, AbstractHeader.Tag tag) {
 		assertNotNull("null format", format);
-		AbstractHeader.Entry entry = format.getHeader().getEntry(tag);
+		AbstractHeader.Entry< ?> entry = format.getHeader().getEntry(tag);
 		assertNotNull("Entry not found : " + tag.getName(), entry);
 		assertEquals("Entry type : " + tag.getName(), 6, entry.getType());
 
@@ -417,7 +417,7 @@ public class RedlineTaskTest extends TestBase {
 
 	private void assertInt32EntryHeaderEquals(int[] expected, Format format, AbstractHeader.Tag tag) {
 		assertNotNull("null format", format);
-		AbstractHeader.Entry entry = format.getHeader().getEntry(tag);
+		AbstractHeader.Entry< ?> entry = format.getHeader().getEntry(tag);
 		assertNotNull("Entry not found : " + tag.getName(), entry);
 		assertEquals("Entry type : " + tag.getName(), 4, entry.getType());
 
