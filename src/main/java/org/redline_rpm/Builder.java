@@ -451,7 +451,7 @@ public class Builder {
 	 * @param prefixes Path prefixes which may be relocated
 	 */
 	public void setPrefixes( final String... prefixes) {
-		if ( prefixes != null) format.getHeader().createEntry( PREFIXES, prefixes);
+		if ( prefixes != null && 0 < prefixes.length) format.getHeader().createEntry( PREFIXES, prefixes);
 	}
 
     /**
