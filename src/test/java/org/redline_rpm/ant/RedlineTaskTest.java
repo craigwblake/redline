@@ -319,15 +319,6 @@ public class RedlineTaskTest extends TestBase {
 		task.setPreUninstallScript(new File("src/test/resources/preun.sh"));
 		task.setPostUninstallScript(new File("src/test/resources/postun.sh"));
 
-		RpmFileSet fs = new RpmFileSet();
-		fs.setPrefix("/etc");
-		fs.setFile(new File("src/test/resources/prein.sh"));
-		fs.setConfig(true);
-		fs.setNoReplace(true);
-		fs.setDoc(true);
-
-		task.addRpmfileset(fs);
-
 		task.execute();
 
 		Format format = getFormat( filename );
@@ -345,6 +336,36 @@ public class RedlineTaskTest extends TestBase {
 		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.POSTINPROG);
 		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.PREUNPROG);
 		assertHeaderEquals("/usr/bin/perl", format, Header.HeaderTag.POSTUNPROG);
+	}
+
+	@Test
+	public void testFiles() throws Exception {
+
+		File dir = ensureTargetDir();
+
+		File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
+
+		RedlineTask task = createBasicTask( dir );
+
+		RpmFileSet fs = new RpmFileSet();
+		fs.setPrefix("/etc");
+		fs.setFile(new File("src/test/resources/prein.sh"));
+		fs.setConfig(true);
+		fs.setNoReplace(true);
+		fs.setDoc(true);
+		fs.setUserName("jabberwocky");
+		fs.setGroup("vorpal");
+
+		task.addRpmfileset(fs);
+
+		task.execute();
+
+		Format format = getFormat( filename );
+
+		assertArrayEquals(new String[] { "jabberwocky" },
+				(String[])format.getHeader().getEntry(Header.HeaderTag.FILEUSERNAME).getValues());
+		assertArrayEquals(new String[] { "vorpal" },
+				(String[])format.getHeader().getEntry(Header.HeaderTag.FILEGROUPNAME).getValues());
 
 		int expectedFlags = Directive.RPMFILE_CONFIG | Directive.RPMFILE_DOC
 				| Directive.RPMFILE_NOREPLACE;
