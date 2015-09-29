@@ -25,7 +25,7 @@ public class WritableChannelWrapper extends ChannelWrapper implements WritableBy
 	 * @throws IOException if an IO error occurs
 	 */
 	public int write( final ByteBuffer buffer) throws IOException {
-		for ( Consumer consumer : consumers.values()) consumer.consume( buffer.duplicate());
+		for ( Consumer< ?> consumer : consumers.values()) consumer.consume( buffer.duplicate());
 		return channel.write( buffer);
 	}
 

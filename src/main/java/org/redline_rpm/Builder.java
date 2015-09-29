@@ -451,7 +451,7 @@ public class Builder {
 	 * @param prefixes Path prefixes which may be relocated
 	 */
 	public void setPrefixes( final String... prefixes) {
-		if ( prefixes != null) format.getHeader().createEntry( PREFIXES, prefixes);
+		if ( prefixes != null && 0 < prefixes.length) format.getHeader().createEntry( PREFIXES, prefixes);
 	}
 
     /**
@@ -1144,7 +1144,9 @@ public class Builder {
 		final String rpm = format.getLead().getName() + "." + format.getLead().getArch().toString().toLowerCase() + ".rpm";
 		final File file = new File( directory, rpm);
 		if ( file.exists()) file.delete();
-		build( new RandomAccessFile( file, "rw").getChannel());
+		RandomAccessFile raFile = new RandomAccessFile( file, "rw");
+		build(raFile.getChannel());
+		raFile.close();
 		return rpm;
 	}
 
@@ -1263,13 +1265,14 @@ public class Builder {
 			
 			final Object object = contents.getSource( header);
 			if ( object instanceof File) {
-				final FileChannel in = new FileInputStream(( File) object).getChannel();
+				FileInputStream fin = new FileInputStream(( File) object);
+				final FileChannel in = fin.getChannel();
 				while ( in.read(( ByteBuffer) buffer.rewind()) > 0) {
 					total += compressor.write(( ByteBuffer) buffer.flip());
 					buffer.compact();
 				}
 				total += header.skip( compressor, total);
-				in.close();
+				fin.close();
 			} else if ( object instanceof URL) {
 				final ReadableByteChannel in = Channels.newChannel((( URL) object).openConnection().getInputStream());
 				while ( in.read(( ByteBuffer) buffer.rewind()) > 0) {
@@ -1302,7 +1305,6 @@ public class Builder {
 		sigsize.setValues( new int[] { output.finish( sigsizekey)});
         signatureGenerator.finishAfterPayload( output );
 		format.getSignature().writePending( original);
-		output.close();
 	}
 
     protected SignatureGenerator createSignatureGenerator() {

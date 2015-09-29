@@ -1,6 +1,5 @@
 package org.redline_rpm.header;
 
-import org.redline_rpm.RedlineException;
 import org.redline_rpm.Util;
 
 import java.io.IOException;

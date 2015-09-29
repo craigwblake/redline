@@ -141,6 +141,50 @@ public class RedlineTaskTest extends TestBase {
 			// Pass
 		}
 	}
+	
+	@Test
+	public void testBadEpoch() throws Exception {
+		RedlineTask task = new RedlineTask();
+		task.setName("nameRequired");
+		task.setVersion("versionRequired");
+		task.setGroup("groupRequired");
+
+		// test epoch with illegal char -
+		task.setEpoch("2-3");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+
+		// test epoch with illegal char ~
+		task.setEpoch("2~3");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+
+		// test epoch with illegal char /
+		task.setEpoch("2/3");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+		
+		// test epoch with illegal chars abc
+		task.setEpoch("abc");
+		try {
+			task.execute();
+			fail();
+		} catch (IllegalArgumentException iae) {
+			// Pass
+		}
+	}
 
 	@Test
 	public void testRestrict() throws Exception {
@@ -275,12 +319,42 @@ public class RedlineTaskTest extends TestBase {
 		task.setPreUninstallScript(new File("src/test/resources/preun.sh"));
 		task.setPostUninstallScript(new File("src/test/resources/postun.sh"));
 
+		task.execute();
+
+		Format format = getFormat( filename );
+
+		assertHeaderEquals("#!/bin/sh\n\necho Hello Pre Install!\n", format,
+				Header.HeaderTag.PREINSCRIPT);
+		assertHeaderEquals("\n\necho Hello Post Install!\n", format,
+				Header.HeaderTag.POSTINSCRIPT);
+		assertHeaderEquals("# comment\n\necho Hello Pre Uninstall!\n", format,
+				Header.HeaderTag.PREUNSCRIPT);
+		assertHeaderEquals("#!/usr/bin/perl\n\nprint \"Hello Post Uninstall!\\n\";\n", format,
+				Header.HeaderTag.POSTUNSCRIPT);
+
+		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.PREINPROG);
+		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.POSTINPROG);
+		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.PREUNPROG);
+		assertHeaderEquals("/usr/bin/perl", format, Header.HeaderTag.POSTUNPROG);
+	}
+
+	@Test
+	public void testFiles() throws Exception {
+
+		File dir = ensureTargetDir();
+
+		File filename = new File(dir, "rpmtest-1.0-1.noarch.rpm");
+
+		RedlineTask task = createBasicTask( dir );
+
 		RpmFileSet fs = new RpmFileSet();
 		fs.setPrefix("/etc");
 		fs.setFile(new File("src/test/resources/prein.sh"));
 		fs.setConfig(true);
 		fs.setNoReplace(true);
 		fs.setDoc(true);
+		fs.setUserName("jabberwocky");
+		fs.setGroup("vorpal");
 
 		task.addRpmfileset(fs);
 
@@ -288,19 +362,10 @@ public class RedlineTaskTest extends TestBase {
 
 		Format format = getFormat( filename );
 
-		assertHeaderEquals("#!/bin/sh\n\necho Hello Pre Install!\n", format,
-				Header.HeaderTag.PREINSCRIPT);
-		assertHeaderEquals("#!/bin/sh\n\necho Hello Post Install!\n", format,
-				Header.HeaderTag.POSTINSCRIPT);
-		assertHeaderEquals("#!/bin/sh\n\necho Hello Pre Uninstall!\n", format,
-				Header.HeaderTag.PREUNSCRIPT);
-		assertHeaderEquals("#!/bin/sh\n\necho Hello Post Uninstall!\n", format,
-				Header.HeaderTag.POSTUNSCRIPT);
-
-		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.PREINPROG);
-		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.POSTINPROG);
-		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.PREUNPROG);
-		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.POSTUNPROG);
+		assertArrayEquals(new String[] { "jabberwocky" },
+				(String[])format.getHeader().getEntry(Header.HeaderTag.FILEUSERNAME).getValues());
+		assertArrayEquals(new String[] { "vorpal" },
+				(String[])format.getHeader().getEntry(Header.HeaderTag.FILEGROUPNAME).getValues());
 
 		int expectedFlags = Directive.RPMFILE_CONFIG | Directive.RPMFILE_DOC
 				| Directive.RPMFILE_NOREPLACE;
@@ -360,7 +425,7 @@ public class RedlineTaskTest extends TestBase {
 
 	private void assertHeaderEquals(String expected, Format format, AbstractHeader.Tag tag) {
 		assertNotNull("null format", format);
-		AbstractHeader.Entry entry = format.getHeader().getEntry(tag);
+		AbstractHeader.Entry< ?> entry = format.getHeader().getEntry(tag);
 		assertNotNull("Entry not found : " + tag.getName(), entry);
 		assertEquals("Entry type : " + tag.getName(), 6, entry.getType());
 
@@ -373,7 +438,7 @@ public class RedlineTaskTest extends TestBase {
 
 	private void assertInt32EntryHeaderEquals(int[] expected, Format format, AbstractHeader.Tag tag) {
 		assertNotNull("null format", format);
-		AbstractHeader.Entry entry = format.getHeader().getEntry(tag);
+		AbstractHeader.Entry< ?> entry = format.getHeader().getEntry(tag);
 		assertNotNull("Entry not found : " + tag.getName(), entry);
 		assertEquals("Entry type : " + tag.getName(), 4, entry.getType());
 

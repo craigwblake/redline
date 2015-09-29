@@ -249,21 +249,20 @@ public class XmlEditor implements Serializable {
 		return newNode( path);
 	}
 
-	public void appendCollection( String nodePath, Collection values) {
+	public void appendCollection( String nodePath, Collection< ?> values) {
 		modified = true;
         for (Object value : values) {
             setValue(appendNode(nodePath), value.toString());
         }
 	}
 
-	public void replaceCollection( String nodePath, Collection values) {
+	public void replaceCollection( String nodePath, Collection< ?> values) {
 		modified = true;
 		deleteNodes( nodePath);
 		appendCollection( nodePath, values);
 	}
 
-	@SuppressWarnings( "unchecked")
-	public Collection nodesToText( String path, Collection result) {
+	public Collection< String> nodesToText( String path, Collection< String> result) {
 		Iterable< Node> nodes = findNodes( path);
 		for ( Node node : nodes) {
 			String string = normalizeString( node.getNodeValue());

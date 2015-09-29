@@ -35,6 +35,7 @@ public class RedlineTask extends Task {
 	public static final String NAMESPACE = "http://freecompany.org/namespace/redline";
 
 	protected String name;
+	protected String epoch = "0";
 	protected String version;
 	protected String group;
 	protected String release = "1";
@@ -93,9 +94,16 @@ public class RedlineTask extends Task {
 		if ( name == null) throw new BuildException( "Attribute 'name' is required.");
 		if ( version == null) throw new BuildException( "Attribute 'version' is required.");
 		if ( group == null) throw new BuildException( "Attribute 'group' is required.");
+		
+		int numEpoch;
+		try {
+			numEpoch = Integer.parseInt( epoch);
+		} catch(Exception e) {
+			throw new IllegalArgumentException( "Epoch must be integer: " + epoch);
+		}
 
 		Builder builder = new Builder();
-		builder.setPackage( name, version, release);
+		builder.setPackage( name, version, release, numEpoch);
 		builder.setType( type);
 		builder.setPlatform( architecture, os);
 		builder.setGroup( group);
@@ -129,27 +137,21 @@ public class RedlineTask extends Task {
 		try {
 			if ( null != preTransScript) {
 				builder.setPreTransScript( preTransScript);
-				builder.setPreTransProgram( "");
 			}
 			if ( null != preInstallScript) {
 				builder.setPreInstallScript( preInstallScript);
-				builder.setPreInstallProgram( "");
 			}
 			if ( null != postInstallScript) {
 				builder.setPostInstallScript( postInstallScript);
-				builder.setPostInstallProgram( "");
 			}
 			if ( null != preUninstallScript) {
 				builder.setPreUninstallScript( preUninstallScript);
-				builder.setPreUninstallProgram( "");
 			}
 			if ( null != postUninstallScript) {
 				builder.setPostUninstallScript( postUninstallScript);
-				builder.setPostUninstallProgram( "");
 			}
 			if ( null != postTransScript) {
 				builder.setPostTransScript( postTransScript);
-				builder.setPostTransProgram( "");
 			}
 
 			for ( EmptyDir emptyDir : emptyDirs) {
@@ -186,7 +188,7 @@ public class RedlineTask extends Task {
 
 				for ( String entry : scanner.getIncludedFiles()) {
 					if ( archive != null) {
-						URL url = new URL( "jar:" + archive.toURL() + "!/" + entry);
+						URL url = new URL( "jar:" + archive.toURI().toURL() + "!/" + entry);
 						builder.addURL( prefix + entry, url, filemode, dirmode, directive, username, group);
 					} else {
 						File file = new File( scanner.getBasedir(), entry);
@@ -224,6 +226,7 @@ public class RedlineTask extends Task {
 	}
 
 	public void setName( String name) { this.name = name; }
+	public void setEpoch( String epoch) { this.epoch = epoch; }
 	public void setType( String type) { this.type = RpmType.valueOf( type); }
 	public void setArchitecture( String architecture) { this.architecture = Architecture.valueOf( architecture); }
 	public void setOs( String os) { this.os = Os.valueOf( os); }

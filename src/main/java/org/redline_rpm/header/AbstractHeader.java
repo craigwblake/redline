@@ -156,8 +156,8 @@ public abstract class AbstractHeader {
 		final Iterator< Integer> i = entries.keySet().iterator();
 		
 		index.position( 16);
-		final Entry first = entries.get( i.next());
-		Entry entry = null;
+		final Entry< ?> first = entries.get( i.next());
+		Entry< ?> entry = null;
 		try {
 			while ( i.hasNext()) {
 				entry = entries.get( i.next());
@@ -191,7 +191,6 @@ public abstract class AbstractHeader {
 		return offset + size;
 	}
 
-	@SuppressWarnings( "unchecked")
 	public void writePending( final FileChannel channel) {
 		for ( Entry< ?> entry : pending.keySet()) {
 			try {
@@ -265,13 +264,12 @@ public abstract class AbstractHeader {
 	 * @param count the count
 	 * @return the entry added
 	 */
-	@SuppressWarnings( "unchecked")
 	public Entry< ?> addEntry( Tag tag, int count) {
 		return createEntry( tag.getCode(), tag.getType(), count);
 	}
 
 	public Entry< ?> readEntry( final int tag, final int type, final int offset, final int count, final ByteBuffer data) {
-		final Entry entry = createEntry( tag, type, count);
+		final Entry< ?> entry = createEntry( tag, type, count);
 		final ByteBuffer buffer = data.duplicate();
 		buffer.position( offset);
 		entry.read( buffer);
@@ -416,7 +414,7 @@ public abstract class AbstractHeader {
 		}
 	}
 
-	class NullEntry extends AbstractEntry {
+	class NullEntry extends AbstractEntry< Object> {
 		public int getType() { return 0; }
 		public int size() { return 0; }
 		public void read( final ByteBuffer buffer) {}
