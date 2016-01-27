@@ -197,7 +197,7 @@ public class RedlineTask extends Task {
 				}
 			}
 			for ( Ghost ghost : ghosts) {
-				builder.addFile( ghost.getPath(), null, ghost.getFilemode(), ghost.getDirmode(), Directive.GHOST, ghost.getUsername(), ghost.getGroup());
+				builder.addFile( ghost.getPath(), null, ghost.getFilemode(), ghost.getDirmode(), ghost.getDirective(), ghost.getUsername(), ghost.getGroup());
 			}
 			for ( Link link : links) builder.addLink( link.getPath(), link.getTarget(), link.getPermissions());
 			for ( Depends dependency : depends) builder.addDependency( dependency.getName(), dependency.getComparison(), dependency.getVersion());
