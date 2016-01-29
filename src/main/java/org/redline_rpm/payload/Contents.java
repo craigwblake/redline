@@ -79,6 +79,7 @@ public class Contents {
 		BUILTIN.add( "/var/cache");
 		BUILTIN.add( "/var/lib");
 		BUILTIN.add( "/var/log");
+		BUILTIN.add( "/var/run");
 		BUILTIN.add( "/var/spool");
 		DOC_DIRS.add("/usr/doc");
 		DOC_DIRS.add("/usr/man");
