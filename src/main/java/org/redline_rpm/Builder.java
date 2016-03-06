@@ -12,7 +12,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -63,17 +62,11 @@ public class Builder {
 
 	protected final Format format = new Format();
 	protected final Set< PrivateKey> signatures = new HashSet< PrivateKey>();
-	protected final Map< String, CharSequence> dependencies = new LinkedHashMap< String, CharSequence>();
-	protected final Map< String, Integer> flags = new LinkedHashMap< String, Integer>();
 
-	protected final Map<String, CharSequence> obsoletes = new LinkedHashMap<String, CharSequence>();
-	protected final Map<String, Integer> obsoletesFlags = new LinkedHashMap<String, Integer>();
-	
-	protected final Map<String, CharSequence> conflicts = new LinkedHashMap<String, CharSequence>();
-	protected final Map<String, Integer> conflictsFlags = new LinkedHashMap<String, Integer>();
-	
-	protected final Map<String, CharSequence> provides = new LinkedHashMap<String, CharSequence>();
-	protected final Map<String, Integer> providesFlags = new LinkedHashMap<String, Integer>();
+	protected final List< Dependency> requires = new LinkedList< Dependency>();
+	protected final List< Dependency> obsoletes = new LinkedList< Dependency>();
+	protected final List< Dependency> conflicts = new LinkedList< Dependency>();
+	protected final List< Dependency> provides = new LinkedList< Dependency>();
 
 	protected final List< String> triggerscripts = new LinkedList< String>();
 	protected final List< String> triggerscriptprogs = new LinkedList< String>();
@@ -117,9 +110,7 @@ public class Builder {
 	}
 
 	public void addObsoletes(final String name, final int comparison, final String version) {
-		obsoletes.put(name, version);
-		obsoletesFlags.put(name, comparison);
-		
+		obsoletes.add(new Dependency(name, version, comparison));
 	}
 	
 	public void addObsoletesLess (final CharSequence name, final CharSequence version) {
@@ -133,13 +124,11 @@ public class Builder {
 	}
 	
 	protected void addObsoletes( final CharSequence name, final CharSequence version, final int flag) {
-		obsoletes.put( name.toString(), version);
-		obsoletesFlags.put( name.toString(), flag);
+		obsoletes.add(new Dependency(name.toString(), version.toString(), flag));
 	}
 	
 	public void addConflicts(final String name, final int comparison, final String version) {
-		conflicts.put(name, version);
-		conflictsFlags.put(name, comparison);
+		conflicts.add(new Dependency(name, version, comparison));
 	}
 	
 	public void addConflictsLess(final CharSequence name, final CharSequence version) {
@@ -153,18 +142,15 @@ public class Builder {
 	}
 	
 	protected void addConflicts(final CharSequence name, final CharSequence version, final int flag) {
-		conflicts.put(name.toString(), version);
-		conflictsFlags.put(name.toString(), flag);
+		conflicts.add(new Dependency(name.toString(), version.toString(), flag));
 	}
 	
 	public void addProvides(final String name, final String version) {
-		provides.put(name, version);
-		providesFlags.put(name, version.length() > 0 ? EQUAL : 0);
+		provides.add(new Dependency(name, version, version.length() > 0 ? EQUAL : 0));
 	}
 
 	protected void addProvides(final CharSequence name, final CharSequence version, final int flag) {
-		provides.put(name.toString(), version);
-		providesFlags.put(name.toString(), flag);
+		provides.add(new Dependency(name.toString(), version.toString(), flag));
 	}
 	
 	/**
@@ -177,8 +163,7 @@ public class Builder {
 	 * @param version the version identifier.
 	 */
 	public void addDependency( final String name, final int comparison, final String version ) {
-		dependencies.put( name, version);
-		flags.put( name, comparison);
+		requires.add(new Dependency(name, version, comparison));
 	}
 
 	/**
@@ -219,8 +204,7 @@ public class Builder {
 	 * @param flag the file flags
 	 */
 	protected void addDependency( final CharSequence name, final CharSequence version, final int flag) {
-		dependencies.put( name.toString(), version);
-		flags.put( name.toString(), flag);
+		requires.add(new Dependency(name.toString(), version.toString(), flag));
 	}
 	
 	/**
@@ -1163,30 +1147,29 @@ public class Builder {
 	public void build( final FileChannel original) throws NoSuchAlgorithmException, IOException {
 		final WritableChannelWrapper output = new WritableChannelWrapper( original);
 
-
-		format.getHeader().createEntry( REQUIRENAME, dependencies.keySet().toArray( new String[ dependencies.size()]));
-		format.getHeader().createEntry( REQUIREVERSION, dependencies.values().toArray( new String[ dependencies.size()]));
-		format.getHeader().createEntry( REQUIREFLAGS, convert( flags.values().toArray( new Integer[ flags.size()])));
+		format.getHeader().createEntry( REQUIRENAME, Dependency.getArrayOfNames(requires));
+		format.getHeader().createEntry( REQUIREVERSION, Dependency.getArrayOfVersions(requires));
+		format.getHeader().createEntry( REQUIREFLAGS, convert(Dependency.getArrayOfFlags(requires)));
 
 		if (0 < obsoletes.size())
 		{
-			format.getHeader().createEntry( OBSOLETENAME, obsoletes.keySet().toArray(new String[ obsoletes.size() ]));
-			format.getHeader().createEntry( OBSOLETEVERSION, obsoletes.values().toArray(new String[ obsoletes.size() ]));
-			format.getHeader().createEntry( OBSOLETEFLAGS, convert(obsoletesFlags.values().toArray(new Integer[ obsoletesFlags.size() ])));
+			format.getHeader().createEntry( OBSOLETENAME, Dependency.getArrayOfNames(obsoletes));
+			format.getHeader().createEntry( OBSOLETEVERSION, Dependency.getArrayOfVersions(obsoletes));
+			format.getHeader().createEntry( OBSOLETEFLAGS, convert(Dependency.getArrayOfFlags(obsoletes)));
 		}
 
 		if (0 < conflicts.size())
 		{
-			format.getHeader().createEntry( CONFLICTNAME, conflicts.keySet().toArray(new String[ conflicts.size() ]));
-			format.getHeader().createEntry(CONFLICTVERSION, conflicts.values().toArray(new String[ conflicts.size() ]));
-			format.getHeader().createEntry( CONFLICTFLAGS, convert( conflictsFlags.values().toArray( new Integer [ conflictsFlags.size()])));
+			format.getHeader().createEntry( CONFLICTNAME, Dependency.getArrayOfNames(conflicts));
+			format.getHeader().createEntry(CONFLICTVERSION, Dependency.getArrayOfVersions(conflicts));
+			format.getHeader().createEntry( CONFLICTFLAGS, convert(Dependency.getArrayOfFlags(conflicts)));
 		}
 
 		if (0 < provides.size())
 		{
-			format.getHeader().createEntry( PROVIDENAME, provides.keySet().toArray(new String[ provides.size() ]));
-			format.getHeader().createEntry(PROVIDEVERSION, provides.values().toArray(new String[ provides.size() ]));
-			format.getHeader().createEntry( PROVIDEFLAGS, convert( providesFlags.values().toArray( new Integer [ providesFlags.size()])));
+			format.getHeader().createEntry( PROVIDENAME, Dependency.getArrayOfNames(provides));
+			format.getHeader().createEntry(PROVIDEVERSION, Dependency.getArrayOfVersions(provides));
+			format.getHeader().createEntry( PROVIDEFLAGS, convert(Dependency.getArrayOfFlags(provides)));
 		}
 
 		format.getHeader().createEntry( SIZE, contents.getTotalSize());
