@@ -1,6 +1,7 @@
 package org.redline_rpm.ant;
 
 import org.apache.tools.zip.UnixStat;
+import org.redline_rpm.payload.Directive;
 
 /**
  * Object describing a %ghost file
@@ -14,6 +15,11 @@ public class Ghost {
     protected String group;
     protected int filemode = -1;
     protected int dirmode = -1;
+    protected Directive directive = new Directive();
+
+    public Ghost() {
+        this.directive.set(Directive.RPMFILE_GHOST);
+    }
 
     public String getPath() {
         return this.path;
@@ -44,5 +50,16 @@ public class Ghost {
     }
     public void setDirmode( String dirmode) {
         this.dirmode = UnixStat.DIR_FLAG | Integer.parseInt(dirmode, 8);
+    }
+    public Directive getDirective() {
+        return this.directive;
+    }
+
+    public void setConfig(boolean config) {
+        if(config) {
+            this.directive.set(Directive.RPMFILE_CONFIG);
+        } else {
+            this.directive.unset(Directive.RPMFILE_CONFIG);
+        }
     }
 }
