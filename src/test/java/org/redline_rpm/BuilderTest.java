@@ -17,6 +17,7 @@ import static org.redline_rpm.ScannerTest.channelWrapper;
 import static org.redline_rpm.header.Architecture.NOARCH;
 import static org.redline_rpm.header.Flags.EQUAL;
 import static org.redline_rpm.header.Flags.GREATER;
+import static org.redline_rpm.header.Flags.LESS;
 import static org.redline_rpm.header.Os.LINUX;
 import static org.redline_rpm.header.RpmType.BINARY;
 
@@ -154,4 +155,28 @@ public class BuilderTest extends TestBase {
         assertArrayEquals(new String[] { ""             }, obsoleteversion);
     }
 
+    @Test
+    public void testMultipleCapabilities() throws Exception {
+        Builder builder = new Builder();
+        builder.setPackage("testMultipleCapabilities", "1.0", "1");
+        builder.setBuildHost("localhost");
+        builder.setLicense("GPL");
+        builder.setPlatform(NOARCH, LINUX);
+        builder.setType(BINARY);
+        builder.addDependency("httpd", GREATER | EQUAL, "1.0");
+        builder.addDependency("httpd", LESS, "2.0");
+        builder.build( new File( getTargetDir()));
+
+        Format format = new Scanner().run(channelWrapper("target" + File.separator + "testMultipleCapabilities-1.0-1.noarch.rpm"));
+
+        String[] require = (String[])format.getHeader().getEntry(HeaderTag.REQUIRENAME).getValues();
+        int[] requireflags = (int[])format.getHeader().getEntry(HeaderTag.REQUIREFLAGS).getValues();
+        String[] requireversion = (String[])format.getHeader().getEntry(HeaderTag.REQUIREVERSION).getValues();
+        assertArrayEquals(new String[] { "httpd"         }, Arrays.copyOfRange(require, require.length - 2, require.length - 1));
+        assertArrayEquals(new    int[] { GREATER | EQUAL }, Arrays.copyOfRange(requireflags, requireflags.length - 2, require.length - 1));
+        assertArrayEquals(new String[] { "1.0"           }, Arrays.copyOfRange(requireversion, requireversion.length - 2, require.length - 1));
+        assertArrayEquals(new String[] { "httpd"         }, Arrays.copyOfRange(require, require.length - 1, require.length));
+        assertArrayEquals(new    int[] { LESS            }, Arrays.copyOfRange(requireflags, requireflags.length - 1, require.length));
+        assertArrayEquals(new String[] { "2.0"           }, Arrays.copyOfRange(requireversion, requireversion.length - 1, require.length));
+    }
 }
