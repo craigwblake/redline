@@ -23,6 +23,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 
 import org.bouncycastle.openpgp.PGPPrivateKey;
+import org.redline_rpm.changelog.ChangelogHandler;
+import org.redline_rpm.changelog.ChangelogParseException;
 import org.redline_rpm.header.Architecture;
 import org.redline_rpm.header.Format;
 import org.redline_rpm.header.Os;
@@ -30,9 +32,6 @@ import org.redline_rpm.header.RpmType;
 import org.redline_rpm.payload.Contents;
 import org.redline_rpm.payload.CpioHeader;
 import org.redline_rpm.payload.Directive;
-
-import com.att.voicetone.gradle.plugins.rpm.changelog.ChangelogHandler;
-import com.att.voicetone.gradle.plugins.rpm.changelog.ChangelogParseException;
 
 import static org.redline_rpm.ChannelWrapper.*;
 import static org.redline_rpm.header.AbstractHeader.*;

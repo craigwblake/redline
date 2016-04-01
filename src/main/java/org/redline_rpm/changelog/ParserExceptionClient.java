@@ -1,4 +1,4 @@
-package com.att.voicetone.gradle.plugins.rpm.changelog;
+package org.redline_rpm.changelog;
 
 public interface ParserExceptionClient {
 	public static final String MUST_START_WITH_ASTERISK =

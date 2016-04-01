@@ -1,4 +1,4 @@
-package com.att.voicetone.gradle.plugins.rpm.changelog;
+package org.redline_rpm.changelog;
 
 public abstract class ChangelogParseException extends Exception 
 implements ParserExceptionClient{

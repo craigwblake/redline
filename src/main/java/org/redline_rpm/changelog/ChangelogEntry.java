@@ -1,4 +1,4 @@
-package com.att.voicetone.gradle.plugins.rpm.changelog;
+package org.redline_rpm.changelog;
 
 
 import java.util.Date;
@@ -10,6 +10,7 @@ public class ChangelogEntry {
 	
 	public ChangelogEntry() {
 	}
+	
 	public ChangelogEntry(	Date changeLogTime,
 							String userMakingChange,
 							String description) 

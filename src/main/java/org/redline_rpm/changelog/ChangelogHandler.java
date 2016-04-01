@@ -1,4 +1,4 @@
-package com.att.voicetone.gradle.plugins.rpm.changelog;
+package org.redline_rpm.changelog;
 
 import static java.lang.Math.toIntExact;
 import static org.redline_rpm.header.Header.HeaderTag.CHANGELOGNAME;

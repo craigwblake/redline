@@ -1,6 +1,6 @@
-package com.att.voicetone.gradle.plugins.rpm.changelog;
+package org.redline_rpm.changelog;
 
-import static com.att.voicetone.gradle.plugins.rpm.changelog.ParsingState.*;
+import static org.redline_rpm.changelog.ParsingState.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
