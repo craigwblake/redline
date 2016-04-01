@@ -31,6 +31,9 @@ import org.redline_rpm.payload.Contents;
 import org.redline_rpm.payload.CpioHeader;
 import org.redline_rpm.payload.Directive;
 
+import com.att.voicetone.gradle.plugins.rpm.changelog.ChangelogHandler;
+import com.att.voicetone.gradle.plugins.rpm.changelog.ChangelogParseException;
+
 import static org.redline_rpm.ChannelWrapper.*;
 import static org.redline_rpm.header.AbstractHeader.*;
 import static org.redline_rpm.header.Flags.*;
@@ -216,6 +219,16 @@ public class Builder {
 	public void addHeaderEntry( final Tag tag, final String value) {
 	    format.getHeader().createEntry(tag, value);
 	}
+	
+	/**
+     * Adds a non-String header entry value to the header. For example in creating changelogs
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+     */
+	public void addHeaderEntry( final Tag tag, final Object value) {
+	    format.getHeader().createEntry(tag, value);
+	}
+
 
 	/**
 	 * @param illegalChars the illegal characters to check for.
@@ -1077,6 +1090,11 @@ public class Builder {
 	public void addSignature( final PrivateKey key) {
 		signatures.add( key);
 	}
+	
+	public void addChangelogFile(File changelogFile) throws IOException, ChangelogParseException {
+		new ChangelogHandler(this).addChangeLog(changelogFile);
+	}
+	
 
     /**
      * Sets the PGP key ring file used for header and header + payload signature.
