@@ -37,6 +37,10 @@ public abstract class AbstractHeader {
 		int getCode();
 		int getType();
 		String getName();
+		/**
+		 * @return true if the tag's type expects an array, false otherwise.
+		 */
+		public abstract boolean isArrayType();
 	}
 
 	protected static final int HEADER_HEADER_SIZE = 16;
