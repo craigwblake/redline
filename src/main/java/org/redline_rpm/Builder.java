@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -221,13 +222,26 @@ public class Builder {
 	
 	/**
      * Adds a non-String header entry value to the header. For example in creating changelogs
+     * If the supplied tag demands an array and value is not an array type, convert the value
+     * to a single-element array of the required class.
      * @param tag the header tag to set
      * @param value the value to set the header entry with
      */
 	public void addHeaderEntry( final Tag tag, final Object value) {
-	    format.getHeader().createEntry(tag, value);
+		Class vClass = value.getClass();
+		if (!vClass.isArray() && tag.isArrayType()) {
+			format.getHeader().createEntry(tag, getArray(vClass, value));
+		} else {
+			format.getHeader().createEntry(tag, value);
+		}
+	    
 	}
-
+	private static <E> E[] getArray(Class<E> clazz, E value) {
+	    @SuppressWarnings("unchecked")
+	    E[] arr = (E[]) Array.newInstance(clazz, 1);
+	    arr[0] = value;
+	    return arr;
+	}
 
 	/**
 	 * @param illegalChars the illegal characters to check for.
