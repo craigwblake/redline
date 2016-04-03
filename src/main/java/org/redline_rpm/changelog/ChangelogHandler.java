@@ -34,7 +34,7 @@ public class ChangelogHandler {
 		long epochMillis = entry.getChangeLogTime().getTime();
 		long epochSecs = epochMillis/1000L; // seconds since the epoch
 		int unixdate = (int) epochSecs; 
-		builder.addHeaderEntry(CHANGELOGTIME, unixdate);
+		builder.addHeaderEntry(CHANGELOGTIME, new int[] {unixdate});
 		builder.addHeaderEntry(CHANGELOGNAME, entry.getUserMakingChange());
 		builder.addHeaderEntry(CHANGELOGTEXT, entry.getDescription());
 	}

@@ -37,7 +37,6 @@ public abstract class AbstractHeader {
 		int getCode();
 		int getType();
 		String getName();
-		public boolean isArrayType();
 	}
 
 	protected static final int HEADER_HEADER_SIZE = 16;
