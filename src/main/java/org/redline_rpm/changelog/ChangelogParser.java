@@ -14,7 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 class ChangelogParser {
-	final SimpleDateFormat fmt = new SimpleDateFormat("EEE MMM dd yyyy");
+	static final SimpleDateFormat fmt = new SimpleDateFormat("EEE MMM dd yyyy");
 	public List<ChangelogEntry> parse(String[] lines) throws ChangelogParseException {
 		fmt.setLenient(false);
 		final int TIME_LEN = 15;
@@ -24,7 +24,7 @@ class ChangelogParser {
 		Date lastTime = null;
 		ChangelogEntry entry = new ChangelogEntry();
 		String restOfLine = null;
-		StringBuilder description = new StringBuilder("");
+		ArrayList<String> description = new ArrayList<String>();
 		int index = 0;
 		String line = lines[index];
 lineloop:
@@ -66,30 +66,28 @@ lineloop:
 				if (index < lines.length) {
 					line = lines[index];
 					if (line.startsWith("*")) {
-						// a new entry begins
-						if (description.length() > 0) {
-							entry.setDescription(description.toString());
+						// a new entry begins.  write out the last one.
+						if (description.size() > 0) {
+							entry.setDescription(description.toArray(new String[0]));
 						}	
 						if (entry.isComplete()) {
 							result.add(entry);
 							entry = new ChangelogEntry();
-							description = new StringBuilder();
+							description = new ArrayList<String>();
 							state = NEW;
 						} else {
 							throw new IncompleteChangelogEntryException();
 						}
 					} else {
-						description.append(line).append('\n');
+						description.add(line);
 					}
 				} else {
-					entry.setDescription(description.toString());
+					entry.setDescription(description.toArray(new String[0]));
 					break lineloop;
 				}	
 			}
 		}
-		if (description.length() > 0) {
-			entry.setDescription(description.toString());
-		}	
+
 		if (entry.isComplete()) {
 			result.add(entry);
 		} else if (lines.length > 0){

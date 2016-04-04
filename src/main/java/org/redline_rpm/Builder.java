@@ -319,7 +319,7 @@ public class Builder {
 	public void addHeaderEntry( final Tag tag, final long[] value) {
 	    format.getHeader().createEntry(tag, value);
 	}
-
+	
 	/**
 	 * @param illegalChars the illegal characters to check for.
 	 * @param variable the character sequence to check for illegal characters.
@@ -1181,8 +1181,14 @@ public class Builder {
 		signatures.add( key);
 	}
 	
+	/**
+	 * Adds the supplied changelog file as a changelog to the header
+	 * @param changelogFile File containing the changelog information
+	 * @throws IOException if file does not exist or cannot be read
+	 * @throws ChangelogParseException if file is not of the correct format.
+	 */
 	public void addChangelogFile(File changelogFile) throws IOException, ChangelogParseException {
-		new ChangelogHandler(this).addChangeLog(changelogFile);
+		new ChangelogHandler(this.format.getHeader()).addChangeLog(changelogFile);
 	}
 	
 

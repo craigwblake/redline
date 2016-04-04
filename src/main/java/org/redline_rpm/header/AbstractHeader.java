@@ -49,6 +49,7 @@ public abstract class AbstractHeader {
 
 	protected final Map< Integer, Tag> tags = new HashMap< Integer, Tag>();
 	protected final Map< Integer, Entry< ?>> entries = new TreeMap< Integer, Entry< ?>>();
+	protected final List<Entry< ?>> changelogs = new LinkedList<Entry< ?>>();
 	protected final Map< Entry< ?>, Integer> pending = new LinkedHashMap< Entry< ?>, Integer>();
 
     protected int startPos;
@@ -245,6 +246,14 @@ public abstract class AbstractHeader {
 		entry.setValues( values);
 		return entry;
 	}
+	
+	@SuppressWarnings( "unchecked")
+	public < T> Entry< T> appendChangeLogEntry( Tag tag, T values) {
+		Entry< T> entry = ( Entry< T>) createChangeLogEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
+		entry.setValues( values);
+		return entry;
+	}
+
 
 	@SuppressWarnings( "unchecked")
 	public < T> Entry< T> createEntry( Tag tag, int type, T values) {
@@ -288,6 +297,15 @@ public abstract class AbstractHeader {
 		entries.put( tag, entry);
 		return entry;
 	}
+	
+	public Entry< ?> createChangeLogEntry( final int tag, final int type, final int count) {
+		final Entry< ?> entry = createEntry( type);
+		entry.setTag( tag);
+		entry.setCount( count);
+		changelogs.add(entry);
+		return entry;
+	}
+
 
 	protected Entry< ?> createEntry( int type) {
 		switch ( type) {
