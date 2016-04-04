@@ -49,6 +49,10 @@ public abstract class AbstractHeader {
 
 	protected final Map< Integer, Tag> tags = new HashMap< Integer, Tag>();
 	protected final Map< Integer, Entry< ?>> entries = new TreeMap< Integer, Entry< ?>>();
+	/**
+	 * place to put the changelog entries.  we can't use entries because it is a map and each changelog
+	 * added would overwrite the previous one.
+	 */
 	protected final List<Entry< ?>> changelogs = new LinkedList<Entry< ?>>();
 	protected final Map< Entry< ?>, Integer> pending = new LinkedHashMap< Entry< ?>, Integer>();
 
@@ -168,12 +172,19 @@ public abstract class AbstractHeader {
 				entry = entries.get( i.next());
 				offset = writeData( buffers, index, entry, offset);
 			}
+			// now write the changelogs
+			for (Entry< ?> clentry : changelogs) {
+				offset = writeData(buffers, index, clentry, offset);
+			}
 			index.position( 0);
 			offset = writeData( buffers, index, first, offset);
 			index.position( index.limit());
 		} catch ( IllegalArgumentException e) {
 			throw new RuntimeException( "Error while writing '" + entry + "'.", e);
 		}
+		
+		
+		
 		ByteBuffer data = ByteBuffer.allocate( offset);
 		for ( ByteBuffer buffer : buffers) data.put( buffer);
 		return data;
