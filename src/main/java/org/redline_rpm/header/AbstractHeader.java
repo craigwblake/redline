@@ -361,7 +361,26 @@ public abstract class AbstractHeader {
 		public void setSize( int size) { this.size = size; }
 		public void setCount( int count) { this.count = count; }
 		public void setOffset( int offset) { this.offset = offset; }
-		public void setValues( T values) { this.values = values; }
+		
+		/**
+		 * Fails fast if Tag and T are not compatible.
+		 * @param values
+		 * @throws ClassCastException - if the type of values is not compatible with the type
+		 * required by tag.type()
+		 */
+		protected abstract void typeCheck(T values);
+		
+		/**
+		 * @param values
+		 * @throws ClassCastException - if the type of values is not compatible with the type
+		 * required by tag.type()
+		 */
+		public void setValues( T values) {
+			if (values.getClass().isArray()) {
+				typeCheck(values);
+			}
+			this.values = values; 
+		}
 
 		public T getValues() { return values; }
 		public int getTag() { return tag; }
@@ -423,6 +442,10 @@ public abstract class AbstractHeader {
 		public int size() { return 0; }
 		public void read( final ByteBuffer buffer) {}
 		public void write( final ByteBuffer data) {}
+		@Override
+		protected void typeCheck(Object values) {
+			return;
+		}
 	}
 
 	class CharEntry extends AbstractEntry< byte[]> {
@@ -442,6 +465,10 @@ public abstract class AbstractHeader {
 			builder.append( "\n\t");
 			return builder.toString();
 		}
+		@Override
+		protected void typeCheck(byte[] values) {
+			for ( @SuppressWarnings("unused") byte c : values) {/*intentionally do nothing*/}
+		}
 	}
 
 	class Int8Entry extends AbstractEntry< byte[]> {
@@ -455,6 +482,11 @@ public abstract class AbstractHeader {
 		public void write( final ByteBuffer data) {
 			for ( byte b : values) data.put( b);
 		}
+		@Override
+		protected void typeCheck(byte[] values) {
+			for ( @SuppressWarnings("unused") byte c : values) {/*intentionally do nothing*/}
+		}
+
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
 			builder.append( "\n\t");
@@ -481,6 +513,10 @@ public abstract class AbstractHeader {
 			for ( short s : values) builder.append( s & 0xFFFF).append( ", ");
 			return builder.toString();
 		}
+		@Override
+		protected void typeCheck(short[] values) {
+			for ( @SuppressWarnings("unused") short c : values) {/*intentionally do nothing*/}
+		}
 	}
 
 	class Int32Entry extends AbstractEntry< int[]> {
@@ -501,6 +537,10 @@ public abstract class AbstractHeader {
 			for ( int i : values) builder.append( i).append( ", ");
 			return builder.toString();
 		}
+		@Override
+		protected void typeCheck(int[] values) {
+			for ( @SuppressWarnings("unused") int c : values) {/*intentionally do nothing*/}
+		}
 	}
 
 	class Int64Entry extends AbstractEntry< long[]> {
@@ -520,6 +560,10 @@ public abstract class AbstractHeader {
 			builder.append( "\n\t");
 			for ( long l : values) builder.append( l).append( ", ");
 			return builder.toString();
+		}
+		@Override
+		protected void typeCheck(long[] values) {
+			for ( @SuppressWarnings("unused") long c : values) {/*intentionally do nothing*/}
 		}
 	}
 
@@ -561,6 +605,10 @@ public abstract class AbstractHeader {
 			}
 			return builder.toString();
 		}
+		@Override
+		protected void typeCheck(String[] values) {
+			for ( @SuppressWarnings("unused") String c : values) {/*intentionally do nothing*/}
+		}
 	}
 
 	class BinEntry extends AbstractEntry< byte[]> {
@@ -581,6 +629,10 @@ public abstract class AbstractHeader {
 				Util.dump( values, builder);
 			}
 			return builder.toString();
+		}
+		@Override
+		protected void typeCheck(byte[] values) {
+			for ( @SuppressWarnings("unused") byte c : values) {/*intentionally do nothing*/}
 		}
 	}
 

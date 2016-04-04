@@ -221,26 +221,103 @@ public class Builder {
 	}
 	
 	/**
-     * Adds a non-String header entry value to the header. For example in creating changelogs
-     * If the supplied tag demands an array and value is not an array type, convert the value
-     * to a single-element array of the required class.
+     * Adds a header entry value to the header. For example use this to set the source RPM package
+     * name on your RPM
      * @param tag the header tag to set
      * @param value the value to set the header entry with
+	 * @throws ClassCastException - if the type required by tag.type() is not byte[]
      */
-	public void addHeaderEntry( final Tag tag, final Object value) {
-		Class vClass = value.getClass();
-		if (!vClass.isArray() && tag.isArrayType()) {
-			format.getHeader().createEntry(tag, getArray(vClass, value));
-		} else {
-			format.getHeader().createEntry(tag, value);
-		}
-	    
+	public void addHeaderEntry( final Tag tag, final byte value) {
+	    format.getHeader().createEntry(tag, new byte[] {value});
 	}
-	private static <E> E[] getArray(Class<E> clazz, E value) {
-	    @SuppressWarnings("unchecked")
-	    E[] arr = (E[]) Array.newInstance(clazz, 1);
-	    arr[0] = value;
-	    return arr;
+	
+	/**
+     * Adds a header entry value to the header. For example use this to set the source RPM package
+     * name on your RPM
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+	 * @throws ClassCastException - if the type required by tag.type() is not byte[]
+     */
+	public void addHeaderEntry( final Tag tag, final char value) {
+	    format.getHeader().createEntry(tag, new byte[] {(byte) value});
+	}
+
+	
+	/**
+     * Adds a header entry value to the header. For example use this to set the source RPM package
+     * name on your RPM
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+	 * @throws ClassCastException - if the type required by tag.type() is not short[]
+     */
+	public void addHeaderEntry( final Tag tag, final short value) {
+	    format.getHeader().createEntry(tag,  new short[] {value});
+	}
+	
+	/**
+     * Adds a header entry value to the header. For example use this to set the source RPM package
+     * name on your RPM
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+ 	 * @throws ClassCastException - if the type required by tag.type() is not int[]
+    */
+	public void addHeaderEntry( final Tag tag, final int value) {
+	    format.getHeader().createEntry(tag, new int[] {value});
+	}
+	
+	/**
+     * Adds a header entry value to the header. For example use this to set the source RPM package
+     * name on your RPM
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+ 	 * @throws ClassCastException - if the type required by tag.type() is not long[]
+     */
+	public void addHeaderEntry( final Tag tag, final long value) {
+	    format.getHeader().createEntry(tag,  new long[] {value});
+	}
+	
+	/**
+     * Adds a header entry value to the header. For example use this to set the source RPM package
+     * name on your RPM
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+ 	 * @throws ClassCastException - if the type required by tag.type() is not byte[]
+     */
+	public void addHeaderEntry( final Tag tag, final byte[] value) {
+	    format.getHeader().createEntry(tag, value);
+	}
+	
+	/**
+     * Adds a header entry value to the header. For example use this to set the source RPM package
+     * name on your RPM
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+ 	 * @throws ClassCastException - if the type required by tag.type() is not short[]
+     */
+	public void addHeaderEntry( final Tag tag, final short[] value) {
+	    format.getHeader().createEntry(tag, value);
+	}
+	
+	/**
+     * Adds a header entry value to the header. For example use this to set the source RPM package
+     * name on your RPM
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+ 	 * @throws ClassCastException - if the type required by tag.type() is not int[]
+     */
+	public void addHeaderEntry( final Tag tag, final int[] value) {
+	    format.getHeader().createEntry(tag, value);
+	}
+	
+	/**
+     * Adds a header entry value to the header. For example use this to set the source RPM package
+     * name on your RPM
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+ 	 * @throws ClassCastException - if the type required by tag.type() is not long[]
+     */
+	public void addHeaderEntry( final Tag tag, final long[] value) {
+	    format.getHeader().createEntry(tag, value);
 	}
 
 	/**
