@@ -47,4 +47,10 @@ public class ChangelogEntry {
 	public void setDescription(String[] description) {
 		this.description = description;
 	}
+	
+	public int getChangeLogTimeEpoch() {
+		long epochMillis = changeLogTime.getTime();
+		long epochSecs = epochMillis/1000L; // seconds since the epoch
+		return (int) epochSecs; 
+	}
 }
