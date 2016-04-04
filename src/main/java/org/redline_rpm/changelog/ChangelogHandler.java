@@ -1,6 +1,6 @@
 package org.redline_rpm.changelog;
 
-import static java.lang.Math.toIntExact;
+import static org.redline_rpm.header.Header.HeaderTag.CHANGELOG;
 import static org.redline_rpm.header.Header.HeaderTag.CHANGELOGNAME;
 import static org.redline_rpm.header.Header.HeaderTag.CHANGELOGTEXT;
 import static org.redline_rpm.header.Header.HeaderTag.CHANGELOGTIME;
@@ -9,8 +9,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Date;
-import java.time.ZoneId;
+
 import java.util.List;
 
 import org.redline_rpm.Builder;
@@ -25,6 +24,7 @@ public class ChangelogHandler {
 		InputStream changelog = new FileInputStream(changelogFile);
 		ChangelogParser parser = new ChangelogParser();
 		List<ChangelogEntry> entries = parser.parse(changelog);
+		builder.addHeaderEntry(CHANGELOG, "%changelog");
 		for (ChangelogEntry entry : entries) {
 			addChangeLogEntry(entry);
 		}
