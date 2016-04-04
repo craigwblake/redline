@@ -51,7 +51,7 @@ public abstract class AbstractHeader {
 	protected final Map< Integer, Entry< ?>> entries = new TreeMap< Integer, Entry< ?>>();
 	/**
 	 * place to put the changelog entries.  we can't use entries because it is a map and each changelog
-	 * 
+	 * added would overwrite the previous one.
 	 */
 	protected final List<Entry< ?>> changelogs = new LinkedList<Entry< ?>>();
 	protected final Map< Entry< ?>, Integer> pending = new LinkedHashMap< Entry< ?>, Integer>();
@@ -243,22 +243,6 @@ public abstract class AbstractHeader {
 		entry.setValues( new String[] { value.toString()});
 		return entry;
 	}
-	@SuppressWarnings( "unchecked")
-	public < T> Entry< T> appendChangeLogEntry( Tag tag, T values) {
-		Entry< T> entry = ( Entry< T>) createChangeLogEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
-		entry.setValues( values);
-		return entry;
-	}
-	@SuppressWarnings( "unchecked")
-	public Entry< String[]> appendChangeLogEntry( Tag tag, String[] values) {
-		Entry<  String[]> entry = ( Entry<  String[]>) createChangeLogEntry( tag.getCode(), tag.getType(), values.length);
-		entry.setValues( values);
-		return entry;
-	}
-
-
-	
-	
 
 	@SuppressWarnings( "unchecked")
 	public Entry< int[]> createEntry( Tag tag, int value) {
@@ -274,6 +258,14 @@ public abstract class AbstractHeader {
 		return entry;
 	}
 	
+	@SuppressWarnings( "unchecked")
+	public < T> Entry< T> appendChangeLogEntry( Tag tag, T values) {
+		Entry< T> entry = ( Entry< T>) createChangeLogEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
+		entry.setValues( values);
+		return entry;
+	}
+
+
 	@SuppressWarnings( "unchecked")
 	public < T> Entry< T> createEntry( Tag tag, int type, T values) {
 		Entry< T> entry = ( Entry< T>) createEntry( tag.getCode(), type, values.getClass().isArray() ? Array.getLength( values) : 1);
