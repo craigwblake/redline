@@ -24,7 +24,7 @@ class ChangelogParser {
 		Date lastTime = null;
 		ChangelogEntry entry = new ChangelogEntry();
 		String restOfLine = null;
-		ArrayList<String> description = new ArrayList<String>();
+		StringBuilder description = new StringBuilder("");
 		int index = 0;
 		String line = lines[index];
 lineloop:
@@ -66,28 +66,30 @@ lineloop:
 				if (index < lines.length) {
 					line = lines[index];
 					if (line.startsWith("*")) {
-						// a new entry begins.  write out the last one.
-						if (description.size() > 0) {
-							entry.setDescription(description.toArray(new String[0]));
+						// a new entry begins
+						if (description.length() > 0) {
+							entry.setDescription(description.toString());
 						}	
 						if (entry.isComplete()) {
 							result.add(entry);
 							entry = new ChangelogEntry();
-							description = new ArrayList<String>();
+							description = new StringBuilder();
 							state = NEW;
 						} else {
 							throw new IncompleteChangelogEntryException();
 						}
 					} else {
-						description.add(line);
+						description.append(line).append('\n');
 					}
 				} else {
-					entry.setDescription(description.toArray(new String[0]));
+					entry.setDescription(description.toString());
 					break lineloop;
 				}	
 			}
 		}
-
+		if (description.length() > 0) {
+			entry.setDescription(description.toString());
+		}	
 		if (entry.isComplete()) {
 			result.add(entry);
 		} else if (lines.length > 0){

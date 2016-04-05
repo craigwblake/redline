@@ -6,14 +6,14 @@ import java.util.Date;
 public class ChangelogEntry {
 	private Date changeLogTime;
 	private String userMakingChange;
-	private String[] description;
+	private String description;
 	
 	public ChangelogEntry() {
 	}
 	
 	public ChangelogEntry(	Date changeLogTime,
 							String userMakingChange,
-							String[] description) 
+							String description) 
 	{
 		this.changeLogTime = changeLogTime;
 		this.userMakingChange = userMakingChange;
@@ -21,7 +21,7 @@ public class ChangelogEntry {
 	}
 	
 	public boolean isComplete() {
-		return changeLogTime != null && userMakingChange != null && description != null && description.length > 0;
+		return changeLogTime != null && userMakingChange != null && description != null;
 	}
 
 	public Date getChangeLogTime() {
@@ -40,11 +40,11 @@ public class ChangelogEntry {
 		this.userMakingChange = userMakingChange;
 	}
 
-	public String[] getDescription() {
+	public String getDescription() {
 		return description;
 	}
 
-	public void setDescription(String[] description) {
+	public void setDescription(String description) {
 		this.description = description;
 	}
 }

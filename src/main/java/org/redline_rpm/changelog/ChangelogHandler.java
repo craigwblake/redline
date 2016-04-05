@@ -34,7 +34,7 @@ public class ChangelogHandler {
 		
 		header.addOrAppendEntry(CHANGELOGTIME, new int[] {unixdate});
 		header.addOrAppendEntry(CHANGELOGNAME, new String[] {entry.getUserMakingChange()});
-		header.addOrAppendEntry(CHANGELOGTEXT, entry.getDescription());
+		header.addOrAppendEntry(CHANGELOGTEXT, new String[] {entry.getDescription()});
 
 	}
 }
