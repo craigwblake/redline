@@ -114,7 +114,7 @@ public abstract class AbstractHeader {
 	}
 
 	public int count() {
-		return entries.size() + changelogs.size();
+		return entries.size();
 	}
 
 	/**
