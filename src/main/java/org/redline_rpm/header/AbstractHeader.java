@@ -259,8 +259,8 @@ public abstract class AbstractHeader {
 	}
 	
 	@SuppressWarnings( "unchecked")
-	public < T> Entry< T> appendChangeLogEntry( Tag tag, T values, int count) {
-		Entry< T> entry = ( Entry< T>) createChangeLogEntry( tag.getCode(), tag.getType(), count);
+	public < T> Entry< T> appendChangeLogEntry( Tag tag, T values) {
+		Entry< T> entry = ( Entry< T>) createChangeLogEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
 		entry.setValues( values);
 		return entry;
 	}
