@@ -19,6 +19,9 @@ class ChangelogParser {
 		fmt.setLenient(false);
 		final int TIME_LEN = 15;
 		List<ChangelogEntry> result = new LinkedList<ChangelogEntry>();
+		if (lines.length == 0) {
+			return result;
+		}
 		
 		ParsingState state = NEW;
 		Date lastTime = null;
@@ -31,7 +34,14 @@ lineloop:
 		while (true) {
 			switch (state) {
 			case NEW:
-				if (!line.startsWith("*")) {
+				if (line.startsWith("#")) {
+					if (++index < lines.length) {
+						line = lines[index];
+						continue;
+					} else {
+						return result;
+					}
+				} else if (!line.startsWith("*")) {
 					throw new NoInitialAsteriskException();
 				}
 				restOfLine = line.substring(1).trim();
@@ -65,7 +75,9 @@ lineloop:
 				index++;
 				if (index < lines.length) {
 					line = lines[index];
-					if (line.startsWith("*")) {
+					if (line.startsWith("#")) {
+						continue;
+					} else if (line.startsWith("*")) {
 						// a new entry begins
 						if (description.length() > 0) {
 							entry.setDescription(description.toString());
@@ -104,7 +116,9 @@ lineloop:
 		String line = null;
 		List<String> lines = new ArrayList<String>();
 		while ((line = reader.readLine()) != null) {
-			lines.add(line);
+			if (!line.startsWith("#")) {
+				lines.add(line);
+			}		
 		}
 		return parse(lines.toArray(new String[0]));
 	}

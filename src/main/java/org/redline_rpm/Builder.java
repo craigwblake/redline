@@ -221,8 +221,7 @@ public class Builder {
 	}
 	
 	/**
-     * Adds a header entry value to the header. For example use this to set the source RPM package
-     * name on your RPM
+     * Adds a header entry byte (8-bit) value to the header. 
      * @param tag the header tag to set
      * @param value the value to set the header entry with
 	 * @throws ClassCastException - if the type required by tag.type() is not byte[]
@@ -232,8 +231,7 @@ public class Builder {
 	}
 	
 	/**
-     * Adds a header entry value to the header. For example use this to set the source RPM package
-     * name on your RPM
+     * Adds a header entry char (8-bit) value to the header. 
      * @param tag the header tag to set
      * @param value the value to set the header entry with
 	 * @throws ClassCastException - if the type required by tag.type() is not byte[]
@@ -244,8 +242,7 @@ public class Builder {
 
 	
 	/**
-     * Adds a header entry value to the header. For example use this to set the source RPM package
-     * name on your RPM
+     * Adds a header entry short (16-bit) value to the header. 
      * @param tag the header tag to set
      * @param value the value to set the header entry with
 	 * @throws ClassCastException - if the type required by tag.type() is not short[]
@@ -255,8 +252,7 @@ public class Builder {
 	}
 	
 	/**
-     * Adds a header entry value to the header. For example use this to set the source RPM package
-     * name on your RPM
+     * Adds a header entry int (32-bit) value to the header. 
      * @param tag the header tag to set
      * @param value the value to set the header entry with
  	 * @throws ClassCastException - if the type required by tag.type() is not int[]
@@ -266,8 +262,7 @@ public class Builder {
 	}
 	
 	/**
-     * Adds a header entry value to the header. For example use this to set the source RPM package
-     * name on your RPM
+     * Adds a header entry long (64-bit) value to the header. 
      * @param tag the header tag to set
      * @param value the value to set the header entry with
  	 * @throws ClassCastException - if the type required by tag.type() is not long[]
@@ -277,8 +272,7 @@ public class Builder {
 	}
 	
 	/**
-     * Adds a header entry value to the header. For example use this to set the source RPM package
-     * name on your RPM
+     * Adds a header entry byte array (8-bit) value to the header. 
      * @param tag the header tag to set
      * @param value the value to set the header entry with
  	 * @throws ClassCastException - if the type required by tag.type() is not byte[]
@@ -288,8 +282,7 @@ public class Builder {
 	}
 	
 	/**
-     * Adds a header entry value to the header. For example use this to set the source RPM package
-     * name on your RPM
+     * Adds a header entry short array (16-bit) value to the header. 
      * @param tag the header tag to set
      * @param value the value to set the header entry with
  	 * @throws ClassCastException - if the type required by tag.type() is not short[]
@@ -299,8 +292,7 @@ public class Builder {
 	}
 	
 	/**
-     * Adds a header entry value to the header. For example use this to set the source RPM package
-     * name on your RPM
+     * Adds a header entry int (32-bit) array value to the header. 
      * @param tag the header tag to set
      * @param value the value to set the header entry with
  	 * @throws ClassCastException - if the type required by tag.type() is not int[]
@@ -310,8 +302,7 @@ public class Builder {
 	}
 	
 	/**
-     * Adds a header entry value to the header. For example use this to set the source RPM package
-     * name on your RPM
+     * Adds a header entry long (64-bit) array value to the header. 
      * @param tag the header tag to set
      * @param value the value to set the header entry with
  	 * @throws ClassCastException - if the type required by tag.type() is not long[]

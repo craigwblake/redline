@@ -118,12 +118,5 @@ public class Header extends AbstractHeader {
 		public int getCode() { return code; }
 		public int getType() { return type; }
 		public String getName() { return name; }
-
-		public boolean isArrayType() {
-			if (this.type == NULL_ENTRY) {
-				return false;
-			}
-			return true;
-		}
 	}
 }

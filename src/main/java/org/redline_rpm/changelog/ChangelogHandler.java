@@ -12,6 +12,9 @@ import java.util.List;
 
 import org.redline_rpm.header.Header;
 
+/**
+ * This class manages the process of adding a Changelog to the header.
+ */
 public class ChangelogHandler {
 	private final Header header;
 	public ChangelogHandler(Header header) {

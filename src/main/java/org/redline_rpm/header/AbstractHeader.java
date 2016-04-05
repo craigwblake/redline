@@ -37,10 +37,6 @@ public abstract class AbstractHeader {
 		int getCode();
 		int getType();
 		String getName();
-		/**
-		 * @return true if the tag's type expects an array, false otherwise.
-		 */
-		public abstract boolean isArrayType();
 	}
 
 	protected static final int HEADER_HEADER_SIZE = 16;
@@ -242,6 +238,15 @@ public abstract class AbstractHeader {
 		return entry;
 	}
 
+	/**
+	 * This is the main entry point through which entries are created from the builder code for
+	 * types other than String.
+	 * @param tag the Tag identifying the type of header this is bound for
+	 * @param values the values to be stored in the entry.
+	 * @throws ClassCastException - if the type of values is not compatible with the type
+	 * required by tag
+	 * @return a header entry of the appropriate type, with the supplied values set in it.
+	 */
 	@SuppressWarnings( "unchecked")
 	public < T> Entry< T> createEntry( Tag tag, T values) {
 		Entry< T> entry = ( Entry< T>) createEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
@@ -249,6 +254,17 @@ public abstract class AbstractHeader {
 		return entry;
 	}
 	
+	/**
+	 * This is the main entry point through which entries are created or appended to 
+	 * from the builder or from places like the ChangelogHandler.  This is useful for 
+	 * header types which may have multiple components of each tag, as changelogs do.
+	 * @param tag the Tag identifying the type of header this is bound for
+	 * @param values the values to be stored in or appended to the entry.
+	 * @throws ClassCastException - if the type of values is not compatible with the 
+	 * type required by tag
+	 * @return a header entry of the appropriate type, with the supplied values 
+	 * set in or appended to it.
+	 */
 	@SuppressWarnings( { "unchecked", "rawtypes" })
 	public < T> Entry< T> addOrAppendEntry( Tag tag, T values) {
 		Entry< T> entry = ( Entry< T>) addOrAppendEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
