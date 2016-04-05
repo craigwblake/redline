@@ -258,10 +258,21 @@ public abstract class AbstractHeader {
 		return entry;
 	}
 	
-	@SuppressWarnings( "unchecked")
-	public < T> Entry< T> appendChangeLogEntry( Tag tag, T values) {
-		Entry< T> entry = ( Entry< T>) createChangeLogEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
-		entry.setValues( values);
+	@SuppressWarnings( { "unchecked", "rawtypes" })
+	public < T> Entry< T> addOrAppendEntry( Tag tag, T values) {
+		Entry< T> entry = ( Entry< T>) addOrAppendEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
+		T existingValues = entry.getValues();
+		if (existingValues == null) {
+			entry.setValues( values);
+		} else {	
+			int oldSize = java.lang.reflect.Array.getLength( existingValues);
+			int newSize = values.getClass().isArray() ? Array.getLength( values) : 1;
+			Class elementType = existingValues.getClass().getComponentType();
+			T newValues = ( T) Array.newInstance( elementType, oldSize + newSize);
+			System.arraycopy( existingValues, 0, newValues, 0, oldSize);
+			System.arraycopy( values, 0, newValues, oldSize, newSize);
+			entry.setValues( newValues);
+		}
 		return entry;
 	}
 
@@ -309,11 +320,16 @@ public abstract class AbstractHeader {
 		return entry;
 	}
 	
-	public Entry< ?> createChangeLogEntry( final int tag, final int type, final int count) {
-		final Entry< ?> entry = createEntry( type);
-		entry.setTag( tag);
-		entry.setCount( count);
-		changelogs.add(entry);
+	public Entry< ?> addOrAppendEntry( final int tag, final int type, final int count) {
+		Entry< ?> entry = entries.get(tag);
+		if (entry == null) {
+			entry = createEntry( type);
+			entry.setTag( tag);
+			entry.setCount(count);			
+		} else {
+			entry.incCount(count);
+		}
+		entries.put( tag, entry);
 		return entry;
 	}
 
@@ -365,6 +381,7 @@ public abstract class AbstractHeader {
 		void setTag( int tag);
 		void setSize( int size);
 		void setCount( int count);
+		void incCount( int count);
 		void setOffset( int offset);
 		void setValues( T values);
 		T getValues();
@@ -389,6 +406,7 @@ public abstract class AbstractHeader {
 		public void setTag( int tag) { this.tag = tag; }
 		public void setSize( int size) { this.size = size; }
 		public void setCount( int count) { this.count = count; }
+		public void incCount( int count) { this.count += count; }
 		public void setOffset( int offset) { this.offset = offset; }
 		
 		/**

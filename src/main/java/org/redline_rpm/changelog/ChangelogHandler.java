@@ -32,9 +32,9 @@ public class ChangelogHandler {
 		long epochSecs = epochMillis/1000L; // seconds since the epoch
 		int unixdate = (int) epochSecs; 
 		
-		header.appendChangeLogEntry(CHANGELOGTIME, new int[] {unixdate});
-		header.appendChangeLogEntry(CHANGELOGNAME, new String[] {entry.getUserMakingChange()});
-		header.appendChangeLogEntry(CHANGELOGTEXT, entry.getDescription());
+		header.addOrAppendEntry(CHANGELOGTIME, new int[] {unixdate});
+		header.addOrAppendEntry(CHANGELOGNAME, new String[] {entry.getUserMakingChange()});
+		header.addOrAppendEntry(CHANGELOGTEXT, entry.getDescription());
 
 	}
 }
