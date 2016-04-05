@@ -23,25 +23,18 @@ public class ChangelogHandler {
 		ChangelogParser parser = new ChangelogParser();
 		List<ChangelogEntry> entries = parser.parse(changelog);
 		for (ChangelogEntry entry : entries) {
-			header.appendChangeLogEntry(CHANGELOGTIME, new int[] {entry.getChangeLogTimeEpoch()});
+			addChangeLogEntry(entry);
 		}
-		for (ChangelogEntry entry : entries) {
-			header.appendChangeLogEntry(CHANGELOGNAME, new String[] {entry.getUserMakingChange()});
-		}
-		for (ChangelogEntry entry : entries) {
-			header.appendChangeLogEntry(CHANGELOGTEXT, entry.getDescription());
-		}
-
 	}
 	
-//	private void addChangeLogEntry( ChangelogEntry entry) {
-//		long epochMillis = entry.getChangeLogTime().getTime();
-//		long epochSecs = epochMillis/1000L; // seconds since the epoch
-//		int unixdate = (int) epochSecs; 
-//		
-//		header.appendChangeLogEntry(CHANGELOGTIME, new int[] {entry.getChangeLogTimeEpoch()});
-//		header.appendChangeLogEntry(CHANGELOGNAME, new String[] {entry.getUserMakingChange()});
-//		header.appendChangeLogEntry(CHANGELOGTEXT, entry.getDescription());
-//
-//	}
+	private void addChangeLogEntry( ChangelogEntry entry) {
+		long epochMillis = entry.getChangeLogTime().getTime();
+		long epochSecs = epochMillis/1000L; // seconds since the epoch
+		int unixdate = (int) epochSecs; 
+		
+		header.appendChangeLogEntry(CHANGELOGTIME, new int[] {unixdate});
+		header.appendChangeLogEntry(CHANGELOGNAME, new String[] {entry.getUserMakingChange()});
+		header.appendChangeLogEntry(CHANGELOGTEXT, entry.getDescription());
+
+	}
 }
