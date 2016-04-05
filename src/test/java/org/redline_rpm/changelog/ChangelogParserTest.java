@@ -50,6 +50,27 @@ implements ParserExceptionClient
 			Assert.fail("parses correctly formatted changelog");
 		}
 	}
+	/**
+	 * Test method for {@link org.redline_rpm.changelog.ChangelogParser#parse(java.lang.String[])}.
+	 */
+	@Test
+	public void comments_ignored() {
+		String[] lines = {
+						"# ORDER MUST BE DESCENDING (most recent change at top)",
+		      			"* Tue Feb 24 2015 George Washington",
+		      			"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua",
+		      			"* Tue Feb 10 2015 George Washington",
+		      			"# a random comment",
+		      			"quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+		};
+
+		try {
+			changelogs = parser.parse(lines);
+			Assert.assertEquals("comments_ignored", 2, changelogs.size());
+		} catch (ChangelogParseException e) {
+			Assert.fail("comments_ignored: failed");
+		}
+	}
 
 	/**
 	 * Test method for {@link org.redline_rpm.changelog.ChangelogParser#parse(java.lang.String[])}.
@@ -204,5 +225,6 @@ implements ParserExceptionClient
 		}
 
 	}
+
 
 }
