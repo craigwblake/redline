@@ -45,7 +45,7 @@ public class CpioHeader {
 
 	protected Charset charset = Charset.forName( "ASCII");
 
-	protected long inode;
+	protected int inode;
 	protected int type;
 	protected int permissions = DEFAULT_FILE_PERMISSION;
 	protected int uid;
@@ -102,7 +102,7 @@ public class CpioHeader {
 	public int getDevMajor() { return devMajor; }
 	public int getDevMinor() { return devMinor; }
 	public int getMtime() { return ( int) ( mtime / 1000L) ; }
-	public long getInode() { return inode; }
+	public int getInode() { return inode; }
 	public String getName() { return name; }
 	public int getFlags() { return flags; }
 	public int getVerifyFlags() { return verifyFlags; }
@@ -113,7 +113,7 @@ public class CpioHeader {
 	public void setType( int type) { this.type = type; }
 	public void setFileSize( int filesize) { this.filesize = filesize; }
 	public void setMtime( long mtime) { this.mtime = mtime; }
-	public void setInode( long inode) { this.inode = inode; }
+	public void setInode( int inode) { this.inode = inode; }
 	public void setFlags( int flags) { this.flags = flags; }
 	public void setVerifyFlags( int verifyFlags) { this.verifyFlags = verifyFlags; }
 
@@ -148,10 +148,6 @@ public class CpioHeader {
 		return charset.encode( pad( data, 6));
 	}
 
-	protected ByteBuffer writeEight( long data) {
-		return charset.encode( pad( Long.toHexString( data), 8));
-	}
-
 	protected ByteBuffer writeEight( int data) {
 		return charset.encode( pad( Integer.toHexString( data), 8));
 	}
@@ -160,8 +156,8 @@ public class CpioHeader {
 		return readChars( buffer, 6);
 	}
 
-	protected Long readEight( CharBuffer buffer) {
-		return Long.parseLong( readChars( buffer, 8).toString(), 16);
+	protected int readEight( CharBuffer buffer) {
+		return Integer.parseInt( readChars( buffer, 8).toString(), 16);
 	}
 
 	protected CharSequence readChars( CharBuffer buffer, int length) {
@@ -201,21 +197,21 @@ public class CpioHeader {
 		if ( !MAGIC.equals(magic.toString())) throw new IllegalStateException( "Invalid magic number '" + magic + "' of length '" + magic.length() + "'.");
 		inode = readEight( buffer);
 		
-		final int mode = readEight( buffer).intValue();
+		final int mode = readEight( buffer);
 		permissions = mode & 07777;
 		type = mode >>> 12;
 		
-		uid = readEight( buffer).intValue();
-		gid = readEight( buffer).intValue();
-		nlink = readEight( buffer).intValue();
-		mtime = 1000L * readEight( buffer).intValue();
-		filesize = readEight( buffer).intValue();
-		devMajor = readEight( buffer).intValue();
-		devMinor = readEight( buffer).intValue();
-		rdevMajor = readEight( buffer).intValue();
-		rdevMinor = readEight( buffer).intValue();
-		int namesize = readEight( buffer).intValue();
-		checksum = readEight( buffer).intValue();
+		uid = readEight( buffer);
+		gid = readEight( buffer);
+		nlink = readEight( buffer);
+		mtime = 1000L * readEight( buffer);
+		filesize = readEight( buffer);
+		devMajor = readEight( buffer);
+		devMinor = readEight( buffer);
+		rdevMajor = readEight( buffer);
+		rdevMinor = readEight( buffer);
+		int namesize = readEight( buffer);
+		checksum = readEight( buffer);
 		total += CPIO_HEADER;
 
 		name = charset.decode( Util.fill( channel, namesize - 1)).toString();
