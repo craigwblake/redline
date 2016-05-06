@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -85,20 +84,18 @@
 				<configuration>
 					<header>
 						&lt;script type="text/javascript"&gt;
-						var _gaq = _gaq || [];
-						_gaq.push(['_setAccount', 'UA-27261304-1']);
-						_gaq.push(['_trackPageview']);
+						  var _gaq = _gaq || [];
+						  _gaq.push(['_setAccount', 'UA-27261304-1']);
+						  _gaq.push(['_trackPageview']);
 
-						(function() {
-						var ga = document.createElement('script'); ga.type =
-						'text/javascript'; ga.async = true;
-						ga.src = ('https:' == document.location.protocol ? 'https://ssl' :
-						'http://www') + '.google-analytics.com/ga.js';
-						var s = document.getElementsByTagName('script')[0];
-						s.parentNode.insertBefore(ga, s);
-						})();
+						  (function() {
+							var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+							ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+							var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+						  })();
 
-						&lt;/script&gt; </header>
+						&lt;/script&gt;
+					</header>
 					<links>
 						<link>http://docs.oracle.com/javase/6/docs/api</link>
 						<link>http://ant-api.herokuapp.com</link>
@@ -145,35 +142,35 @@
 					</descriptorRefs>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<version>2.3</version>
-				<configuration>
-					<shadedArtifactAttached>true</shadedArtifactAttached>
-					<shadedClassifierName>shaded-jar</shadedClassifierName>
-					<transformers>
-						<transformer
-							implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-							<mainClass>org.redline_rpm.Scanner</mainClass>
-						</transformer>
-					</transformers>
-					<relocations>
-						<relocation>
-							<pattern>org.bouncycastle</pattern>
-							<shadedPattern>org.redline_rpm.bouncycastle</shadedPattern>
-						</relocation>
-					</relocations>
-				</configuration>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>2.3</version>
+                <configuration>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <shadedClassifierName>shaded-jar</shadedClassifierName>
+                    <transformers>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <mainClass>org.redline_rpm.Scanner</mainClass>
+                        </transformer>
+                    </transformers>
+                    <relocations>
+                        <relocation>
+                            <pattern>org.bouncycastle</pattern>
+                            <shadedPattern>org.redline_rpm.bouncycastle</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
@@ -204,7 +201,7 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.5</version>
-		</dependency>
+			</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
@@ -284,21 +281,9 @@
 	</reporting>
 
 	<distributionManagement>
-		<!-- <snapshotRepository> -->
-		<!-- <id>ossrh</id> -->
-		<!-- <url>https://oss.sonatype.org/content/repositories/snapshots</url> -->
-		<!-- </snapshotRepository> -->
-
 		<snapshotRepository>
-			<id>nexus</id>
-			<name>att-repository-snapshots</name>
-			<url>http://mavencentral.it.att.com:8084/nexus/content/repositories/att-repository-snapshots</url>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
 		</snapshotRepository>
 	</distributionManagement>
-
-	<!-- <distributionManagement> <repository> <id>nexus</id> <name>att-repository-releases</name> 
-		<url>http://mavencentral.it.att.com:8084/nexus/content/repositories/att-repository-releases</url> 
-		</repository> <snapshotRepository> <id>nexus</id> <name>att-repository-snapshots</name> 
-		<url>http://mavencentral.it.att.com:8084/nexus/content/repositories/att-repository-snapshots</url> 
-		</snapshotRepository> </distributionManagement> -->
 </project>
