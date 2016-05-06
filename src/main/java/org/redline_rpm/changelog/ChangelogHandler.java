@@ -14,12 +14,20 @@ import org.redline_rpm.header.Header;
 
 /**
  * This class manages the process of adding a Changelog to the header.
+ * 
+ * Copyright (c) 2007-2016 FreeCompany 
  */
 public class ChangelogHandler {
 	private final Header header;
 	public ChangelogHandler(Header header) {
 		this.header = header;
 	}
+	/**
+	 * Adds the specified changelog file to the rpm
+	 * @param changelogFile the changelog file to be added
+	 * @throws IOException if the specified file cannot be read
+	 * @throws ChangelogParseException if the file violates the requirements of a Changelog
+	 */
 	public void addChangeLog(File changelogFile) throws IOException, ChangelogParseException {
 		// parse the change log to a list of entries
 		InputStream changelog = new FileInputStream(changelogFile);

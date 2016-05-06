@@ -1,5 +1,9 @@
 package org.redline_rpm.changelog;
 
+/**
+ * Copyright (c) 2007-2016 FreeCompany
+ */
+
 public interface ParserExceptionClient {
 	public static final String MUST_START_WITH_ASTERISK =
 		"Changelog must begin with *";

@@ -12,9 +12,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author SC1478
- *
+ * Copyright (c) 2007-2016 FreeCompany
  */
+
 public class ChangelogParserTest 
 implements ParserExceptionClient
 {
