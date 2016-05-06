@@ -1173,8 +1173,8 @@ public class Builder {
 	}
 	
 	/**
-	 * Adds the supplied changelog file as a changelog to the header
-	 * @param changelogFile File containing the changelog information
+	 * Adds the supplied Changelog file as a Changelog to the header
+	 * @param changelogFile File containing the Changelog information
 	 * @throws IOException if file does not exist or cannot be read
 	 * @throws ChangelogParseException if file is not of the correct format.
 	 */

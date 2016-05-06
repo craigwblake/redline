@@ -42,11 +42,11 @@ public class ChangelogHandlerTest {
 	public void testBadChangeLog() throws URISyntaxException {
 		try {
 			builder.addChangelogFile(new File(this.getClass().getResource("bad.changelog").toURI()));
-			fail("bad changelog file throws ChangelogParseException: not thrown");
+			fail("bad Changelog file throws ChangelogParseException: not thrown");
 		} catch (IOException e) {
-			fail("bad changelog file throws ChangelogParseException: IOException thrown instead");
+			fail("bad Changelog file throws ChangelogParseException: IOException thrown instead");
 		} catch (ChangelogParseException e) {
-			assertTrue("bad changelog file throws ChangelogParseException", e instanceof NoInitialAsteriskException);
+			assertTrue("bad Changelog file throws ChangelogParseException", e instanceof NoInitialAsteriskException);
 		}
 	}
 	/**

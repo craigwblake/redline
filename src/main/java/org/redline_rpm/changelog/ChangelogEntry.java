@@ -5,7 +5,7 @@ import java.util.Date;
 
 /**
  * This class defines a Plain Old Java Object encapsulating 
- * one entry in a changelog for example:
+ * one entry in a Changelog for example:
   * 
    * Wed Nov 08 2006 George Washington
    - Add the foo feature

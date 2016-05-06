@@ -45,9 +45,9 @@ implements ParserExceptionClient
 
 		try {
 			changelogs = parser.parse(lines);
-			Assert.assertEquals("parses correctly formatted changelog", 2, changelogs.size());
+			Assert.assertEquals("parses correctly formatted Changelog", 2, changelogs.size());
 		} catch (ChangelogParseException e) {
-			Assert.fail("parses correctly formatted changelog");
+			Assert.fail("parses correctly formatted Changelog");
 		}
 	}
 	/**

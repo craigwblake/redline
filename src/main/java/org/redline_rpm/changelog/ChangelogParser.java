@@ -14,16 +14,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * This object reads the changelog file and attempts to parse its
+ * This object reads the Changelog file and attempts to parse its
  * contents into a List of ChangeLogEntry objects
  *
  */
 class ChangelogParser {
 	static final SimpleDateFormat fmt = new SimpleDateFormat("EEE MMM dd yyyy");
 	/**
-	 * @param lines an array of lines read from the changelog file
+	 * @param lines an array of lines read from the Changelog file
 	 * @return a List of ChangeLogEntry objects
-	 * @throws ChangelogParseException if any of the rules of a changelog is 
+	 * @throws ChangelogParseException if any of the rules of a Changelog is 
 	 * violated by the input
 	 */
 	public List<ChangelogEntry> parse(String[] lines) throws ChangelogParseException {
@@ -125,7 +125,7 @@ lineloop:
 	 * @param stream stream read from the Changelog file
 	 * @return a List of ChangeLogEntry objects
 	 * @throws IOException if the input stream cannot be read
-	 * @throws ChangelogParseException if any of the rules of a changelog is 
+	 * @throws ChangelogParseException if any of the rules of a Changelog is 
 	 * violated by the input
 	 */
 	public List<ChangelogEntry> parse(InputStream stream) throws IOException, ChangelogParseException 

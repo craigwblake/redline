@@ -23,8 +23,8 @@ public class ChangelogHandler {
 		this.header = header;
 	}
 	/**
-	 * Adds the specified changelog file to the rpm
-	 * @param changelogFile the changelog file to be added
+	 * Adds the specified Changelog file to the rpm
+	 * @param changelogFile the Changelog file to be added
 	 * @throws IOException if the specified file cannot be read
 	 * @throws ChangelogParseException if the file violates the requirements of a Changelog
 	 */

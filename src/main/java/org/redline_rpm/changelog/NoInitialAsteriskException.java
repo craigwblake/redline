@@ -2,7 +2,7 @@ package org.redline_rpm.changelog;
 
 /**
  * This exception is when a change log entry does not begin with an asterisk.
- * In actuality, this can only happen at the beginning of the changelog file
+ * In actuality, this can only happen at the beginning of the Changelog file
  * 
  * Copyright (c) 2007-2016 FreeCompany 
  */
