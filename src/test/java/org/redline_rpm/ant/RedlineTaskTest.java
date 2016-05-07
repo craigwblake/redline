@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.channels.Channels;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -337,6 +339,52 @@ public class RedlineTaskTest extends TestBase {
 		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.PREUNPROG);
 		assertHeaderEquals("/usr/bin/perl", format, Header.HeaderTag.POSTUNPROG);
 	}
+	
+	@Test
+	public void testChangeLog() throws Exception {
+
+		File dir = ensureTargetDir();
+
+		File filename = new File(dir, "rpmtest-1.0-2.noarch.rpm");
+
+		RedlineTask task = createBasicTask( dir );
+		task.setRelease("2");
+		task.setPreInstallScript(new File("src/test/resources/prein.sh"));
+		task.setPostInstallScript(new File("src/test/resources/postin.sh"));
+		task.setPreUninstallScript(new File("src/test/resources/preun.sh"));
+		task.setPostUninstallScript(new File("src/test/resources/postun.sh"));
+		task.setChangeLog(new File("src/test/resources/org/redline_rpm/changelog/changelog"));
+		task.execute();
+
+		Format format = getFormat( filename );
+
+		assertHeaderEquals("#!/bin/sh\n\necho Hello Pre Install!\n", format,
+				Header.HeaderTag.PREINSCRIPT);
+		assertHeaderEquals("\n\necho Hello Post Install!\n", format,
+				Header.HeaderTag.POSTINSCRIPT);
+		assertHeaderEquals("# comment\n\necho Hello Pre Uninstall!\n", format,
+				Header.HeaderTag.PREUNSCRIPT);
+		assertHeaderEquals("#!/usr/bin/perl\n\nprint \"Hello Post Uninstall!\\n\";\n", format,
+				Header.HeaderTag.POSTUNSCRIPT);
+
+		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.PREINPROG);
+		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.POSTINPROG);
+		assertHeaderEquals("/bin/sh", format, Header.HeaderTag.PREUNPROG);
+		assertHeaderEquals("/usr/bin/perl", format, Header.HeaderTag.POSTUNPROG);
+		
+		assertDateEntryHeaderEqualsAt("Tue Feb 24 2015", format,
+				Header.HeaderTag.CHANGELOGTIME,10, 0);
+		assertHeaderEqualsAt("Thomas Jefferson", format,
+				Header.HeaderTag.CHANGELOGNAME,10, 4);
+		assertHeaderEqualsAt("- Initial rpm for this package", format,
+				Header.HeaderTag.CHANGELOGTEXT,10, 9);
+		String expectedMultiLineDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod \n"+ 
+											  "tempor incididunt ut labore et dolore magna aliqua";
+		assertHeaderEqualsAt(expectedMultiLineDescription, format,
+				Header.HeaderTag.CHANGELOGTEXT,10, 0);
+
+	}
+
 
 	@Test
 	public void testFiles() throws Exception {
@@ -436,6 +484,19 @@ public class RedlineTaskTest extends TestBase {
 		assertEquals("Entry value : " + tag.getName(), expected, values[0]);
 	}
 
+	private void assertHeaderEqualsAt(String expected, Format format, AbstractHeader.Tag tag, int size, int pos) {
+		assertNotNull("null format", format);
+		AbstractHeader.Entry< ?> entry = format.getHeader().getEntry(tag);
+		assertNotNull("Entry not found : " + tag.getName(), entry);
+		assertEquals("Entry type : " + tag.getName(), 8, entry.getType());
+
+		String[] values = (String[]) entry.getValues();
+		assertNotNull("null values", values);
+		assertEquals("Entry size : " + tag.getName(), size, values.length);
+
+		assertEquals("Entry value : " + tag.getName(), expected, values[pos]);
+	}
+
 	private void assertInt32EntryHeaderEquals(int[] expected, Format format, AbstractHeader.Tag tag) {
 		assertNotNull("null format", format);
 		AbstractHeader.Entry< ?> entry = format.getHeader().getEntry(tag);
@@ -447,6 +508,21 @@ public class RedlineTaskTest extends TestBase {
 		assertEquals("Entry size : " + tag.getName(), 1, values.length);
 
 		assertArrayEquals("Entry value : " + tag.getName(), expected, values);
+	}
+	static final SimpleDateFormat fmt = new SimpleDateFormat("EEE MMM dd yyyy");
+	private void assertDateEntryHeaderEqualsAt(String expected, Format format, AbstractHeader.Tag tag, int size, int pos) {
+		assertNotNull("null format", format);
+		AbstractHeader.Entry< ?> entry = format.getHeader().getEntry(tag);
+		assertNotNull("Entry not found : " + tag.getName(), entry);
+		assertEquals("Entry type : " + tag.getName(), 4, entry.getType());
+
+		int[] values = (int[]) entry.getValues();
+		assertNotNull("null values", values);
+		assertEquals("Entry size : " + tag.getName(), size, values.length);
+		
+		Date date = new Date((long) values[pos] * 1000);
+
+		assertEquals("Entry value : " + tag.getName(), expected, fmt.format(date));
 	}
 
 	@Test
