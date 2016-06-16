@@ -19,6 +19,7 @@ public enum Architecture {
 	S390,
 	S390X,
 	PPC64,
+	PPC64LE,
 	SH,
 	XTENSA,
 	X86_64
