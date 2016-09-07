@@ -7,6 +7,7 @@ import org.apache.tools.ant.types.ArchiveFileSet;
 import org.apache.tools.ant.types.TarFileSet;
 import org.apache.tools.ant.types.ZipFileSet;
 import org.redline_rpm.Builder;
+import org.redline_rpm.changelog.ChangelogParseException;
 import org.redline_rpm.header.Architecture;
 import org.redline_rpm.header.Header;
 import org.redline_rpm.header.Os;
@@ -80,6 +81,8 @@ public class RedlineTask extends Task {
     protected File privateKeyRingFile;
     protected String privateKeyId;
     protected String privateKeyPassphrase;
+    
+    protected File changeLog;
 
 	public RedlineTask() {
 		try {
@@ -153,6 +156,9 @@ public class RedlineTask extends Task {
 			if ( null != postTransScript) {
 				builder.setPostTransScript( postTransScript);
 			}
+			if ( null != changeLog) {
+				builder.addChangelogFile(changeLog);
+			}
 
 			for ( EmptyDir emptyDir : emptyDirs) {
 				builder.addDirectory(emptyDir.getPath(), emptyDir.getDirmode(), Directive.NONE, emptyDir.getUsername(), emptyDir.getGroup(), true);
@@ -215,6 +221,8 @@ public class RedlineTask extends Task {
 			throw new BuildException( "Error packaging distribution files.", e);
 		} catch ( NoSuchAlgorithmException e) {
 			throw new BuildException( "This system does not support MD5 digests.", e);
+		} catch (ChangelogParseException e) {
+			throw new BuildException( "Error parsing Changelog", e);
 		}
 	}
 
@@ -269,4 +277,6 @@ public class RedlineTask extends Task {
     public void setPrivateKeyId( String privateKeyId ) { this.privateKeyId = privateKeyId; }
     public void setPrivateKeyPassphrase( String privateKeyPassphrase ) { this.privateKeyPassphrase = privateKeyPassphrase; }
     public void addBuiltin( BuiltIn builtIn) { builtIns.add(builtIn); }
+	public void setChangeLog(File changeLog) { this.changeLog = changeLog; }
+	
 }

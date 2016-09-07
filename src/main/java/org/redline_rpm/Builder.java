@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.lang.reflect.Array;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -23,6 +24,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 
 import org.bouncycastle.openpgp.PGPPrivateKey;
+import org.redline_rpm.changelog.ChangelogHandler;
+import org.redline_rpm.changelog.ChangelogParseException;
 import org.redline_rpm.header.Architecture;
 import org.redline_rpm.header.Format;
 import org.redline_rpm.header.Os;
@@ -216,7 +219,98 @@ public class Builder {
 	public void addHeaderEntry( final Tag tag, final String value) {
 	    format.getHeader().createEntry(tag, value);
 	}
+	
+	/**
+     * Adds a header entry byte (8-bit) value to the header. 
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+	 * @throws ClassCastException - if the type required by tag.type() is not byte[]
+     */
+	public void addHeaderEntry( final Tag tag, final byte value) {
+	    format.getHeader().createEntry(tag, new byte[] {value});
+	}
+	
+	/**
+     * Adds a header entry char (8-bit) value to the header. 
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+	 * @throws ClassCastException - if the type required by tag.type() is not byte[]
+     */
+	public void addHeaderEntry( final Tag tag, final char value) {
+	    format.getHeader().createEntry(tag, new byte[] {(byte) value});
+	}
 
+	
+	/**
+     * Adds a header entry short (16-bit) value to the header. 
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+	 * @throws ClassCastException - if the type required by tag.type() is not short[]
+     */
+	public void addHeaderEntry( final Tag tag, final short value) {
+	    format.getHeader().createEntry(tag,  new short[] {value});
+	}
+	
+	/**
+     * Adds a header entry int (32-bit) value to the header. 
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+ 	 * @throws ClassCastException - if the type required by tag.type() is not int[]
+    */
+	public void addHeaderEntry( final Tag tag, final int value) {
+	    format.getHeader().createEntry(tag, new int[] {value});
+	}
+	
+	/**
+     * Adds a header entry long (64-bit) value to the header. 
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+ 	 * @throws ClassCastException - if the type required by tag.type() is not long[]
+     */
+	public void addHeaderEntry( final Tag tag, final long value) {
+	    format.getHeader().createEntry(tag,  new long[] {value});
+	}
+	
+	/**
+     * Adds a header entry byte array (8-bit) value to the header. 
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+ 	 * @throws ClassCastException - if the type required by tag.type() is not byte[]
+     */
+	public void addHeaderEntry( final Tag tag, final byte[] value) {
+	    format.getHeader().createEntry(tag, value);
+	}
+	
+	/**
+     * Adds a header entry short array (16-bit) value to the header. 
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+ 	 * @throws ClassCastException - if the type required by tag.type() is not short[]
+     */
+	public void addHeaderEntry( final Tag tag, final short[] value) {
+	    format.getHeader().createEntry(tag, value);
+	}
+	
+	/**
+     * Adds a header entry int (32-bit) array value to the header. 
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+ 	 * @throws ClassCastException - if the type required by tag.type() is not int[]
+     */
+	public void addHeaderEntry( final Tag tag, final int[] value) {
+	    format.getHeader().createEntry(tag, value);
+	}
+	
+	/**
+     * Adds a header entry long (64-bit) array value to the header. 
+     * @param tag the header tag to set
+     * @param value the value to set the header entry with
+ 	 * @throws ClassCastException - if the type required by tag.type() is not long[]
+     */
+	public void addHeaderEntry( final Tag tag, final long[] value) {
+	    format.getHeader().createEntry(tag, value);
+	}
+	
 	/**
 	 * @param illegalChars the illegal characters to check for.
 	 * @param variable the character sequence to check for illegal characters.
@@ -1077,6 +1171,17 @@ public class Builder {
 	public void addSignature( final PrivateKey key) {
 		signatures.add( key);
 	}
+	
+	/**
+	 * Adds the supplied Changelog file as a Changelog to the header
+	 * @param changelogFile File containing the Changelog information
+	 * @throws IOException if file does not exist or cannot be read
+	 * @throws ChangelogParseException if file is not of the correct format.
+	 */
+	public void addChangelogFile(File changelogFile) throws IOException, ChangelogParseException {
+		new ChangelogHandler(this.format.getHeader()).addChangeLog(changelogFile);
+	}
+	
 
     /**
      * Sets the PGP key ring file used for header and header + payload signature.

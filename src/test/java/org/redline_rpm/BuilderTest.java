@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.fail;
 import static org.redline_rpm.ScannerTest.channelWrapper;
 import static org.redline_rpm.header.Architecture.NOARCH;
 import static org.redline_rpm.header.Flags.EQUAL;
@@ -178,5 +178,34 @@ public class BuilderTest extends TestBase {
         assertArrayEquals(new String[] { "httpd"         }, Arrays.copyOfRange(require, require.length - 1, require.length));
         assertArrayEquals(new    int[] { LESS            }, Arrays.copyOfRange(requireflags, requireflags.length - 1, require.length));
         assertArrayEquals(new String[] { "2.0"           }, Arrays.copyOfRange(requireversion, requireversion.length - 1, require.length));
+    }
+    @Test
+    public void testAddHeaderEntry() {
+    	Builder builder = new Builder();
+    	builder.addHeaderEntry(Header.HeaderTag.CHANGELOGTIME, 1);
+    	try {
+        	builder.addHeaderEntry(Header.HeaderTag.CHANGELOGNAME, 1);
+        	fail("ClassCastException expected on setting header int value where String expected.");
+    	} catch (ClassCastException e) { /* exception expected*/ }
+    	
+    	try {
+        	builder.addHeaderEntry(Header.HeaderTag.CHANGELOGTIME, "Mon Jan 01 2016");
+        	fail("ClassCastException expected on setting header String value where int expected.");
+    	} catch (ClassCastException e) { /* exception expected*/ }
+    	try {
+        	builder.addHeaderEntry(Header.HeaderTag.CHANGELOGTIME, 1L);
+        	fail("ClassCastException expected on setting header long value where int expected.");
+    	} catch (ClassCastException e) { /* exception expected*/ }
+    	try {
+    		short s = (short) 1;
+        	builder.addHeaderEntry(Header.HeaderTag.CHANGELOGTIME, s);
+        	fail("ClassCastException expected on setting header short value where int expected.");
+    	} catch (ClassCastException e) { /* exception expected*/ }
+    	try {
+    		Character c = 'c';
+        	builder.addHeaderEntry(Header.HeaderTag.CHANGELOGTIME, c);
+        	fail("ClassCastException expected on setting header char value where int expected.");
+    	} catch (ClassCastException e) { /* exception expected*/ }
+
     }
 }

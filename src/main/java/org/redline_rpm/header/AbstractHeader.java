@@ -169,6 +169,9 @@ public abstract class AbstractHeader {
 		} catch ( IllegalArgumentException e) {
 			throw new RuntimeException( "Error while writing '" + entry + "'.", e);
 		}
+		
+		
+		
 		ByteBuffer data = ByteBuffer.allocate( offset);
 		for ( ByteBuffer buffer : buffers) data.put( buffer);
 		return data;
@@ -235,12 +238,51 @@ public abstract class AbstractHeader {
 		return entry;
 	}
 
+	/**
+	 * This is the main entry point through which entries are created from the builder code for
+	 * types other than String.
+	 * @param tag the Tag identifying the type of header this is bound for
+	 * @param values the values to be stored in the entry.
+	 * @throws ClassCastException - if the type of values is not compatible with the type
+	 * required by tag
+	 * @return a header entry of the appropriate type, with the supplied values set in it.
+	 */
 	@SuppressWarnings( "unchecked")
 	public < T> Entry< T> createEntry( Tag tag, T values) {
 		Entry< T> entry = ( Entry< T>) createEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
 		entry.setValues( values);
 		return entry;
 	}
+	
+	/**
+	 * This is the main entry point through which entries are created or appended to 
+	 * from the builder or from places like the ChangelogHandler.  This is useful for 
+	 * header types which may have multiple components of each tag, as changelogs do.
+	 * @param tag the Tag identifying the type of header this is bound for
+	 * @param values the values to be stored in or appended to the entry.
+	 * @throws ClassCastException - if the type of values is not compatible with the 
+	 * type required by tag
+	 * @return a header entry of the appropriate type, with the supplied values 
+	 * set in or appended to it.
+	 */
+	@SuppressWarnings( { "unchecked", "rawtypes" })
+	public < T> Entry< T> addOrAppendEntry( Tag tag, T values) {
+		Entry< T> entry = ( Entry< T>) addOrAppendEntry( tag.getCode(), tag.getType(), values.getClass().isArray() ? Array.getLength( values) : 1);
+		T existingValues = entry.getValues();
+		if (existingValues == null) {
+			entry.setValues( values);
+		} else {	
+			int oldSize = java.lang.reflect.Array.getLength( existingValues);
+			int newSize = values.getClass().isArray() ? Array.getLength( values) : 1;
+			Class elementType = existingValues.getClass().getComponentType();
+			T newValues = ( T) Array.newInstance( elementType, oldSize + newSize);
+			System.arraycopy( existingValues, 0, newValues, 0, oldSize);
+			System.arraycopy( values, 0, newValues, oldSize, newSize);
+			entry.setValues( newValues);
+		}
+		return entry;
+	}
+
 
 	@SuppressWarnings( "unchecked")
 	public < T> Entry< T> createEntry( Tag tag, int type, T values) {
@@ -284,6 +326,20 @@ public abstract class AbstractHeader {
 		entries.put( tag, entry);
 		return entry;
 	}
+	
+	public Entry< ?> addOrAppendEntry( final int tag, final int type, final int count) {
+		Entry< ?> entry = entries.get(tag);
+		if (entry == null) {
+			entry = createEntry( type);
+			entry.setTag( tag);
+			entry.setCount(count);			
+		} else {
+			entry.incCount(count);
+		}
+		entries.put( tag, entry);
+		return entry;
+	}
+
 
 	protected Entry< ?> createEntry( int type) {
 		switch ( type) {
@@ -332,6 +388,7 @@ public abstract class AbstractHeader {
 		void setTag( int tag);
 		void setSize( int size);
 		void setCount( int count);
+		void incCount( int count);
 		void setOffset( int offset);
 		void setValues( T values);
 		T getValues();
@@ -356,8 +413,28 @@ public abstract class AbstractHeader {
 		public void setTag( int tag) { this.tag = tag; }
 		public void setSize( int size) { this.size = size; }
 		public void setCount( int count) { this.count = count; }
+		public void incCount( int count) { this.count += count; }
 		public void setOffset( int offset) { this.offset = offset; }
-		public void setValues( T values) { this.values = values; }
+		
+		/**
+		 * Fails fast if Tag and T are not compatible.
+		 * @param values
+		 * @throws ClassCastException - if the type of values is not compatible with the type
+		 * required by tag.type()
+		 */
+		protected abstract void typeCheck(T values);
+		
+		/**
+		 * @param values
+		 * @throws ClassCastException - if the type of values is not compatible with the type
+		 * required by tag.type()
+		 */
+		public void setValues( T values) {
+			if (values.getClass().isArray()) {
+				typeCheck(values);
+			}
+			this.values = values; 
+		}
 
 		public T getValues() { return values; }
 		public int getTag() { return tag; }
@@ -419,6 +496,10 @@ public abstract class AbstractHeader {
 		public int size() { return 0; }
 		public void read( final ByteBuffer buffer) {}
 		public void write( final ByteBuffer data) {}
+		@Override
+		protected void typeCheck(Object values) {
+			return;
+		}
 	}
 
 	class CharEntry extends AbstractEntry< byte[]> {
@@ -438,6 +519,10 @@ public abstract class AbstractHeader {
 			builder.append( "\n\t");
 			return builder.toString();
 		}
+		@Override
+		protected void typeCheck(byte[] values) {
+			for ( @SuppressWarnings("unused") byte c : values) {/*intentionally do nothing*/}
+		}
 	}
 
 	class Int8Entry extends AbstractEntry< byte[]> {
@@ -451,6 +536,11 @@ public abstract class AbstractHeader {
 		public void write( final ByteBuffer data) {
 			for ( byte b : values) data.put( b);
 		}
+		@Override
+		protected void typeCheck(byte[] values) {
+			for ( @SuppressWarnings("unused") byte c : values) {/*intentionally do nothing*/}
+		}
+
 		public String toString() {
 			StringBuilder builder = new StringBuilder( super.toString());
 			builder.append( "\n\t");
@@ -477,6 +567,10 @@ public abstract class AbstractHeader {
 			for ( short s : values) builder.append( s & 0xFFFF).append( ", ");
 			return builder.toString();
 		}
+		@Override
+		protected void typeCheck(short[] values) {
+			for ( @SuppressWarnings("unused") short c : values) {/*intentionally do nothing*/}
+		}
 	}
 
 	class Int32Entry extends AbstractEntry< int[]> {
@@ -497,6 +591,10 @@ public abstract class AbstractHeader {
 			for ( int i : values) builder.append( i).append( ", ");
 			return builder.toString();
 		}
+		@Override
+		protected void typeCheck(int[] values) {
+			for ( @SuppressWarnings("unused") int c : values) {/*intentionally do nothing*/}
+		}
 	}
 
 	class Int64Entry extends AbstractEntry< long[]> {
@@ -516,6 +614,10 @@ public abstract class AbstractHeader {
 			builder.append( "\n\t");
 			for ( long l : values) builder.append( l).append( ", ");
 			return builder.toString();
+		}
+		@Override
+		protected void typeCheck(long[] values) {
+			for ( @SuppressWarnings("unused") long c : values) {/*intentionally do nothing*/}
 		}
 	}
 
@@ -557,6 +659,10 @@ public abstract class AbstractHeader {
 			}
 			return builder.toString();
 		}
+		@Override
+		protected void typeCheck(String[] values) {
+			for ( @SuppressWarnings("unused") String c : values) {/*intentionally do nothing*/}
+		}
 	}
 
 	class BinEntry extends AbstractEntry< byte[]> {
@@ -577,6 +683,10 @@ public abstract class AbstractHeader {
 				Util.dump( values, builder);
 			}
 			return builder.toString();
+		}
+		@Override
+		protected void typeCheck(byte[] values) {
+			for ( @SuppressWarnings("unused") byte c : values) {/*intentionally do nothing*/}
 		}
 	}
 
