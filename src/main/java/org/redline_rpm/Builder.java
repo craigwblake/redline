@@ -13,7 +13,6 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +69,7 @@ public class Builder {
 	protected final List< Dependency> requires = new LinkedList< Dependency>();
 	protected final List< Dependency> obsoletes = new LinkedList< Dependency>();
 	protected final List< Dependency> conflicts = new LinkedList< Dependency>();
-	protected final Map< String, Dependency> provides = new LinkedHashMap< String, Dependency>();
+	protected final List< Dependency> provides = new LinkedList< Dependency>();
 
 	protected final List< String> triggerscripts = new LinkedList< String>();
 	protected final List< String> triggerscriptprogs = new LinkedList< String>();
@@ -150,11 +149,11 @@ public class Builder {
 	}
 	
 	public void addProvides(final String name, final String version) {
-		provides.put(name, new Dependency(name, version, version.length() > 0 ? EQUAL : 0));
+		provides.add(new Dependency(name, version, version.length() > 0 ? EQUAL : 0));
 	}
 
 	protected void addProvides(final CharSequence name, final CharSequence version, final int flag) {
-		provides.put(name.toString(), new Dependency(name.toString(), version.toString(), flag));
+		provides.add(new Dependency(name.toString(), version.toString(), flag));
 	}
 	
 	/**

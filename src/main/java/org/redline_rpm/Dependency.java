@@ -2,7 +2,6 @@ package org.redline_rpm;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class represents a RPM dependency.
@@ -90,53 +89,4 @@ public class Dependency {
 
         return flagsList.toArray(new Integer[flagsList.size()]);
     }
-  
-    /**
-     * Returns an array of String with the name of every dependency from a list of dependencies.
-     * @param dependencies    List of dependencies
-     * @return String[] with all names of the dependencies
-     */
-    public static String[] getArrayOfNames(Map< String, Dependency> dependencies) {
-        List<String> nameList = new LinkedList<String>();
-
-        for (Dependency dependency : dependencies.values()) {
-            nameList.add(dependency.getName());
-        }
-
-        return nameList.toArray(new String[nameList.size()]);
-    }
-
-    /**
-     * Returns an array of String with the version of every dependency from a list of dependencies.
-     * @param dependencies    List of dependencies
-     * @return String[] with all versions of the dependencies
-     */
-    public static String[] getArrayOfVersions(Map< String, Dependency> dependencies) {
-        List<String> versionList = new LinkedList<String>();
-
-        for (Dependency dependency : dependencies.values()) {
-            versionList.add(dependency.getVersion());
-        }
-
-        return versionList.toArray(new String[versionList.size()]);
-    }
-
-    /**
-     * Returns an array of Integer with the flags of every dependency from a list of dependencies.
-     * @param dependencies    List of dependencies
-     * @return Integer[] with all flags of the dependencies
-     */
-    public static Integer[] getArrayOfFlags(Map< String, Dependency> dependencies) {
-        List<Integer> flagsList = new LinkedList<Integer>();
-
-        for (Dependency dependency : dependencies.values()) {
-            flagsList.add(dependency.getFlags());
-        }
-
-        return flagsList.toArray(new Integer[flagsList.size()]);
-    }
 }
-
-    
-    
-
