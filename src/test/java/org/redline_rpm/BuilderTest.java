@@ -179,6 +179,34 @@ public class BuilderTest extends TestBase {
         assertArrayEquals(new    int[] { LESS            }, Arrays.copyOfRange(requireflags, requireflags.length - 1, require.length));
         assertArrayEquals(new String[] { "2.0"           }, Arrays.copyOfRange(requireversion, requireversion.length - 1, require.length));
     }
+    
+    @Test
+    public void testProvideOverride() throws Exception {
+        Builder builder = new Builder();
+        builder.setPackage("testProvideOverride", "1.0", "1");
+        builder.setBuildHost("localhost");
+        builder.setLicense("GPL");
+        builder.setPlatform(NOARCH, LINUX);
+        builder.setType(BINARY);
+        
+        // add a provide of the same name as the one created by setPackage().
+        // only one provide entry should appear in the RPM.
+        builder.addProvides("testProvideOverride", "1.0");
+
+        builder.build( new File( getTargetDir()));
+
+        Format format = new Scanner().run(channelWrapper("target" + File.separator + "testProvideOverride-1.0-1.noarch.rpm"));
+
+        String[] provide = (String[])format.getHeader().getEntry(HeaderTag.PROVIDENAME).getValues();
+        int[] provideflags = (int[])format.getHeader().getEntry(HeaderTag.PROVIDEFLAGS).getValues();
+        String[] provideversion = (String[])format.getHeader().getEntry(HeaderTag.PROVIDEVERSION).getValues();
+
+        assertEquals( 1, provide.length);
+        assertArrayEquals(new String[] { "testProvideOverride"}, Arrays.copyOfRange(provide, 0, provide.length));
+        assertArrayEquals(new    int[] { EQUAL                }, Arrays.copyOfRange(provideflags, 0, provide.length));
+        assertArrayEquals(new String[] { "1.0"                }, Arrays.copyOfRange(provideversion, 0, provide.length));
+    }
+
     @Test
     public void testAddHeaderEntry() {
     	Builder builder = new Builder();
