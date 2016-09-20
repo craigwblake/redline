@@ -8,8 +8,8 @@ To use Redline include it as a Maven dependency:
 <dependency>
 	<groupId>org.redline-rpm</groupId>
 	<artifactId>redline</artifactId>
-	<version>1.2.3</version>
+	<version>1.2.4</version>
 </dependency>
 ```
 
-Redline can also be downloaded directly from [GitHub](https://github.com/craigwblake/redline/releases/download/redline-1.2.3/redline-1.2.3-jar-with-dependencies.jar)
+Redline can also be downloaded directly from [GitHub](https://github.com/craigwblake/redline/releases/download/redline-1.2.4/redline-1.2.4-jar-with-dependencies.jar)
