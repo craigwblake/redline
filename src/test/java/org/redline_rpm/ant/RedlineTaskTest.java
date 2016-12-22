@@ -90,15 +90,6 @@ public class RedlineTaskTest extends TestBase {
 			// Pass
 		}
 
-		// test version with illegal char ~
-		task.setVersion("1.0~beta");
-		try {
-			task.execute();
-			fail();
-		} catch (IllegalArgumentException iae) {
-			// Pass
-		}
-
 		// test version with illegal char /
 		task.setVersion("1.0/beta");
 		try {
@@ -118,15 +109,6 @@ public class RedlineTaskTest extends TestBase {
 
 		// test release with illegal char -
 		task.setRelease("2-3");
-		try {
-			task.execute();
-			fail();
-		} catch (IllegalArgumentException iae) {
-			// Pass
-		}
-
-		// test release with illegal char ~
-		task.setRelease("2~3");
 		try {
 			task.execute();
 			fail();
