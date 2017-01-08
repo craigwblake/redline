@@ -61,7 +61,7 @@ public class Builder {
 
 	private static final String DEFAULTSCRIPTPROG = "/bin/sh";
 
-	private static final char[] ILLEGAL_CHARS_VARIABLE = new char[] { '-', '~', '/' };
+	private static final char[] ILLEGAL_CHARS_VARIABLE = new char[] { '-', '/' };
 	private static final char[] ILLEGAL_CHARS_NAME = new char[] { '/', ' ', '\t', '\n', '\r' };
 
 	protected final Format format = new Format();
