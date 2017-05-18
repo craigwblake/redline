@@ -254,7 +254,7 @@ public class RedlineTaskTest extends TestBase {
 				obs.setComparison((Obsoletes.ComparisonEnum)EnumeratedAttribute.getInstance(Obsoletes.ComparisonEnum.class, def[1]));
 			if(0 < def[2].length())
 				obs.setVersion(def[2]);
-			task.addObseletes(obs);
+			task.addObsoletes(obs);
 		}
 
 		task.execute();

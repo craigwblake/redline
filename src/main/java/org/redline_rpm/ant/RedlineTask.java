@@ -261,7 +261,7 @@ public class RedlineTask extends Task {
 	public void addDepends( Depends dependency) { depends.add( dependency); }
 	public void addProvides( Provides provision) { moreProvides.add( provision); }
 	public void addConflicts( Conflicts conflict) { conflicts.add( conflict); }
-	public void addObseletes( Obsoletes obsoletion) { obsoletes.add( obsoletion); }
+	public void addObsoletes( Obsoletes obsoletion) { obsoletes.add( obsoletion); }
 	public void addTriggerPreIn( TriggerPreIn triggerPreIn) { triggersPreIn.add( triggerPreIn); }
 	public void addTriggerIn( TriggerIn triggerIn) { triggersIn.add( triggerIn); }
 	public void addTriggerUn( TriggerUn triggerUn) { triggersUn.add( triggerUn); }
