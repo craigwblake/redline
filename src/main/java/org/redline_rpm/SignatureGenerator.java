@@ -30,7 +30,7 @@ import static org.redline_rpm.header.Signature.SignatureTag.RSAHEADER;
  */
 public class SignatureGenerator {
 
-    protected static final int SIGNATURE_SIZE = 287;
+    protected int signatureSize;
     protected final boolean enabled;
     protected Entry< byte[]> headerOnlyRSAEntry;
     protected Entry< byte[]> headerAndPayloadPGPEntry;
@@ -39,12 +39,14 @@ public class SignatureGenerator {
     protected Key< byte[]> headerAndPayloadKey = null;
     private Logger logger = getLogger( SignatureGenerator.class.getName());
 
-    public SignatureGenerator( PGPPrivateKey privateKey ) {
+    public SignatureGenerator( PGPPrivateKey privateKey, int signatureSize ) {
         this.privateKey = privateKey;
         this.enabled = privateKey != null;
+        this.signatureSize = signatureSize > 0 ? signatureSize : 287;
     }
 
-    public SignatureGenerator( File privateKeyRingFile, String privateKeyId, String privateKeyPassphrase ) {
+    public SignatureGenerator( File privateKeyRingFile, String privateKeyId, String privateKeyPassphrase, int signatureSize ) {
+        this.signatureSize = signatureSize > 0 ? signatureSize : 287;
         if ( privateKeyRingFile != null ) {
             PGPSecretKeyRingCollection keyRings = readKeyRings( privateKeyRingFile );
             PGPSecretKey secretKey = findMatchingSecretKey( keyRings, privateKeyId );
@@ -63,8 +65,8 @@ public class SignatureGenerator {
     @SuppressWarnings("unchecked")
 	public void prepare( Signature signature ) {
         if ( enabled ) {
-            headerOnlyRSAEntry = ( Entry< byte[]> ) signature.addEntry( RSAHEADER, SIGNATURE_SIZE );
-            headerAndPayloadPGPEntry = ( Entry< byte[]> ) signature.addEntry( LEGACY_PGP, SIGNATURE_SIZE );
+            headerOnlyRSAEntry = ( Entry< byte[]> ) signature.addEntry( RSAHEADER, signatureSize );
+            headerAndPayloadPGPEntry = ( Entry< byte[]> ) signature.addEntry( LEGACY_PGP, signatureSize );
         }
     }
 
