@@ -131,9 +131,9 @@ public class RedlineTask extends Task {
 		
 		// add built-ins
 		for ( BuiltIn builtIn : builtIns) {
-			String text = builtIn.getText();
+			String text = builtIn.getDirectory();
 			if (text != null && !text.trim().equals("")) {
-				builder.addBuiltinDirectory( builtIn.getText());
+				builder.addBuiltinDirectory( builtIn.getDirectory());
 			}
 		}
 
