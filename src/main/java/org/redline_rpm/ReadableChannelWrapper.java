@@ -1,6 +1,7 @@
 package org.redline_rpm;
 
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ReadableByteChannel;
 
@@ -23,19 +24,28 @@ public class ReadableChannelWrapper extends ChannelWrapper implements ReadableBy
 	 *
 	 * @param buffer the buffer to read into
 	 * @return the number of bytes read from the underlying channel
-	 * @throws IOException if an IO error occurrs
+	 * @throws IOException if an IO error occurs
 	 */
 	public int read( final ByteBuffer buffer) throws IOException {
-		final int read = channel.read( buffer);
-		for ( Consumer< ?> consumer : consumers.values()) consumer.consume(( ByteBuffer) buffer.duplicate().flip());
-		return read;
+		int total = 0;
+		while (buffer.hasRemaining()) {
+			int read;
+			if ((read = channel.read(buffer)) == -1) {
+				throw new BufferUnderflowException();
+			}
+			total += read;
+		}
+		for (Consumer consumer : consumers.values()) {
+			consumer.consume(( ByteBuffer) buffer.duplicate().flip());
+		}
+		return total;
 	}
 
 	/**
 	 * Close the underlying read channel and complete any operations in the
 	 * consumer.
 	 *
-	 * @throws IOException if an IO error occurrs
+	 * @throws IOException if an IO error occurs
 	 */
 	public void close() throws IOException {
 		channel.close();
