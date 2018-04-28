@@ -5,7 +5,7 @@ package org.redline_rpm.payload;
  *
  * @see <a href="http://www.rpm.org/api/4.4.2.2/rpmlib_8h-source.html#l00473">rpm.org</a>
  */
-public class Directive {
+public class Directive implements Serializable {
     public final static int RPMFILE_NONE         = 0;
     public final static int RPMFILE_CONFIG       = (1);
     public final static int RPMFILE_DOC          = (1 <<  1);
