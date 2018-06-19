@@ -73,6 +73,7 @@ public class Contents {
 		BUILTIN.add( "/root");
 		BUILTIN.add( "/sbin");
 		BUILTIN.add( "/opt");
+		BUILTIN.add( "/run");
 		BUILTIN.add( "/srv");
 		BUILTIN.add( "/tmp");
 		BUILTIN.add( "/var");
