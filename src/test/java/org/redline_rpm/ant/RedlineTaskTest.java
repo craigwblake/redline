@@ -7,6 +7,7 @@ import java.nio.channels.Channels;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Locale;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -31,6 +32,8 @@ import static org.junit.Assert.*;
 
 public class RedlineTaskTest extends TestBase {
 
+	static final SimpleDateFormat fmt = new SimpleDateFormat("EEE MMM dd yyyy", Locale.ENGLISH);
+	
 	@Test
 	public void testBadName() throws Exception {
 			File dir = ensureTargetDir();
@@ -491,7 +494,7 @@ public class RedlineTaskTest extends TestBase {
 
 		assertArrayEquals("Entry value : " + tag.getName(), expected, values);
 	}
-	static final SimpleDateFormat fmt = new SimpleDateFormat("EEE MMM dd yyyy");
+	
 	private void assertDateEntryHeaderEqualsAt(String expected, Format format, AbstractHeader.Tag tag, int size, int pos) {
 		assertNotNull("null format", format);
 		AbstractHeader.Entry< ?> entry = format.getHeader().getEntry(tag);

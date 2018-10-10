@@ -12,6 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * This object reads the Changelog file and attempts to parse its
@@ -19,7 +20,7 @@ import java.util.List;
  *
  */
 class ChangelogParser {
-	static final SimpleDateFormat fmt = new SimpleDateFormat("EEE MMM dd yyyy");
+	static final SimpleDateFormat fmt = new SimpleDateFormat("EEE MMM dd yyyy", Locale.ENGLISH);
 	/**
 	 * @param lines an array of lines read from the Changelog file
 	 * @return a List of ChangeLogEntry objects
