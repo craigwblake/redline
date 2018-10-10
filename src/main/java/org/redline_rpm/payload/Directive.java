@@ -1,5 +1,7 @@
 package org.redline_rpm.payload;
 
+import java.io.Serializable;
+
 /**
  * Constants taken from {@code lib/rpmlib.h}
  *
