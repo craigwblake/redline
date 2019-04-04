@@ -175,6 +175,7 @@ public class RedlineTask extends Task {
 				String username = null;
 				String group = null;
                 Directive directive = null;
+                boolean addParents = true;
 
 				if (fileset instanceof TarFileSet) {
 					TarFileSet tarFileSet = (TarFileSet)fileset;
@@ -185,6 +186,11 @@ public class RedlineTask extends Task {
                         directive = rpmFileSet.getDirective();
                     }
 				}
+
+                if (fileset instanceof RpmFileSet) {
+                    RpmFileSet rpmFileSet = (RpmFileSet) fileset;
+                    addParents = rpmFileSet.getAddParents();
+                }
 
 				// include any directories, including empty ones, duplicates will be ignored when we scan included files
 				for (String entry : scanner.getIncludedDirectories()) {
@@ -198,7 +204,7 @@ public class RedlineTask extends Task {
 						builder.addURL( prefix + entry, url, filemode, dirmode, directive, username, group);
 					} else {
 						File file = new File( scanner.getBasedir(), entry);
-						builder.addFile(prefix + entry, file, filemode, dirmode, directive, username, group);
+						builder.addFile(prefix + entry, file, filemode, dirmode, directive, username, group, addParents);
 					}
 				}
 			}
