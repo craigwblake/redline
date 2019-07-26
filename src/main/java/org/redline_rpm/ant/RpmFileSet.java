@@ -18,6 +18,11 @@ public class RpmFileSet extends TarFileSet {
     private Directive directive = new Directive();
 
     /**
+     * Whether to create parent directories for the file. Defaults to true.
+     */
+    private boolean addParents = true;
+
+    /**
      * Constructor for {@code RpmFileSet}
      */
     public RpmFileSet() {
@@ -168,5 +173,13 @@ public class RpmFileSet extends TarFileSet {
                 instanceof RpmFileSet))) {
             checkAttributesAllowed();
         }
+    }
+
+    public boolean getAddParents() {
+        return addParents;
+    }
+
+    public void setAddParents(boolean addParents) {
+        this.addParents = addParents;
     }
 }
