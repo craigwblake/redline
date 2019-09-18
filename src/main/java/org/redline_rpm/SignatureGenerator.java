@@ -7,6 +7,7 @@ import org.bouncycastle.openpgp.PGPSecretKeyRing;
 import org.bouncycastle.openpgp.PGPSecretKeyRingCollection;
 import org.bouncycastle.openpgp.PGPUtil;
 import org.bouncycastle.openpgp.operator.PBESecretKeyDecryptor;
+import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator;
 import org.bouncycastle.openpgp.operator.bc.BcPBESecretKeyDecryptorBuilder;
 import org.bouncycastle.openpgp.operator.bc.BcPGPDigestCalculatorProvider;
 import org.redline_rpm.header.Signature;
@@ -90,7 +91,7 @@ public class SignatureGenerator {
             InputStream keyInputStream = new BufferedInputStream( new FileInputStream( privateKeyRingFile ) );
             InputStream decoderStream = PGPUtil.getDecoderStream( keyInputStream );
             try {
-                return new PGPSecretKeyRingCollection( decoderStream );
+                return new PGPSecretKeyRingCollection( decoderStream , new BcKeyFingerprintCalculator());
 
             } finally {
                 decoderStream.close();

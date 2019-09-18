@@ -221,7 +221,7 @@
 		<dependency>
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcpg-jdk15on</artifactId>
-			<version>1.50</version>
+			<version>1.62</version>
 		</dependency>
 	</dependencies>
 
