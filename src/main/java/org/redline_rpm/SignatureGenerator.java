@@ -105,16 +105,17 @@ public class SignatureGenerator {
 
     protected PGPSecretKey findMatchingSecretKey( PGPSecretKeyRingCollection keyRings, String privateKeyId ) {
         privateKeyId = privateKeyId != null ? privateKeyId.toLowerCase() : null;
-
+        System.out.println("keyRings.size() = " + keyRings.size());
         @SuppressWarnings( "unchecked" )
         Iterator< PGPSecretKeyRing> iter = keyRings.getKeyRings();
         while ( iter.hasNext() ) {
             PGPSecretKeyRing keyRing = iter.next();
-
+            System.out.println("keyRing = " + keyRing);
             @SuppressWarnings( "unchecked" )
             Iterator< PGPSecretKey> keyIter = keyRing.getSecretKeys();
             while ( keyIter.hasNext() ) {
                 PGPSecretKey key = keyIter.next();
+                System.out.println("key = " + key + " -- " + key.isSigningKey());
                 if ( key.isSigningKey() && isMatchingKeyId( key, privateKeyId ) ) {
                     return key;
                 }
@@ -125,10 +126,11 @@ public class SignatureGenerator {
     }
 
     protected boolean isMatchingKeyId( PGPSecretKey key, String privateKeyId ) {
+        System.out.println("privateKeyId = " + privateKeyId);
         if (privateKeyId == null) {
             return true;
         }
-
+        System.out.println("Long.toHexString( key.getKeyID() ) = " + Long.toHexString(key.getKeyID()));
         return Long.toHexString( key.getKeyID() ).endsWith( privateKeyId );
     }
 

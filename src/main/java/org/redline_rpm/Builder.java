@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.lang.reflect.Array;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
@@ -57,6 +56,7 @@ public class Builder {
 	private static final int GPGSIZE = 65;
 	private static final int DSASIZE = 65;
 	private static final int SHASIZE = 41;
+	private static final int SHA256_SIZE = 65;
 	private static final int MD5SIZE = 32;
 
 	private static final String DEFAULTSCRIPTPROG = "/bin/sh";
@@ -1297,7 +1297,8 @@ public class Builder {
 		}
 
 		if (0 < contents.size()) {
-			format.getHeader().createEntry(FILEMD5S, contents.getMD5s());
+			String[] checksums = contents.getMD5s();
+			format.getHeader().createEntry(FILEDIGESTS, checksums);
 			format.getHeader().createEntry(FILESIZES, contents.getSizes());
 			format.getHeader().createEntry(FILEMODES, contents.getModes());
 			format.getHeader().createEntry(FILERDEVS, contents.getRdevs());
@@ -1319,7 +1320,9 @@ public class Builder {
 		final Entry< int[]> payload = ( Entry< int[]>) format.getSignature().addEntry( PAYLOADSIZE, 1);
 		final Entry< byte[]> md5 = ( Entry< byte[]>) format.getSignature().addEntry( LEGACY_MD5, 16);
 		final Entry< String[]> sha = ( Entry< String[]>) format.getSignature().addEntry( SHA1HEADER, 1);
+		final Entry<String[]> sha256 = ( Entry< String[]>) format.getSignature().addEntry( SHA256HEADER, 1);
 		sha.setSize( SHASIZE);
+		sha256.setSize(SHA256_SIZE);
 
         SignatureGenerator signatureGenerator = createSignatureGenerator();
         signatureGenerator.prepare( format.getSignature() );
@@ -1331,11 +1334,13 @@ public class Builder {
 		final Key< Integer> sigsizekey = output.start();
 		final Key< byte[]> shakey = output.start( "SHA");
 		final Key< byte[]> md5key = output.start( "MD5");
+		final Key< byte[]> sha256key = output.start( "SHA-256");
         signatureGenerator.startBeforeHeader( output );
 
 		immutable.setValues( getImmutable( format.getHeader().count()));
 		format.getHeader().write( output);
 		sha.setValues( new String[] { Util.hex( output.finish( shakey))});
+		sha256.setValues( new String[] { Util.hex( output.finish( sha256key) ) });
         signatureGenerator.finishAfterHeader( output );
 
 		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( output));
