@@ -608,7 +608,7 @@ public class Contents {
 	 * @throws NoSuchAlgorithmException if the algorithm isn't supported
 	 * @throws IOException there was an IO error
 	 */
-	public String[] getMD5s() throws NoSuchAlgorithmException, IOException {
+	public String[] getFileChecksums() throws NoSuchAlgorithmException, IOException {
 		/**
 		 * This could be more efficiently handled during the output phase using a filtering channel,
 		 * but would require placeholder values in the archive and some state. This is left for a
@@ -623,14 +623,14 @@ public class Contents {
 			if ( object instanceof File) {
 				FileInputStream fileInput = new FileInputStream(( File) object);
 				final ReadableChannelWrapper input = new ReadableChannelWrapper( fileInput.getChannel());
-				final Key< byte[]> key = input.start( "MD5");
+				final Key< byte[]> key = input.start( "SHA-256");
 				while ( input.read( buffer) != -1) buffer.rewind();
 				value = Util.hex(input.finish(key));
 				input.close();
 				fileInput.close();
 			} else if ( object instanceof URL) {
 				final ReadableChannelWrapper input = new ReadableChannelWrapper( Channels.newChannel((( URL) object).openConnection().getInputStream()));
-				final Key< byte[]> key = input.start( "MD5");
+				final Key< byte[]> key = input.start( "SHA-256");
 				while ( input.read( buffer) != -1) buffer.rewind();
 				value = Util.hex(input.finish(key));
 				input.close();

@@ -107,7 +107,6 @@ public class Header extends AbstractHeader {
 		DISTURL( 1123, STRING_ENTRY, "disturl"),
 		DISTTAG( 1155, STRING_ENTRY, "disttag"),
 
-		FILEDIGESTALGO( 5011, INT32_ENTRY, "filedigestalgo"),
 		BUGURL( 5012, STRING_ENTRY, "bugurl"),
 		ENCODING( 5062, STRING_ENTRY, "encoding"),
 		PAYLOADDIGEST( 5092, STRING_ARRAY_ENTRY, "payloaddigest"),

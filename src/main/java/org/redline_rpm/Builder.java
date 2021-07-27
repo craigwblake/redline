@@ -5,12 +5,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.security.DigestOutputStream;
+import java.security.MessageDigest;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -84,7 +87,7 @@ public class Builder {
 
 	@SuppressWarnings( "unchecked")
 	protected final Entry< byte[]> signature = ( Entry< byte[]>) format.getSignature().addEntry( SIGNATURES, 16);
-	
+
 	@SuppressWarnings( "unchecked")
 	protected final Entry< byte[]> immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
 
@@ -983,7 +986,7 @@ public class Builder {
 	public void addFile( final String path, final File source, final int mode, final Directive directive, final String uname, final String gname) throws NoSuchAlgorithmException, IOException {
 		contents.addFile( path, source, mode, directive, uname, gname);
 	}
-	
+
 	/**
 	 * Add the specified file to the repository payload in order.
 	 * The required header entries will automatically be generated
@@ -1297,7 +1300,9 @@ public class Builder {
 		}
 
 		if (0 < contents.size()) {
-			String[] checksums = contents.getMD5s();
+			String[] checksums = contents.getFileChecksums();
+			format.getHeader().createEntry(FILEDIGESTALGO, 8);
+			format.getHeader().createEntry(PAYLOADDIGESTALGO, 8);
 			format.getHeader().createEntry(FILEDIGESTS, checksums);
 			format.getHeader().createEntry(FILESIZES, contents.getSizes());
 			format.getHeader().createEntry(FILEMODES, contents.getModes());
@@ -1315,6 +1320,8 @@ public class Builder {
 		}
 
 		format.getHeader().createEntry( PAYLOADFLAGS, new String[] { "9"});
+		final Entry<String[]> payloadDigest = ( Entry< String[]>) format.getHeader().addEntry( PAYLOADDIGEST, 1);
+		final Entry<String[]> payloadDigestAlt = ( Entry< String[]>) format.getHeader().addEntry( PAYLOADDIGESTALT, 1);
 
 		final Entry< int[]> sigsize = ( Entry< int[]>) format.getSignature().addEntry( LEGACY_SIGSIZE, 1);
 		final Entry< int[]> payload = ( Entry< int[]>) format.getSignature().addEntry( PAYLOADSIZE, 1);
@@ -1323,6 +1330,8 @@ public class Builder {
 		final Entry<String[]> sha256 = ( Entry< String[]>) format.getSignature().addEntry( SHA256HEADER, 1);
 		sha.setSize( SHASIZE);
 		sha256.setSize(SHA256_SIZE);
+		payloadDigest.setSize(SHA256_SIZE);
+		payloadDigestAlt.setSize(SHA256_SIZE);
 
         SignatureGenerator signatureGenerator = createSignatureGenerator();
         signatureGenerator.prepare( format.getSignature() );
@@ -1336,14 +1345,24 @@ public class Builder {
 		final Key< byte[]> md5key = output.start( "MD5");
 		final Key< byte[]> sha256key = output.start( "SHA-256");
         signatureGenerator.startBeforeHeader( output );
-
-		immutable.setValues( getImmutable( format.getHeader().count()));
+		immutable.setValues(getImmutable( format.getHeader().count()));
+		String[] payloadDigestValue =  new String[] { Util.hex(calcPayloadDigest()) };
+		payloadDigest.setValues( payloadDigestValue );
+		payloadDigestAlt.setValues( payloadDigestValue );
 		format.getHeader().write( output);
 		sha.setValues( new String[] { Util.hex( output.finish( shakey))});
 		sha256.setValues( new String[] { Util.hex( output.finish( sha256key) ) });
-        signatureGenerator.finishAfterHeader( output );
+		signatureGenerator.finishAfterHeader( output );
+		int payloadLength = processPayload(Channels.newOutputStream(output));
+		payload.setValues( new int[] { payloadLength });
+		md5.setValues( output.finish( md5key));
+		sigsize.setValues( new int[] { output.finish( sigsizekey)});
+        signatureGenerator.finishAfterPayload( output );
+        format.getSignature().writePending( original);
+	}
 
-		final GZIPOutputStream zip = new GZIPOutputStream( Channels.newOutputStream( output));
+	private int processPayload(OutputStream output) throws IOException {
+		final GZIPOutputStream zip = new GZIPOutputStream(output);
 		final WritableChannelWrapper compressor = new WritableChannelWrapper( Channels.newChannel( zip));
 		final Key< Integer> payloadkey = compressor.start();
 
@@ -1356,7 +1375,7 @@ public class Builder {
 			final String path = header.getName();
 			if ( path.startsWith( "/")) header.setName( "." + path);
 			total = header.write( compressor, total);
-			
+
 			final Object object = contents.getSource( header);
 			if ( object instanceof File) {
 				FileInputStream fin = new FileInputStream(( File) object);
@@ -1381,7 +1400,7 @@ public class Builder {
 				total += header.skip( compressor, target.length());
 			}
 		}
-		
+
 		final CpioHeader trailer = new CpioHeader();
 		trailer.setLast();
 		total = trailer.write( compressor, total);
@@ -1392,13 +1411,20 @@ public class Builder {
 		Util.empty( compressor, ByteBuffer.allocate( pad));
 		length += pad;
 
-		payload.setValues( new int[] { length});
 		zip.finish();
-		
-		md5.setValues( output.finish( md5key));
-		sigsize.setValues( new int[] { output.finish( sigsizekey)});
-        signatureGenerator.finishAfterPayload( output );
-		format.getSignature().writePending( original);
+		return length;
+	}
+
+	private byte[] calcPayloadDigest() throws IOException {
+		final MessageDigest digest;
+		try {
+			digest = MessageDigest.getInstance( "SHA-256");
+		} catch ( Exception e) {
+			throw new RuntimeException( e);
+		}
+		DigestOutputStream digestOutputStream = new DigestOutputStream(nullOutputStream(), digest);
+		processPayload(digestOutputStream);
+		return digest.digest();
 	}
 
     protected SignatureGenerator createSignatureGenerator() {
@@ -1443,5 +1469,32 @@ public class Builder {
 		int count = 0;
 		for ( int i : ints) array[ count++] = i;
 		return array;
+	}
+
+	public static OutputStream nullOutputStream() {
+		return new OutputStream() {
+			private volatile boolean closed;
+
+			private void ensureOpen() throws IOException {
+				if (closed) {
+					throw new IOException("Stream closed");
+				}
+			}
+
+			@Override
+			public void write(int b) throws IOException {
+				ensureOpen();
+			}
+
+			@Override
+			public void write(byte b[], int off, int len) throws IOException {
+				ensureOpen();
+			}
+
+			@Override
+			public void close() {
+				closed = true;
+			}
+		};
 	}
 }
