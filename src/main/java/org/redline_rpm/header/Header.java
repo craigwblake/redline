@@ -79,7 +79,7 @@ public class Header extends AbstractHeader {
 		FILEMODES( 1030, INT16_ENTRY, "filemodes"),
 		FILERDEVS( 1033, INT16_ENTRY, "filerdevs"),
 		FILEMTIMES( 1034, INT32_ENTRY, "filemtimes"),
-		FILEMD5S( 1035, STRING_ARRAY_ENTRY, "filemd5s"),
+		FILEDIGESTS( 1035, STRING_ARRAY_ENTRY, "filedigests"),
 		FILELINKTOS( 1036, STRING_ARRAY_ENTRY, "filelinktos"),
 		FILEFLAGS( 1037, INT32_ENTRY, "fileflags"),
 		FILEUSERNAME( 1039, STRING_ARRAY_ENTRY, "fileusername"),
@@ -103,7 +103,15 @@ public class Header extends AbstractHeader {
 		PROVIDEFLAGS( 1112, INT32_ENTRY, "provideflags"),
 		PROVIDEVERSION( 1113, STRING_ARRAY_ENTRY, "provideversion"),
 		OBSOLETEFLAGS( 1114, INT32_ENTRY, "obsoleteflags"),
-		OBSOLETEVERSION( 1115, STRING_ARRAY_ENTRY, "obsoleteversion");
+		OBSOLETEVERSION( 1115, STRING_ARRAY_ENTRY, "obsoleteversion"),
+		DISTURL( 1123, STRING_ENTRY, "disturl"),
+		DISTTAG( 1155, STRING_ENTRY, "disttag"),
+
+		BUGURL( 5012, STRING_ENTRY, "bugurl"),
+		ENCODING( 5062, STRING_ENTRY, "encoding"),
+		PAYLOADDIGEST( 5092, STRING_ARRAY_ENTRY, "payloaddigest"),
+		PAYLOADDIGESTALGO( 5093, INT32_ENTRY, "payloaddigestalgo"),
+		PAYLOADDIGESTALT( 5097, STRING_ARRAY_ENTRY, "payloaddigestalt");
 
 		private int code;
 		private int type;
