@@ -92,10 +92,11 @@ public class Builder {
 	protected final Entry< byte[]> immutable = ( Entry< byte[]>) format.getHeader().addEntry( HEADERIMMUTABLE, 16);
 
 	protected Contents contents = new Contents();
-    protected File privateKeyRingFile;
-    protected String privateKeyId;
-    protected String privateKeyPassphrase;
-    protected PGPPrivateKey privateKey;
+  protected File privateKeyRingFile;
+  protected String privateKeyId;
+  protected String privateKeyPassphrase;
+  protected PGPPrivateKey privateKey;
+  protected int signatureSize = 287;
 
 	/**
 	 * Initializes the builder and sets some required fields to known values.
@@ -1223,6 +1224,15 @@ public class Builder {
     public void setPrivateKey( PGPPrivateKey privateKey ) {
         this.privateKey = privateKey;
     }
+    
+     /**
+     * Sets the signature size for generating keys with different RSA headers. 
+     * This should only be used if the exact size of the header is known. 
+     * @param signatureSize the signature size
+     */
+    public void setSignatureSize( int signatureSize ) {
+        this.signatureSize = signatureSize;
+    }
 
     /**
 	 * Generates an RPM with a standard name consisting of the RPM package name, version, release,
@@ -1429,9 +1439,9 @@ public class Builder {
 
     protected SignatureGenerator createSignatureGenerator() {
         if (privateKey != null) {
-           return new SignatureGenerator( privateKey );
+           return new SignatureGenerator( privateKey, signatureSize );
         }
-        return new SignatureGenerator( privateKeyRingFile, privateKeyId, privateKeyPassphrase);
+        return new SignatureGenerator( privateKeyRingFile, privateKeyId, privateKeyPassphrase, signatureSize );
     }
 
     protected byte[] getSignature( final int count) {

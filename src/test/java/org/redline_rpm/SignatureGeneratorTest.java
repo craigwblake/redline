@@ -10,13 +10,13 @@ public class SignatureGeneratorTest extends TestBase {
 
     @Test
     public void testReadingFirstKey() throws Exception {
-        SignatureGenerator generator = new SignatureGenerator( new File( getFileResource( "/pgp/secring.gpg" ) ), null, "redline" );
+        SignatureGenerator generator = new SignatureGenerator( new File( getFileResource( "/pgp/secring.gpg" ) ), null, "redline", 287 );
         assertTrue( generator.isEnabled() );
     }
 
     @Test
     public void testFindByKey() throws Exception {
-        SignatureGenerator generator = new SignatureGenerator( new File( getFileResource( "/pgp/secring.gpg" )), "5A186608", "redline" );
+        SignatureGenerator generator = new SignatureGenerator( new File( getFileResource( "/pgp/secring.gpg" )), "5A186608", "redline", 287 );
         assertTrue( generator.isEnabled() );
     }
 }
