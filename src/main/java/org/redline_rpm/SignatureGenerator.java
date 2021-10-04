@@ -1,5 +1,6 @@
 package org.redline_rpm;
 
+import org.bouncycastle.bcpg.PublicKeyAlgorithmTags;
 import org.bouncycastle.openpgp.PGPException;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.bouncycastle.openpgp.PGPSecretKey;
@@ -54,6 +55,10 @@ public class SignatureGenerator {
                 logger.warning("Private Key could not be extracted and therefore a signature will not be generated! "+e.getLocalizedMessage());
             }
             privateKey=key; 
+            if (getAlgorithm() != PublicKeyAlgorithmTags.RSA_GENERAL &&
+                    getAlgorithm() != PublicKeyAlgorithmTags.RSA_SIGN) {
+                throw new IllegalArgumentException("Only RSA keys are supported");
+            }
             this.enabled = key!=null?true:false;
         } else {
             privateKey = null;
