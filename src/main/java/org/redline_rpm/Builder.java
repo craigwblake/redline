@@ -102,9 +102,9 @@ public class Builder {
 	 */
 	public Builder() {
 		format.getHeader().createEntry( HEADERI18NTABLE, "C");
-        long sourceDateEpoch=0;
-        long buildTime = System.currentTimeMillis()/1000;
-        try {
+		long sourceDateEpoch=0;
+		long buildTime = System.currentTimeMillis()/1000;
+		try {
 			sourceDateEpoch = Long.parseLong(System.getenv("SOURCE_DATE_EPOCH"));
 		}catch(NumberFormatException e) {
 			// do nothing
