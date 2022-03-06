@@ -102,7 +102,17 @@ public class Builder {
 	 */
 	public Builder() {
 		format.getHeader().createEntry( HEADERI18NTABLE, "C");
-		format.getHeader().createEntry( BUILDTIME, ( int) ( System.currentTimeMillis() / 1000));
+		long sourceDateEpoch=0;
+		long buildTime = System.currentTimeMillis()/1000;
+		try {
+			sourceDateEpoch = Long.parseLong(System.getenv("SOURCE_DATE_EPOCH"));
+		}catch(NumberFormatException e) {
+			// do nothing
+		}
+		if(sourceDateEpoch!=0){
+			buildTime = sourceDateEpoch;
+		}
+		format.getHeader().createEntry( BUILDTIME, ( int)buildTime);
 		format.getHeader().createEntry( RPMVERSION, "4.4.2");
 		format.getHeader().createEntry( PAYLOADFORMAT, "cpio");
 		format.getHeader().createEntry( PAYLOADCOMPRESSOR, "gzip");

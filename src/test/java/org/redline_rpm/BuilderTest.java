@@ -1,7 +1,8 @@
 package org.redline_rpm;
 
+import org.junit.Rule;
 import org.junit.Test;
-import org.redline_rpm.Scanner;
+import org.junit.contrib.java.lang.system.EnvironmentVariables;
 import org.redline_rpm.header.Format;
 import org.redline_rpm.header.Header.HeaderTag;
 import org.redline_rpm.header.Header;
@@ -23,6 +24,9 @@ import static org.redline_rpm.header.RpmType.BINARY;
 
 public class BuilderTest extends TestBase {
 
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables();
+    
     @Test
     public void testLongNameTruncation() throws Exception {
         Builder builder = new Builder();
@@ -202,6 +206,27 @@ public class BuilderTest extends TestBase {
         assertArrayEquals(new String[] { "testProvideOverride"}, Arrays.copyOfRange(provide, 0, provide.length));
         assertArrayEquals(new    int[] { EQUAL                }, Arrays.copyOfRange(provideflags, 0, provide.length));
         assertArrayEquals(new String[] { "1.0"                }, Arrays.copyOfRange(provideversion, 0, provide.length));
+
+    }
+
+    /**
+     * Allows the Build Date of the RPM to be overridden by the environment variable SOURCE_DATE_EPOCH
+     * See https://reproducible-builds.org/docs/source-date-epoch/
+     * @throws Exception
+     */
+    @Test
+    public void testReproducibleBuilds() throws Exception {
+        final String EXPECTED_BUILD_TIME="1644516016";
+        environmentVariables.set("SOURCE_DATE_EPOCH", EXPECTED_BUILD_TIME);
+
+        Builder builder = new Builder();
+        builder.setPackage("testReproducibleBuilds", "1.0", "1");
+        builder.build( new File( getTargetDir()));
+
+        Format format = new Scanner().run(channelWrapper("target" + File.separator + "testReproducibleBuilds-1.0-1.noarch.rpm"));
+        System.out.println(EXPECTED_BUILD_TIME+" hhhhhh ==" + format.getHeader().getEntry(HeaderTag.BUILDTIME).toString());
+    
+        assertEquals("buildtime[tag=1006,type=4,count=1,size=4,offset=36]\n\t"+EXPECTED_BUILD_TIME+", ", format.getHeader().getEntry(HeaderTag.BUILDTIME).toString());
 
     }
 
