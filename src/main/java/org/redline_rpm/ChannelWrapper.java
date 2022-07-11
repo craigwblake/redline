@@ -17,7 +17,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.Signature;
 
-import static org.bouncycastle.bcpg.HashAlgorithmTags.SHA1;
+import static org.bouncycastle.bcpg.HashAlgorithmTags.SHA256;
 import static org.bouncycastle.openpgp.PGPSignature.BINARY_DOCUMENT;
 
 /**
@@ -123,7 +123,7 @@ public abstract class ChannelWrapper {
      * @return reference to the new key added to the consumers
      */
     public Key<byte[]> start( final PGPPrivateKey key, int algorithm ) {
-        BcPGPContentSignerBuilder contentSignerBuilder = new BcPGPContentSignerBuilder( algorithm, SHA1 );
+        BcPGPContentSignerBuilder contentSignerBuilder = new BcPGPContentSignerBuilder( algorithm, SHA256 );
         final PGPSignatureGenerator signatureGenerator = new PGPSignatureGenerator( contentSignerBuilder );
         try {
             signatureGenerator.init( BINARY_DOCUMENT, key );
