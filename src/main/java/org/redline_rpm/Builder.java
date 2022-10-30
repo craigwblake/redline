@@ -29,10 +29,7 @@ import java.security.PrivateKey;
 import org.bouncycastle.openpgp.PGPPrivateKey;
 import org.redline_rpm.changelog.ChangelogHandler;
 import org.redline_rpm.changelog.ChangelogParseException;
-import org.redline_rpm.header.Architecture;
-import org.redline_rpm.header.Format;
-import org.redline_rpm.header.Os;
-import org.redline_rpm.header.RpmType;
+import org.redline_rpm.header.*;
 import org.redline_rpm.payload.Contents;
 import org.redline_rpm.payload.CpioHeader;
 import org.redline_rpm.payload.Directive;
@@ -96,7 +93,7 @@ public class Builder {
     protected String privateKeyId;
     protected String privateKeyPassphrase;
     protected PGPPrivateKey privateKey;
-
+	protected FileDigestsAlg fileDigestsAlg = FileDigestsAlg.SHA256;
 	/**
 	 * Initializes the builder and sets some required fields to known values.
 	 */
@@ -1213,6 +1210,10 @@ public class Builder {
         this.privateKeyPassphrase = privateKeyPassphrase;
     }
 
+	public void setFileDigestAlg(FileDigestsAlg alg){
+		this.fileDigestsAlg = alg;
+	}
+
     /**
      * Sets the private key for header and payload signing directly. Alternatively, you can set
      * {@link #setPrivateKeyRingFile(java.io.File) key ring file}, {@link #setPrivateKeyId(String) key id}
@@ -1300,8 +1301,8 @@ public class Builder {
 		}
 
 		if (0 < contents.size()) {
-			String[] checksums = contents.getFileChecksums();
-			format.getHeader().createEntry(FILEDIGESTALGO, 8);
+			String[] checksums = contents.getFileChecksums(fileDigestsAlg);
+			format.getHeader().createEntry(FILEDIGESTALGO, fileDigestsAlg.getCode());
 			format.getHeader().createEntry(PAYLOADDIGESTALGO, 8);
 			format.getHeader().createEntry(FILEDIGESTS, checksums);
 			format.getHeader().createEntry(FILESIZES, contents.getSizes());

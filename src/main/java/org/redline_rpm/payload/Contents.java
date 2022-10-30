@@ -3,6 +3,7 @@ package org.redline_rpm.payload;
 import org.redline_rpm.ChannelWrapper.Key;
 import org.redline_rpm.ReadableChannelWrapper;
 import org.redline_rpm.Util;
+import org.redline_rpm.header.FileDigestsAlg;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -603,12 +604,13 @@ public class Contents {
 	}
 
 	/**
-	 * Caclulates an MD5 hash for each file in the archive.
-	 * @return the MD5 hashes
+	 * Caclulates a hash for each file in the archive.
+	 * @param alg hash algorithm
+	 * @return the hashes
 	 * @throws NoSuchAlgorithmException if the algorithm isn't supported
 	 * @throws IOException there was an IO error
 	 */
-	public String[] getFileChecksums() throws NoSuchAlgorithmException, IOException {
+	public String[] getFileChecksums(FileDigestsAlg alg) throws NoSuchAlgorithmException, IOException {
 		/**
 		 * This could be more efficiently handled during the output phase using a filtering channel,
 		 * but would require placeholder values in the archive and some state. This is left for a
@@ -623,14 +625,14 @@ public class Contents {
 			if ( object instanceof File) {
 				FileInputStream fileInput = new FileInputStream(( File) object);
 				final ReadableChannelWrapper input = new ReadableChannelWrapper( fileInput.getChannel());
-				final Key< byte[]> key = input.start( "SHA-256");
+				final Key< byte[]> key = input.start( alg.getAlgName());
 				while ( input.read( buffer) != -1) buffer.rewind();
 				value = Util.hex(input.finish(key));
 				input.close();
 				fileInput.close();
 			} else if ( object instanceof URL) {
 				final ReadableChannelWrapper input = new ReadableChannelWrapper( Channels.newChannel((( URL) object).openConnection().getInputStream()));
-				final Key< byte[]> key = input.start( "SHA-256");
+				final Key< byte[]> key = input.start( alg.getAlgName());
 				while ( input.read( buffer) != -1) buffer.rewind();
 				value = Util.hex(input.finish(key));
 				input.close();
